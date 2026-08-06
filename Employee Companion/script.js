@@ -843,6 +843,9 @@ document.addEventListener('DOMContentLoaded', () => {
         timerInterval = setInterval(() => {
             timerSeconds++;
             updateDisplay();
+            if (timerSeconds > 0 && timerSeconds % 1800 === 0) { // Every 30 minutes
+                window.playDutyChime();
+            }
         }, 1000);
     };
 
@@ -872,12 +875,20 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const edinH = String(edinTime.getHours()).padStart(2, '0');
         const edinM = String(edinTime.getMinutes()).padStart(2, '0');
+        const edinS = String(edinTime.getSeconds()).padStart(2, '0');
+        
         const istH = String(istTime.getHours()).padStart(2, '0');
         const istM = String(istTime.getMinutes()).padStart(2, '0');
+        const istS = String(istTime.getSeconds()).padStart(2, '0');
         
         const liveTimeEl = document.getElementById('bc-live-time');
         if (liveTimeEl) {
             liveTimeEl.textContent = `${edinH}:${edinM} (Edinburgh) | ${istH}:${istM} (IST)`;
+        }
+        
+        const bigClockEl = document.getElementById('big-live-clock');
+        if (bigClockEl) {
+            bigClockEl.textContent = `${edinH}:${edinM}:${edinS} (Edinburgh) | ${istH}:${istM}:${istS} (IST)`;
         }
         
         const liveDateEl = document.getElementById('lr-live-date');
