@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /snapshots/{snapshotId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['data', 'createdAt', 'expireAt']);
+    }
+    match /app_state/{document} {
+      allow read, write: if true;
+    }
+    match /discord_logs/{document} {
+      allow read, write: if true;
+    }
+    match /flagged_logs/{document} {
+      allow read, write: if true;
+    }
+  }
+}

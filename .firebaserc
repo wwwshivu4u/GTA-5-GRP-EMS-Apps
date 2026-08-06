@@ -1,0 +1,21 @@
+{
+  "projects": {
+    "default": "ems-hub-gtav-grp"
+  },
+  "targets": {
+    "ems-hub-gtav-grp": {
+      "hosting": {
+        "companion": [
+          "ems-companion-gtav-grp"
+        ],
+        "shift": [
+          "ems-shift-gtav-grp"
+        ],
+        "hrms": [
+          "ems-hrms-gtav-grp"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

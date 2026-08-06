@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMS Shift Guide</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- Background Blur Overlay -->
+        <div class="bg-blur"></div>
+
+        <!-- TOP STATUS BAR -->
+        <div class="top-bar">
+            <div class="progress-container">
+                <!-- Duty Timer -->
+                <div class="timer-row">
+                    <span>SHIFT DURATION</span>
+                    <span id="shift-timer">00:00:00</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="shift-progress-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN APP CONTENT -->
+        <div class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">⚡ EMS Shift Guide</div>
+                
+                <div class="dashboard-grid">
+                    
+                    <!-- START MY DAY PANEL -->
+                    <div class="glass-section panel-start-day">
+                        <div class="section-title start-title">
+                            <span>🟢</span> Start My Day Checklist
+                        </div>
+                        <div class="wizard-container">
+                        <div class="wizard-steps" id="start-day-wizard">
+                            
+                            <div class="wizard-step" data-step="1">
+                                <div style="display: flex; gap: 8px;">
+                                    <div class="step-num"><span>1</span></div>
+                                    <div class="step-body">
+                                        <div class="step-title">Shift Location</div>
+                                        <div class="input-group">
+                                            <select id="guide-location-select">
+                                                <option value="PH front">PH Front</option>
+                                                <option value="PH back">PH Back</option>
+                                                <option value="Sandy Shores">Sandy Shores</option>
+                                                <option value="Paleto Bay">Paleto Bay</option>
+                                                <option value="Lobby">Lobby</option>
+                                            </select>
+                                        </div>
+                                        <div class="step-action-row">
+                                            <button class="btn btn-success step-next-btn" id="step1-next-btn" style="width: 100%;">Confirm & Next</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="wizard-step locked" data-step="2">
+                                <div style="display: flex; gap: 8px;">
+                                    <div class="step-num"><span>2</span></div>
+                                    <div class="step-body">
+                                        <div class="step-title">Equipment & Dress Code</div>
+                                        <div class="input-group ems-only" id="ems-subdept-container">
+                                            <label>Select EMS Sub-Department</label>
+                                            <select id="ems-subdept-select">
+                                                <option value="HS">HS - Hospital Staff</option>
+                                                <option value="GS">GS - Ground Services</option>
+                                                <option value="LT">LT - Lab Tech</option>
+                                                <option value="ARO">ARO - Air Rescue Operations</option>
+                                                <option value="FTO">FTO - Field Training Officer</option>
+                                            </select>
+                                        </div>
+                                        <p class="step-desc" id="start-dress-desc">Change to your Duty uniform. Log your vest inside Discord.</p>
+                                        <div class="step-action-row">
+                                            <button class="btn btn-secondary step-prev-btn" id="start-btn-prev-2" style="width: 50%;">Previous</button>
+                                            <button class="btn btn-success step-next-btn" id="start-btn-2" style="width: 50%;">Uniform Pinned & Next</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="wizard-step locked" data-step="3">
+                                <div style="display: flex; gap: 8px;">
+                                    <div class="step-num"><span>3</span></div>
+                                    <div class="step-body">
+                                        <div class="step-title">Activate Bodycam</div>
+                                        <div class="copy-steps-stack">
+                                            <div class="copy-block">
+                                                <div class="copy-header"><span>Step 1 (Activation)</span><button class="btn copy-btn" data-target="start-bc-1">📋</button></div>
+                                                <div class="copy-content" id="start-bc-1" contenteditable="true">/me Takes out Bodycam and attaches Bodycam to chest and checks its ballistic, water proof</div>
+                                            </div>
+                                            <div class="copy-block">
+                                                <div class="copy-header"><span>Step 2 (Verification)</span><button class="btn copy-btn" data-target="start-bc-2">📋</button></div>
+                                                <div class="copy-content" id="start-bc-2" contenteditable="true">/me Makes sure it is recording and checks for the red light</div>
+                                            </div>
+                                            <div class="copy-block">
+                                                <div class="copy-header"><span>Step 3 (Status)</span><button class="btn copy-btn" data-target="start-bc-3">📋</button></div>
+                                                <div class="copy-content" id="start-bc-3" contenteditable="true">/do It is recording, and its ballistic, water proof</div>
+                                            </div>
+                                        </div>
+                                        <div class="step-action-row">
+                                            <button class="btn btn-secondary step-prev-btn" id="start-btn-prev-3" style="width: 50%;">Previous</button>
+                                            <button class="btn btn-success step-next-btn" id="start-btn-3" style="width: 50%;">Next</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="wizard-step locked" data-step="4">
+                                <div style="display: flex; gap: 8px;">
+                                    <div class="step-num"><span>4</span></div>
+                                    <div class="step-body">
+                                        <div class="step-title">Vehicle Deployment</div>
+                                        <p class="step-desc" id="start-vehicle-desc">Rent your vehicle. If lobby duty, skip.</p>
+                                        <div class="input-group" id="start-plate-input-group" style="display: none;">
+                                            <input type="text" id="start-vehicle-plate" placeholder="e.g. 001">
+                                        </div>
+                                        <div class="step-action-row">
+                                            <button class="btn btn-secondary step-prev-btn" id="start-btn-prev-4" style="width: 50%;">Previous</button>
+                                            <button class="btn btn-success step-next-btn" id="start-btn-4" style="width: 50%;">Vehicle Ready & Next</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="wizard-step locked" data-step="5">
+                                <div style="display: flex; gap: 8px;">
+                                    <div class="step-num"><span>5</span></div>
+                                    <div class="step-body">
+                                        <div class="step-title">Radio Code On-Duty</div>
+                                        <div class="copy-block">
+                                            <div class="copy-header">
+                                                <span>Radio Log</span>
+                                                <div class="copy-header-options">
+                                                    <label><input type="checkbox" id="start-radio-open-discord" checked> Open Discord</label>
+                                                    <button class="btn copy-btn" data-target="start-radio-msg" data-discord-key="replacementlogs">📋</button>
+                                                </div>
+                                            </div>
+                                            <div class="copy-content" id="start-radio-msg" contenteditable="true">10-5 {LOC}</div>
+                                        </div>
+                                        <div class="step-action-row">
+                                            <button class="btn btn-secondary step-prev-btn" id="start-btn-prev-5" style="width: 40%;">Previous</button>
+                                            <button class="btn btn-primary" id="start-btn-5" onclick="clockInUser()" style="width: 60%;">⚡ Clock In</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        </div>
+                    </div>
+
+                    <!-- END MY DAY PANEL -->
+                    <div class="glass-section panel-end-day">
+                        <div class="section-title end-title">
+                            <span>🔴</span> End My Day Checklist
+                        </div>
+                        <div class="wizard-container">
+                        <div class="wizard-steps" id="end-day-wizard">
+
+                            <div class="wizard-step locked" data-step="1">
+                                <div style="display: flex; gap: 8px;">
+                                    <div class="step-num"><span>1</span></div>
+                                    <div class="step-body">
+                                        <div class="step-title">Lobby Replacement</div>
+                                        <div class="copy-block">
+                                            <div class="copy-header">
+                                                <span>10 min replacement req</span>
+                                                <div class="copy-header-options">
+                                                    <label><input type="checkbox" id="end-rep-open-discord-1" checked> Open Discord</label>
+                                                    <button class="btn copy-btn" data-target="end-rep-msg-1" data-discord-key="replacementlogs">📋</button>
+                                                </div>
+                                            </div>
+                                            <div class="copy-content" id="end-rep-msg-1" contenteditable="true">10-7 {LOC} need replacement in 10 minute</div>
+                                        </div>
+                                        <div class="step-action-row">
+                                            <button class="btn btn-success step-next-btn" id="end-btn-1" style="width: 100%;">Replacement Addressed</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="wizard-step locked" data-step="2">
+                                <div style="display: flex; gap: 8px;">
+                                    <div class="step-num"><span>2</span></div>
+                                    <div class="step-body">
+                                        <div class="step-title">Radio Code Off-Duty</div>
+                                        <div class="copy-block">
+                                            <div class="copy-header">
+                                                <span>Radio Log</span>
+                                                <div class="copy-header-options">
+                                                    <label><input type="checkbox" id="end-radio-open-discord" checked> Open Discord</label>
+                                                    <button class="btn copy-btn" data-target="end-radio-msg" data-discord-key="replacementlogs">📋</button>
+                                                </div>
+                                            </div>
+                                            <div class="copy-content" id="end-radio-msg" contenteditable="true">10-7 {LOC} replaced by {REP}</div>
+                                        </div>
+                                        <div class="step-action-row">
+                                            <button class="btn btn-secondary step-prev-btn" id="end-btn-prev-2" style="width: 50%;">Previous</button>
+                                            <button class="btn btn-success step-next-btn" id="end-btn-2" style="width: 50%;">Radio Broadcasted</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="wizard-step locked" data-step="3">
+                                <div style="display: flex; gap: 8px;">
+                                    <div class="step-num"><span>3</span></div>
+                                    <div class="step-body">
+                                        <div class="step-title">Deactivate Bodycam</div>
+                                        <div class="copy-steps-stack">
+                                            <div class="copy-block">
+                                                <div class="copy-header"><span>Step 1 (Deactivation)</span><button class="btn copy-btn" data-target="end-bc-1">📋</button></div>
+                                                <div class="copy-content" id="end-bc-1" contenteditable="true">/me Switches off the bodycam and checks for the Green Light</div>
+                                            </div>
+                                            <div class="copy-block">
+                                                <div class="copy-header"><span>Step 2 (Local Storage)</span><button class="btn copy-btn" data-target="end-bc-2">📋</button></div>
+                                                <div class="copy-content" id="end-bc-2" contenteditable="true">/do Bodycam footage has been saved to SD Card</div>
+                                            </div>
+                                            <div class="copy-block">
+                                                <div class="copy-header"><span>Step 3 (Cloud Upload)</span><button class="btn copy-btn" data-target="end-bc-3">📋</button></div>
+                                                <div class="copy-content" id="end-bc-3" contenteditable="true">/me Uploads the bodycam footage to the EMS Cloud Server</div>
+                                            </div>
+                                        </div>
+                                        <div class="step-action-row">
+                                            <button class="btn btn-secondary step-prev-btn" id="end-btn-prev-3" style="width: 50%;">Previous</button>
+                                            <button class="btn btn-success step-next-btn" id="end-btn-3" style="width: 50%;">Next</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="wizard-step locked" data-step="4">
+                                <div style="display: flex; gap: 8px;">
+                                    <div class="step-num"><span>4</span></div>
+                                    <div class="step-body">
+                                        <div class="step-title">Discord Logs</div>
+                                        <div class="copy-block">
+                                            <div class="copy-header">
+                                                <span>#BODYCAM-LOGS text</span>
+                                                <div class="copy-header-options">
+                                                    <label><input type="checkbox" id="end-bodycam-open-discord" checked> Open Discord</label>
+                                                    <button class="btn copy-btn" data-target="end-bodycam-log-msg" data-discord-key="bodycam">📋</button>
+                                                </div>
+                                            </div>
+                                            <div class="copy-content" id="end-bodycam-log-msg" contenteditable="true">Off duty &#10;Time: {TIME_EDIN} (Edinburgh)</div>
+                                        </div>
+                                        <div class="step-action-row">
+                                            <button class="btn btn-secondary step-prev-btn" id="end-btn-prev-4" style="width: 40%;">Previous</button>
+                                            <button class="btn btn-primary" id="end-btn-4" onclick="clockOutUser()" style="width: 60%;">🛑 Clock Out</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>
