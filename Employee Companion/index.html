@@ -10,6 +10,48 @@
 </head>
 
 <body>
+    <!-- AI Splash Screen -->
+    <div id="ai-splash-screen">
+        <div class="splash-overlay"></div>
+        <div class="splash-grid"></div>
+        
+        <!-- HUD Setup Outlines -->
+        <div class="hud-outline top-left"></div>
+        <div class="hud-outline top-right"></div>
+        <div class="hud-outline bottom-left"></div>
+        <div class="hud-outline bottom-right"></div>
+        
+        <!-- Building Blocks -->
+        <div class="blocks-container">
+            <div class="block b1"></div><div class="block b2"></div><div class="block b3"></div>
+            <div class="block b4"></div><div class="block b5"></div><div class="block b6"></div>
+            <div class="block b7"></div><div class="block b8"></div><div class="block b9"></div>
+        </div>
+
+        <div class="splash-content glitch-wrapper">
+            <div class="ai-core-container glitch">
+                <div class="core-ring ring-1"></div>
+                <div class="core-ring ring-2"></div>
+                <div class="core-ring ring-3"></div>
+                <div class="core-center"></div>
+            </div>
+            
+            <div class="splash-status-container glitch">
+                <div class="status-header glitch-text" data-text="SYSTEM BOOT SEQUENCE">SYSTEM BOOT SEQUENCE</div>
+                <div class="status-text" id="splash-status-text">INITIALIZING CORE PROTOCOLS...</div>
+                <div class="status-progress-bar">
+                    <div class="status-progress-fill" id="splash-progress-fill"></div>
+                </div>
+                <div class="status-logs" id="splash-logs">
+                    <div class="log-glitch">> MEMORY MODULES: [ OK ]</div>
+                    <div class="log-delayed-1 log-glitch">> NETWORK UPLINK: [ ESTABLISHING ]</div>
+                    <div class="log-delayed-2 log-glitch">> EMS DATABASE: [ CONNECTING ]</div>
+                    <div class="log-delayed-3 log-glitch">> HUD CALIBRATION: [ IN PROGRESS ]</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="app-container">
 
     <!-- Background Blur Overlay -->

@@ -778,3 +778,347 @@ input::-webkit-calendar-picker-indicator {
 #modal-discord-bodycam .btn-delete {
     display: none !important;
 }
+
+/* -----------------------------------------------------
+   AI SPLASH SCREEN
+   ----------------------------------------------------- */
+#ai-splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #050a0f;
+    z-index: 99999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #0ff;
+    font-family: monospace;
+    overflow: hidden;
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+
+#ai-splash-screen.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.splash-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, transparent 0%, #000 90%);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.splash-grid {
+    position: absolute;
+    inset: 0;
+    background-image: 
+        linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
+    z-index: 1;
+    perspective: 500px;
+    transform: rotateX(60deg) scale(2);
+    transform-origin: center calc(100% + 50vh);
+    animation: gridMove 5s linear infinite;
+    opacity: 0.3;
+}
+
+@keyframes gridMove {
+    0% { transform: rotateX(60deg) scale(2) translateY(0); }
+    100% { transform: rotateX(60deg) scale(2) translateY(30px); }
+}
+
+.splash-content {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+    width: 100%;
+    max-width: 600px;
+}
+
+/* AI Core (Iron Man style) */
+.ai-core-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.core-center {
+    width: 50px;
+    height: 50px;
+    background-color: #dffff5;
+    border-radius: 50%;
+    box-shadow: 0 0 20px #0ff, 0 0 40px #0ff, inset 0 0 10px #fff;
+    animation: corePulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes corePulse {
+    0% { box-shadow: 0 0 10px #0ff, 0 0 20px #0ff, inset 0 0 10px #fff; transform: scale(0.95); }
+    100% { box-shadow: 0 0 30px #0ff, 0 0 60px #0ff, inset 0 0 20px #fff; transform: scale(1.05); }
+}
+
+.core-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: rgba(0, 255, 255, 0.8);
+    border-bottom-color: rgba(0, 255, 255, 0.8);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+}
+
+.ring-1 {
+    width: 100%;
+    height: 100%;
+    animation: spin 3s linear infinite;
+    border-width: 3px;
+}
+
+.ring-2 {
+    width: 75%;
+    height: 75%;
+    animation: spin-reverse 2s linear infinite;
+    border-left-color: rgba(0, 255, 255, 0.5);
+    border-right-color: rgba(0, 255, 255, 0.5);
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+}
+
+.ring-3 {
+    width: 120%;
+    height: 120%;
+    animation: spin 7s linear infinite;
+    border: 1px dashed rgba(0, 255, 255, 0.4);
+}
+
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes spin-reverse {
+    100% { transform: rotate(-360deg); }
+}
+
+/* Status Text & Logs */
+.splash-status-container {
+    width: 100%;
+    padding: 2rem;
+    background: rgba(0, 20, 30, 0.6);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.1), inset 0 0 15px rgba(0, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.splash-status-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #0ff, transparent);
+    animation: scanLine 2s linear infinite;
+}
+
+@keyframes scanLine {
+    0% { transform: translateY(-10px); }
+    100% { transform: translateY(200px); }
+}
+
+.status-header {
+    font-size: 1.2rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 1rem;
+    color: #fff;
+    text-shadow: 0 0 5px #0ff;
+    text-align: center;
+}
+
+.status-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    animation: glitchText 0.5s steps(2, end) infinite alternate;
+}
+
+.status-progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(0, 255, 255, 0.1);
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.status-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #0ff;
+    box-shadow: 0 0 10px #0ff;
+    transition: width 0.3s ease;
+}
+
+.status-logs {
+    font-size: 0.8rem;
+    color: rgba(0, 255, 255, 0.7);
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.log-delayed-1, .log-delayed-2 {
+    opacity: 0;
+    animation: fadeInLog 0.1s forwards;
+}
+
+.log-delayed-1 { animation-delay: 1.5s; }
+.log-delayed-2 { animation-delay: 2.8s; }
+.log-delayed-3 { animation-delay: 3.8s; }
+
+@keyframes fadeInLog {
+    to { opacity: 1; }
+}
+
+/* -----------------------------------------------------
+   HUD OUTLINES
+   ----------------------------------------------------- */
+.hud-outline {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border: 3px solid transparent;
+    z-index: 2;
+    opacity: 0;
+    animation: hudFadeIn 0.5s 0.2s forwards, hudGlitch 3s infinite;
+}
+.hud-outline.top-left { top: 30px; left: 30px; border-top-color: #0ff; border-left-color: #0ff; }
+.hud-outline.top-right { top: 30px; right: 30px; border-top-color: #0ff; border-right-color: #0ff; }
+.hud-outline.bottom-left { bottom: 30px; left: 30px; border-bottom-color: #0ff; border-left-color: #0ff; }
+.hud-outline.bottom-right { bottom: 30px; right: 30px; border-bottom-color: #0ff; border-right-color: #0ff; }
+
+@keyframes hudFadeIn { to { opacity: 0.7; } }
+@keyframes hudGlitch {
+    0% { transform: translate(0); }
+    1% { transform: translate(-2px, 2px); }
+    2% { transform: translate(2px, -2px); }
+    3% { transform: translate(0); }
+    100% { transform: translate(0); }
+}
+
+/* -----------------------------------------------------
+   BUILDING BLOCKS
+   ----------------------------------------------------- */
+.blocks-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px;
+    height: 800px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 10px;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.15;
+}
+
+.block {
+    background: #0ff;
+    opacity: 0;
+    animation: blockBuild 4s forwards;
+}
+
+.b1 { animation-delay: 0.2s; }
+.b2 { animation-delay: 0.8s; }
+.b3 { animation-delay: 1.4s; }
+.b4 { animation-delay: 0.5s; }
+.b5 { animation-delay: 0.1s; } /* Center block builds first */
+.b6 { animation-delay: 1.1s; }
+.b7 { animation-delay: 1.7s; }
+.b8 { animation-delay: 1.0s; }
+.b9 { animation-delay: 2.0s; }
+
+@keyframes blockBuild {
+    0% { opacity: 0; transform: scale(0.8) translate3d(0, 50px, 0); }
+    10% { opacity: 0.5; transform: scale(1.05) translate3d(0, -10px, 0); }
+    20% { opacity: 0.2; transform: scale(1) translate3d(0, 0, 0); }
+    100% { opacity: 0.05; transform: scale(1); }
+}
+
+/* -----------------------------------------------------
+   GLITCH EFFECTS
+   ----------------------------------------------------- */
+.glitch-wrapper {
+    animation: wrapperGlitch 4s infinite;
+}
+
+@keyframes wrapperGlitch {
+    0% { transform: translate(0) skew(0deg); filter: hue-rotate(0deg); }
+    1% { transform: translate(-5px, 2px) skew(2deg); filter: hue-rotate(90deg); }
+    2% { transform: translate(5px, -2px) skew(-2deg); filter: hue-rotate(0deg); }
+    3% { transform: translate(0) skew(0deg); }
+    100% { transform: translate(0); }
+}
+
+.glitch-text {
+    position: relative;
+    display: inline-block;
+}
+
+.glitch-text::before, .glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 20, 30, 0.8);
+}
+
+.glitch-text::before {
+    left: 2px;
+    text-shadow: -1px 0 red;
+    clip: rect(24px, 550px, 90px, 0);
+    animation: glitch-anim 2s infinite linear alternate-reverse;
+}
+
+.glitch-text::after {
+    left: -2px;
+    text-shadow: -1px 0 blue;
+    clip: rect(85px, 550px, 140px, 0);
+    animation: glitch-anim 2.5s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+    0% { clip: rect(10px, 9999px, 31px, 0); transform: skew(0.2deg); }
+    20% { clip: rect(66px, 9999px, 15px, 0); transform: skew(0.5deg); }
+    40% { clip: rect(35px, 9999px, 78px, 0); transform: skew(0.1deg); }
+    60% { clip: rect(89px, 9999px, 42px, 0); transform: skew(0.8deg); }
+    80% { clip: rect(21px, 9999px, 90px, 0); transform: skew(0.3deg); }
+    100% { clip: rect(54px, 9999px, 11px, 0); transform: skew(0.6deg); }
+}
+
+.log-glitch {
+    animation: fadeInLog 0.1s forwards, textGlitch 3s infinite;
+}
+
+@keyframes textGlitch {
+    0%, 95%, 100% { opacity: 1; transform: translateX(0); }
+    96% { opacity: 0.8; transform: translateX(-2px); }
+    97% { opacity: 0.9; transform: translateX(2px); }
+    98% { opacity: 0.7; transform: translateX(-1px); }
+}

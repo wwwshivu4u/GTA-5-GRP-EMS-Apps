@@ -1,5 +1,50 @@
 document.addEventListener('DOMContentLoaded', () => {
     // -----------------------------------------------------
+    // SPLASH SCREEN LOGIC
+    // -----------------------------------------------------
+    const splashScreen = document.getElementById('ai-splash-screen');
+    if (splashScreen) {
+        const statusText = document.getElementById('splash-status-text');
+        const progressFill = document.getElementById('splash-progress-fill');
+        const splashLogs = document.getElementById('splash-logs');
+
+        // Sequence timings
+        setTimeout(() => {
+            if (statusText) statusText.innerText = "LOADING MEMORY MODULES...";
+            if (progressFill) progressFill.style.width = "30%";
+        }, 1000);
+
+        setTimeout(() => {
+            if (statusText) statusText.innerText = "ESTABLISHING NETWORK UPLINK...";
+            if (progressFill) progressFill.style.width = "60%";
+        }, 2500);
+
+        setTimeout(() => {
+            if (statusText) statusText.innerText = "INTEGRATING CORE COMPONENTS...";
+            if (progressFill) progressFill.style.width = "90%";
+            if (splashLogs) {
+                const newLog = document.createElement('div');
+                newLog.className = 'log-glitch';
+                newLog.innerText = "> AI PROTOCOLS: [ ENGAGED ]";
+                splashLogs.appendChild(newLog);
+            }
+        }, 3500);
+
+        setTimeout(() => {
+            if (statusText) statusText.innerText = "SYSTEM READY";
+            if (progressFill) progressFill.style.width = "100%";
+        }, 4500);
+
+        // Remove splash screen after 5 seconds
+        setTimeout(() => {
+            splashScreen.classList.add('fade-out');
+            setTimeout(() => {
+                splashScreen.remove();
+            }, 500); // Wait for transition to complete
+        }, 5000);
+    }
+
+    // -----------------------------------------------------
     // MODAL LOGIC
     // -----------------------------------------------------
     const overlay = document.getElementById('modalOverlay');
