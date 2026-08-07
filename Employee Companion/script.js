@@ -744,13 +744,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const now = new Date();
             const edinTime = new Date(now.toLocaleString("en-US", {timeZone: "Europe/London"}));
-            const istTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
             
             const edinH = String(edinTime.getHours()).padStart(2, '0');
             const edinM = String(edinTime.getMinutes()).padStart(2, '0');
-            
-            // const istH = String(istTime.getHours()).padStart(2, '0');
-            // const istM = String(istTime.getMinutes()).padStart(2, '0');
             
             text = `${status} : ${edinH}:${edinM}`;
         }
@@ -871,24 +867,24 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(() => {
         const now = new Date();
         const edinTime = new Date(now.toLocaleString("en-US", {timeZone: "Europe/London"}));
-        const istTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+        const userTime = new Date(); // Local user time
         
         const edinH = String(edinTime.getHours()).padStart(2, '0');
         const edinM = String(edinTime.getMinutes()).padStart(2, '0');
         const edinS = String(edinTime.getSeconds()).padStart(2, '0');
         
-        const istH = String(istTime.getHours()).padStart(2, '0');
-        const istM = String(istTime.getMinutes()).padStart(2, '0');
-        const istS = String(istTime.getSeconds()).padStart(2, '0');
+        const userH = String(userTime.getHours()).padStart(2, '0');
+        const userM = String(userTime.getMinutes()).padStart(2, '0');
+        const userS = String(userTime.getSeconds()).padStart(2, '0');
         
         const liveTimeEl = document.getElementById('bc-live-time');
         if (liveTimeEl) {
-            liveTimeEl.textContent = `${edinH}:${edinM} (Edinburgh) | ${istH}:${istM} (IST)`;
+            liveTimeEl.textContent = `${edinH}:${edinM} (Edinburgh) | ${userH}:${userM} (Local)`;
         }
         
         const bigClockEl = document.getElementById('big-live-clock');
         if (bigClockEl) {
-            bigClockEl.textContent = `${edinH}:${edinM}:${edinS} (Edinburgh) | ${istH}:${istM}:${istS} (IST)`;
+            bigClockEl.textContent = `${edinH}:${edinM}:${edinS} (Edinburgh) | ${userH}:${userM}:${userS} (Local)`;
         }
         
         const liveDateEl = document.getElementById('lr-live-date');
@@ -897,11 +893,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const edinM = String(edinTime.getMonth() + 1).padStart(2, '0');
             const edinY = edinTime.getFullYear();
             
-            const istD = String(istTime.getDate()).padStart(2, '0');
-            const istMo = String(istTime.getMonth() + 1).padStart(2, '0');
-            const istY = istTime.getFullYear();
+            const userD = String(userTime.getDate()).padStart(2, '0');
+            const userMo = String(userTime.getMonth() + 1).padStart(2, '0');
+            const userY = userTime.getFullYear();
             
-            liveDateEl.textContent = `${edinD}/${edinM}/${edinY} (Edinburgh) | ${istD}/${istMo}/${istY} (IST)`;
+            liveDateEl.textContent = `${edinD}/${edinM}/${edinY} (Edinburgh) | ${userD}/${userMo}/${userY} (Local)`;
         }
     }, 1000);
 

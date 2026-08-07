@@ -17,8 +17,8 @@
     "od1": true,
     "od2": true,
     "od3": true,
-    "ref1": false,
-    "ref2": false,
+    "ref1": true,
+    "ref2": true,
     "sav1": false,
     "sav2": false,
     "off1": false,
@@ -42,7 +42,7 @@
     "sw3_4": false,
     "sw3_5": false
   },
-  "dutyStartTime": 1785938509291,
+  "dutyStartTime": 1786056654878,
   "rotaCap": 0,
   "rotaDel": 0,
   "customCommands": {
@@ -74,7 +74,7 @@
     "cmd-bank-4": "...",
     "cmd-subs-1": "EMS To ALL: Doctors are loading adrenaline and preparing for the SUBS! See you there!",
     "cmd-subs-2": "EMS To ALL: Doctors have arrived at the situation. Come to the EMS vehicle for adrenaline shots!!",
-    "cmd-subs-3": "EMS To ALL: Good luck at the SUBS! Stay safe and watch your backs.",
+    "cmd-subs-3": "EMS To ALL: Good luck at the SUBS! Stay safe and watch your backs!",
     "cmd-subs-4": "...",
     "cmd-emergency-1": "EMS To ALL: Requesting everyone to drop a 911 call for a store robbery. Thank You!!!",
     "cmd-emergency-2": "EMS To ALL: Requesting everyone to drop a 911 call for a gun store robbery. Thank You!!!",
@@ -94,7 +94,9 @@
     "cmd-meet-14": "EMS To FIB: Can we have a quick meeting at your HQ?",
     "hs-bc-off": "/me Switches off the bodycam and checks for the Green Light\n\n/do Bodycam footage has been saved to SD Card | {NAME} ({ID})\n\n/me Uploads the bodycam footage to the EMS Cloud Server",
     "hs-bc-sav": "/me Saves bodycam, uploads it to the EMS Cloud Server\n\n/do It is recording, and its ballistic, water proof | {NAME} ({ID})",
-    "hs-bc-ref": "/me Refreshes the bodycam\n\n/do It is recording, and its ballistic, water proof | {NAME} ({ID})"
+    "hs-bc-ref": "/me Refreshes the bodycam\n\n/do It is recording, and its ballistic, water proof | {NAME} ({ID})",
+    "ref1": "/me Refreshes the bodycam",
+    "ref2": "/do It is recording, and its ballistic, water proof "
   },
   "userAddedCommands": [
     {
@@ -208,12 +210,12 @@
     "cmd-bgc-11": "EMS To NG: 10-4 much appreciated",
     "cmd-subs-1": "EMS To ALL: Doctors are loading adrenaline and preparing for the SUBS! See you there!",
     "cmd-subs-2": "EMS To ALL: Doctors have arrived at the situation. Come to the EMS vehicle for adrenaline shots!!",
-    "cmd-subs-3": "EMS To ALL: Good luck at the SUBS! Stay safe and watch your backs.",
+    "cmd-subs-3": "EMS To ALL: Good luck at the SUBS! Stay safe and watch your backs!",
     "cmd-subs-4": "...",
-    "hs-bc-on": "/me Takes out Bodycam and attaches Bodycam to chest and checks its ballistic, water proof\n/me Makes sure it is recording and checks for the red light\n/do It is recording, and its ballistic, water proof | {NAME} ({ID})",
-    "hs-bc-ref": "/me Refreshes the bodycam\n/do It is recording, and its ballistic, water proof | {NAME} ({ID})",
-    "hs-bc-sav": "/me Saves bodycam, uploads it to the EMS Cloud Server\n/do It is recording, and its ballistic, water proof | {NAME} ({ID})",
-    "hs-bc-off": "/me Switches off the bodycam and checks for the Green Light\n/do Bodycam footage has been saved to SD Card | {NAME} ({ID})\n/me Uploads the bodycam footage to the EMS Cloud Server",
+    "hs-bc-on": "/me Takes out Bodycam and attaches Bodycam to chest and checks its ballistic, water proof\n\n/me Makes sure it is recording and checks for the red light\n\n/do It is recording, and its ballistic, water proof | {NAME} ({ID})",
+    "hs-bc-ref": "/me Refreshes the bodycam\n\n/do It is recording, and its ballistic, water proof | {NAME} ({ID})",
+    "hs-bc-sav": "/me Saves bodycam, uploads it to the EMS Cloud Server\n\n/do It is recording, and its ballistic, water proof | {NAME} ({ID})",
+    "hs-bc-off": "/me Switches off the bodycam and checks for the Green Light\n\n/do Bodycam footage has been saved to SD Card | {NAME} ({ID})\n\n/me Uploads the bodycam footage to the EMS Cloud Server",
     "hs-rc-108": "10-8 where am I needed?",
     "hs-rc-105": "10-5 {LOC} replacing {REP}",
     "hs-rc-107a": "10-7 {LOC} need replacement in 10 minute",
@@ -226,7 +228,13 @@
   },
   "deletedCommands": [],
   "customTitles": {
-    "hs-bc-on": "On Duty"
+    "hs-bc-on": "On Duty",
+    "cmd-acc-2": "Command at 21:25",
+    "cmd-acc-1": "Command at 20:55\n",
+    "od1": "Step 1",
+    "cmd-subs-1": "Command at 23:30\n",
+    "cmd-subs-2": "Command at 23:55\n",
+    "cmd-subs-3": "Command at 00:00\n"
   },
   "lastProfileVerifyDate": null,
   "selectedSubDept": "HS",
