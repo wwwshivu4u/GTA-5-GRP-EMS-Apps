@@ -96,7 +96,10 @@
     "hs-bc-sav": "/me Saves bodycam, uploads it to the EMS Cloud Server\n\n/do It is recording, and its ballistic, water proof | {NAME} ({ID})",
     "hs-bc-ref": "/me Refreshes the bodycam\n\n/do It is recording, and its ballistic, water proof | {NAME} ({ID})",
     "ref1": "/me Refreshes the bodycam",
-    "ref2": "/do It is recording, and its ballistic, water proof "
+    "ref2": "/do It is recording, and its ballistic, water proof ",
+    "cmd-bgc-1": "EMS To ALL: How Copy?",
+    "cmd-bgc-3": "EMS To FIB: Can i have a bgc on (Name of person) Thanks in advance!",
+    "cmd-bgc-8": "EMS To FIB: 10-4 much appreciated"
   },
   "userAddedCommands": [
     {
@@ -234,7 +237,9 @@
     "od1": "Step 1",
     "cmd-subs-1": "Command at 23:30\n",
     "cmd-subs-2": "Command at 23:55\n",
-    "cmd-subs-3": "Command at 00:00\n"
+    "cmd-subs-3": "Command at 00:00\n",
+    "cmd-acc-3": "Command at 21:30",
+    "cmd-acc-4": "Command"
   },
   "lastProfileVerifyDate": null,
   "selectedSubDept": "HS",
