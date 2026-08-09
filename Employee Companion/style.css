@@ -1228,7 +1228,7 @@ input::-webkit-calendar-picker-indicator {
     right: 0px;
     width: 80px;
     height: 50px;
-    border-radius: 50px 0 0 50px;
+    border-radius: 20px 0 0 20px;
     background: #ffffff;
     color: var(--bg-dark);
     font-size: 1.5rem;
@@ -1239,11 +1239,12 @@ input::-webkit-calendar-picker-indicator {
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(0, 255, 255, 0.4);
     z-index: 99;
+    transform: translateX(10px);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .tutorial-fab:hover {
-    transform: scale(1.1);
+    transform: translateX(0);
     box-shadow: 0 6px 20px rgba(0, 255, 255, 0.6);
 }
 
