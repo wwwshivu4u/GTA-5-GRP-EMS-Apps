@@ -4,44 +4,59 @@ document.addEventListener('DOMContentLoaded', () => {
     // -----------------------------------------------------
     const splashScreen = document.getElementById('ai-splash-screen');
     if (splashScreen) {
-        const statusText = document.getElementById('splash-status-text');
-        const progressFill = document.getElementById('splash-progress-fill');
-        const splashLogs = document.getElementById('splash-logs');
-
-        // Sequence timings
-        setTimeout(() => {
-            if (statusText) statusText.innerText = "LOADING MEMORY MODULES...";
-            if (progressFill) progressFill.style.width = "30%";
-        }, 1000);
-
-        setTimeout(() => {
-            if (statusText) statusText.innerText = "ESTABLISHING NETWORK UPLINK...";
-            if (progressFill) progressFill.style.width = "60%";
-        }, 2500);
-
-        setTimeout(() => {
-            if (statusText) statusText.innerText = "INTEGRATING CORE COMPONENTS...";
-            if (progressFill) progressFill.style.width = "90%";
-            if (splashLogs) {
-                const newLog = document.createElement('div');
-                newLog.className = 'log-glitch';
-                newLog.innerText = "> AI PROTOCOLS: [ ENGAGED ]";
-                splashLogs.appendChild(newLog);
+        let showBootScreen = true;
+        try {
+            const saved = localStorage.getItem('emsSettings');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (typeof parsed.showBootScreen !== 'undefined') {
+                    showBootScreen = parsed.showBootScreen;
+                }
             }
-        }, 3500);
+        } catch (e) {}
 
-        setTimeout(() => {
-            if (statusText) statusText.innerText = "SYSTEM READY";
-            if (progressFill) progressFill.style.width = "100%";
-        }, 4500);
+        if (!showBootScreen) {
+            splashScreen.remove();
+        } else {
+            const statusText = document.getElementById('splash-status-text');
+            const progressFill = document.getElementById('splash-progress-fill');
+            const splashLogs = document.getElementById('splash-logs');
 
-        // Remove splash screen after 5 seconds
-        setTimeout(() => {
-            splashScreen.classList.add('fade-out');
+            // Sequence timings
             setTimeout(() => {
-                splashScreen.remove();
-            }, 500); // Wait for transition to complete
-        }, 5000);
+                if (statusText) statusText.innerText = "LOADING MEMORY MODULES...";
+                if (progressFill) progressFill.style.width = "30%";
+            }, 1000);
+
+            setTimeout(() => {
+                if (statusText) statusText.innerText = "ESTABLISHING NETWORK UPLINK...";
+                if (progressFill) progressFill.style.width = "60%";
+            }, 2500);
+
+            setTimeout(() => {
+                if (statusText) statusText.innerText = "INTEGRATING CORE COMPONENTS...";
+                if (progressFill) progressFill.style.width = "90%";
+                if (splashLogs) {
+                    const newLog = document.createElement('div');
+                    newLog.className = 'log-glitch';
+                    newLog.innerText = "> AI PROTOCOLS: [ ENGAGED ]";
+                    splashLogs.appendChild(newLog);
+                }
+            }, 3500);
+
+            setTimeout(() => {
+                if (statusText) statusText.innerText = "SYSTEM READY";
+                if (progressFill) progressFill.style.width = "100%";
+            }, 4500);
+
+            // Remove splash screen after 5 seconds
+            setTimeout(() => {
+                splashScreen.classList.add('fade-out');
+                setTimeout(() => {
+                    splashScreen.remove();
+                }, 500); // Wait for transition to complete
+            }, 5000);
+        }
     }
 
     // -----------------------------------------------------
@@ -161,7 +176,8 @@ document.addEventListener('DOMContentLoaded', () => {
             nightPH: 25000, nightSH: 40000, nightCalls: 20000,
             dayPH: 10000, daySH: 30000, dayCalls: 15000,
             labCaptcha: 5000, labMedicine: 10000
-        }
+        },
+        showBootScreen: true
     };
 
     function saveState() {
@@ -178,6 +194,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 state = { ...state, ...parsed };
                 state.discordChannels = mergedDiscordChannels;
                 
+                if (typeof state.showBootScreen === 'undefined') state.showBootScreen = true;
+
                 if (!state.dutySteps) state.dutySteps = {};
                 ['od1','od2','od3','ref1','ref2','sav1','sav2','off1','off2','off3', 'sw1_1','sw1_2','sw1_3','sw1_4','sw1_5','sw2_1','sw2_2','sw2_3','sw2_4','sw2_5', 'sw3_1','sw3_2','sw3_3','sw3_4','sw3_5'].forEach(step => {
                     if (typeof state.dutySteps[step] === 'undefined') state.dutySteps[step] = false;
@@ -273,7 +291,17 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePreviews();
         checkDutyState();
         if (state.dutyStartTime) {
-            window.startDutyTimer(true);
+            const defaultView = document.getElementById('tb-default-view');
+            const setupView = document.getElementById('tb-setup-view');
+            const compactView = document.getElementById('tb-compact-view');
+            
+            if (defaultView) defaultView.classList.add('hidden');
+            if (setupView) setupView.classList.add('hidden');
+            if (compactView) compactView.classList.remove('hidden');
+            
+            if (typeof startRotaTimer === 'function') {
+                startRotaTimer();
+            }
         }
 
     }
@@ -328,6 +356,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const key = input.getAttribute('data-key');
             state.discordChannels[key] = input.value.trim();
         });
+        
+        const bootScreenToggle = document.getElementById('settingShowBootScreen');
+        if (bootScreenToggle) {
+            state.showBootScreen = bootScreenToggle.checked;
+        }
+
         saveState();
         alert('Settings Saved!');
         closeModals();
@@ -342,6 +376,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const key = input.getAttribute('data-key');
             input.value = state.discordChannels[key] || '';
         });
+        
+        const bootScreenToggle = document.getElementById('settingShowBootScreen');
+        if (bootScreenToggle) {
+            bootScreenToggle.checked = state.showBootScreen !== false; // default true
+            // Instant save for better UX with modern switch
+            bootScreenToggle.onchange = (e) => {
+                state.showBootScreen = e.target.checked;
+                saveState();
+            };
+        }
     }
 
     // -----------------------------------------------------
@@ -1498,3 +1542,121 @@ window.filterDeptCommands = () => {
         }
     });
 };
+
+// --- TUTORIAL LOGIC ---
+let currentTutorialStep = 0;
+const tutorialSteps = [
+    {
+        targetSelector: ".nav-item[onclick*='modal-bodycam']",
+        text: "Step 1: Start your shift by doing your On Duty Bodycam logs. Click this button to open the Bodycam menu.",
+        action: () => { closeModals(); closeSubModal(); }
+    },
+    {
+        targetSelector: "#btn-tab-onduty",
+        text: "Use these copy blocks to fill out your On Duty bodycam logs.",
+        action: () => { openModal('modal-bodycam'); document.getElementById('btn-tab-onduty').click(); }
+    },
+    {
+        targetSelector: "#tb-setup-view",
+        text: "Step 2: Shift Start. Select your location and click the ▶ (Play) button to start tracking your duty time.",
+        action: () => { closeModals(); }
+    },
+    {
+        targetSelector: "#tb-compact-view",
+        text: "Step 3: Shift End. When you are done with your shift, click the ⏹ (Stop) button here.",
+        action: () => { 
+            document.getElementById('tb-default-view').classList.add('hidden');
+            document.getElementById('tb-setup-view').classList.add('hidden');
+            document.getElementById('tb-compact-view').classList.remove('hidden');
+        }
+    },
+    {
+        targetSelector: "#lr-bonus-display",
+        text: "Step 4: Bonus! You can track your captchas and deliveries in the Labtech Rota to calculate your bonus.",
+        action: () => { 
+            // Reset top bar
+            document.getElementById('tb-compact-view').classList.add('hidden');
+            if (activeShiftStartTime) {
+                document.getElementById('tb-compact-view').classList.remove('hidden');
+            } else {
+                document.getElementById('tb-setup-view').classList.remove('hidden');
+            }
+            openModal('modal-discord'); 
+            openSubModal('sub-rota'); 
+        }
+    },
+    {
+        targetSelector: "#btn-tab-offduty",
+        text: "Step 5: Going Off Duty. Before closing the app, go back to Bodycam logs, click 'Off Duty', and log off.",
+        action: () => { closeSubModal(); openModal('modal-bodycam'); document.getElementById('btn-tab-offduty').click(); }
+    }
+];
+
+function startTutorial() {
+    currentTutorialStep = 0;
+    document.getElementById('tutorial-overlay').classList.remove('hidden');
+    renderTutorialStep();
+}
+
+function endTutorial() {
+    document.getElementById('tutorial-overlay').classList.add('hidden');
+    closeModals();
+    closeSubModal();
+    
+    // Full reset to off duty state
+    if (window.stopDutyTimer) {
+        window.stopDutyTimer();
+    }
+    state.rotaCap = 0;
+    state.rotaDel = 0;
+    saveState();
+    
+    // Reload to ensure a completely clean UI
+    location.reload();
+}
+
+function nextTutorialStep() {
+    currentTutorialStep++;
+    if (currentTutorialStep >= tutorialSteps.length) {
+        endTutorial();
+    } else {
+        renderTutorialStep();
+    }
+}
+
+function renderTutorialStep() {
+    const step = tutorialSteps[currentTutorialStep];
+    
+    if (step.action) step.action();
+
+    setTimeout(() => {
+        const target = document.querySelector(step.targetSelector);
+        if (target) {
+            const highlightBox = document.getElementById('tutorial-highlight-box');
+            const rect = target.getBoundingClientRect();
+            
+            // Set highlight box to target's position and size
+            highlightBox.style.top = rect.top + 'px';
+            highlightBox.style.left = rect.left + 'px';
+            highlightBox.style.width = rect.width + 'px';
+            highlightBox.style.height = rect.height + 'px';
+            
+            const box = document.getElementById('tutorial-box');
+            
+            let top = rect.bottom + 15;
+            let left = rect.left + (rect.width / 2) - 175;
+            
+            if (top + 150 > window.innerHeight) {
+                top = rect.top - 150;
+            }
+            if (left < 10) left = 10;
+            if (left + 350 > window.innerWidth) left = window.innerWidth - 360;
+
+            box.style.top = top + 'px';
+            box.style.left = left + 'px';
+            
+            document.getElementById('tutorial-text').innerText = step.text;
+            document.getElementById('tutorial-next').innerText = (currentTutorialStep === tutorialSteps.length - 1) ? "Finish" : "Next >";
+        }
+    }, 300);
+}

@@ -1218,3 +1218,141 @@ input::-webkit-calendar-picker-indicator {
     stroke-dashoffset: 1000;
     transition: stroke-dashoffset 1s linear;
 }
+
+/* -----------------------------------------------------
+   TUTORIAL OVERLAY & FAB
+   ----------------------------------------------------- */
+.tutorial-fab {
+    position: fixed;
+    top: 160px;
+    right: 0px;
+    width: 80px;
+    height: 50px;
+    border-radius: 50px 0 0 50px;
+    background: #ffffff;
+    color: var(--bg-dark);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.4);
+    z-index: 99;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.tutorial-fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 255, 255, 0.6);
+}
+
+.tutorial-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent; /* Background is handled by box-shadow */
+    z-index: 1000;
+    pointer-events: auto;
+    transition: opacity 0.3s ease;
+    overflow: hidden; /* Prevent scrolling from massive box-shadow */
+}
+
+.tutorial-highlight-box {
+    position: absolute;
+    border-radius: 8px;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.8), 0 0 15px var(--primary);
+    pointer-events: none; /* Let clicks pass through if needed, though overlay catches them */
+    transition: all 0.3s ease;
+    z-index: 1001;
+    border: 2px solid var(--primary);
+}
+
+.tutorial-box {
+    background: rgba(10, 15, 20, 0.95);
+    border: 1px solid var(--primary);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    max-width: 350px;
+    text-align: center;
+    position: absolute; /* Dynamic positioning based on target */
+    z-index: 1002;
+    transition: all 0.3s ease;
+}
+
+.tutorial-text {
+    color: var(--text-main);
+    font-size: 1rem;
+    line-height: 1.4;
+    margin-bottom: 1.5rem;
+}
+
+.tutorial-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+/* -----------------------------------------------------
+   MODERN TOGGLE SWITCH
+   ----------------------------------------------------- */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: .4s;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background-color: var(--text-muted);
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: var(--primary);
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px var(--primary);
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+    background-color: var(--bg-dark);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 24px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}

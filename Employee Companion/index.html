@@ -110,8 +110,8 @@
         </div>
 
         <!-- TOP RIGHT CLOCK -->
-        <div id="big-live-clock" style="font-size: 1.4rem;color: var(--text-main);font-family: monospace;font-weight: bold;text-align: right;text-shadow: 0 0 10px rgba(255,255,255,0.3);z-index: 1000;display: flex;flex-direction: column;gap: 2px;max-width: 12ch;">
-            <span>--:--:-- (Edinburgh)</span>
+        <div id="big-live-clock" style="font-size: 1.4rem;color: var(--text-main);font-family: monospace;font-weight: bold;text-align: right;text-shadow: 0 0 10px rgba(255,255,255,0.3);z-index: 1000;display: flex;flex-direction: column;gap: 2px;max-width: 14ch;">
+            <span>--:--:-- (IC)</span>
             <span style="font-size: 0.7rem; color: var(--text-muted);">--:--:-- (IST)</span>
         </div>
     </div>
@@ -136,6 +136,15 @@
                     <div class="input-group">
                         <label>ID</label>
                         <input type="text" id="myId" placeholder="e.g. 62692">
+                    </div>
+                </div>
+                <div class="input-group" style="margin-top: 1rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="color: var(--text-main); font-size: 0.9rem;">Show Boot Sequence on Startup</span>
+                        <label class="switch">
+                            <input type="checkbox" id="settingShowBootScreen">
+                            <span class="slider round"></span>
+                        </label>
                     </div>
                 </div>
             </div>
@@ -1788,6 +1797,21 @@
             <button class="btn btn-success" style="width: 100%; padding: 0.8rem; margin-top: 1rem;" onclick="saveNewCommandFromForm()">Save Command</button>
         </div>
     </div>
+
+    <!-- TUTORIAL OVERLAY -->
+    <div id="tutorial-overlay" class="tutorial-overlay hidden">
+        <div id="tutorial-highlight-box" class="tutorial-highlight-box"></div>
+        <div id="tutorial-box" class="tutorial-box">
+            <div id="tutorial-text" class="tutorial-text">Welcome to the tutorial!</div>
+            <div class="tutorial-actions">
+                <button id="tutorial-skip" class="btn btn-secondary btn-sm" onclick="endTutorial()">Skip</button>
+                <button id="tutorial-next" class="btn btn-primary btn-sm" onclick="nextTutorialStep()">Next ></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TUTORIAL FAB -->
+    <button class="tutorial-fab" onclick="startTutorial()" title="Help & Tutorial">❓</button>
 
     <script src="script.js"></script>
     </div>
