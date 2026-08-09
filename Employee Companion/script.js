@@ -145,7 +145,12 @@ document.addEventListener('DOMContentLoaded', () => {
         deletedCommands: [],
         customTitles: {},
         lastProfileVerifyDate: null,
-        selectedSubDept: 'HS'
+        selectedSubDept: 'HS',
+        shiftRates: {
+            nightPH: 25000, nightSH: 40000, nightCalls: 20000,
+            dayPH: 10000, daySH: 30000, dayCalls: 15000,
+            labCaptcha: 5000, labMedicine: 10000
+        }
     };
 
     function saveState() {
@@ -167,6 +172,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (typeof state.dutySteps[step] === 'undefined') state.dutySteps[step] = false;
                 });
                 if (!state.customCommands) state.customCommands = {};
+                if (!state.shiftRates) state.shiftRates = {
+                    nightPH: 25000, nightSH: 40000, nightCalls: 20000,
+                    dayPH: 10000, daySH: 30000, dayCalls: 15000,
+                    labCaptcha: 5000, labMedicine: 10000
+                };
             } catch(e) { console.error('Failed to parse settings'); }
         }
         
@@ -262,6 +272,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const lrDel = document.getElementById('lr-del');
         if (lrCap) state.rotaCap = parseInt(lrCap.value) || 0;
         if (lrDel) state.rotaDel = parseInt(lrDel.value) || 0;
+        
+        // Update live bonus display
+        const bonusDisplay = document.getElementById('lr-bonus-display');
+        if (bonusDisplay) {
+            const capRate = state.shiftRates.labCaptcha || 0;
+            const delRate = state.shiftRates.labMedicine || 0;
+            const totalBonus = (state.rotaCap * capRate) + (state.rotaDel * delRate);
+            bonusDisplay.textContent = `Bonus Earned: $${totalBonus.toLocaleString()}`;
+        }
+        
         saveState();
     };
 
@@ -361,7 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // -----------------------------------------------------
     const nameInput = document.getElementById('myName');
     const idInput = document.getElementById('myId');
-    const locSelect = document.getElementById('locSelect');
+    const rotaLocSelect = document.getElementById('rota-location');
     const locInputCustom = document.getElementById('locInputCustom');
     const repInput = document.getElementById('repInput');
 
@@ -376,10 +396,31 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePreviews();
     });
 
-    if(locSelect) {
-        locSelect.addEventListener('change', () => {
-            if (locSelect.value === 'Other...') locInputCustom.style.display = 'block';
-            else locInputCustom.style.display = 'none';
+    const rateInputs = {
+        rateNightPH: 'nightPH', rateNightSH: 'nightSH', rateNightCalls: 'nightCalls',
+        rateDayPH: 'dayPH', rateDaySH: 'daySH', rateDayCalls: 'dayCalls',
+        rateLabCaptcha: 'labCaptcha', rateLabMedicine: 'labMedicine'
+    };
+    for (const [id, key] of Object.entries(rateInputs)) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', () => {
+                state.shiftRates[key] = parseInt(el.value) || 0;
+                saveState();
+            });
+        }
+    }
+
+    if(rotaLocSelect) {
+        rotaLocSelect.addEventListener('change', () => {
+            if (rotaLocSelect.value === 'Other...') {
+                locInputCustom.style.display = 'block';
+            } else {
+                locInputCustom.style.display = 'none';
+            }
+            if (rotaLocSelect.value === 'Labs') {
+                openModal('sub-rota');
+            }
             updatePreviews();
         });
     }
@@ -449,11 +490,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const name = state.name || '[Name]';
             const id = state.id || '[ID]';
-            const locSelect = document.getElementById('locSelect');
+            const rotaLocSelect = document.getElementById('rota-location');
             const locInputCustom = document.getElementById('locInputCustom');
             const repInput = document.getElementById('repInput');
             
-            let loc = locSelect ? locSelect.value : '';
+            let loc = rotaLocSelect ? rotaLocSelect.value : '';
             if (loc === 'Other...') loc = locInputCustom ? locInputCustom.value : '';
             if (!loc) loc = '[Location]';
             let rep = repInput ? repInput.value : '';
@@ -495,11 +536,23 @@ document.addEventListener('DOMContentLoaded', () => {
         nameInput.value = state.name || '';
         idInput.value = state.id || '';
 
+        const rateInputs = {
+            rateNightPH: 'nightPH', rateNightSH: 'nightSH', rateNightCalls: 'nightCalls',
+            rateDayPH: 'dayPH', rateDaySH: 'daySH', rateDayCalls: 'dayCalls',
+            rateLabCaptcha: 'labCaptcha', rateLabMedicine: 'labMedicine'
+        };
+        for (const [id, key] of Object.entries(rateInputs)) {
+            const el = document.getElementById(id);
+            if (el && state.shiftRates) {
+                el.value = state.shiftRates[key] || '';
+            }
+        }
+
         const name = state.name || '[Name]';
         const id = state.id || '[ID]';
         
-        let loc = locSelect ? locSelect.value : '';
-        if (loc === 'Other...') loc = locInputCustom.value;
+        let loc = rotaLocSelect ? rotaLocSelect.value : '';
+        if (loc === 'Other...') loc = locInputCustom ? locInputCustom.value : '';
         if (!loc) loc = '[Location]';
 
         let rep = repInput ? repInput.value : '';
@@ -647,7 +700,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let newTemplate = textToCopy;
             const name = state.name || '[Name]';
             const id = state.id || '[ID]';
-            let loc = locSelect ? locSelect.value : '';
+            let loc = rotaLocSelect ? rotaLocSelect.value : '';
             if (loc === 'Other...') loc = locInputCustom ? locInputCustom.value : '';
             if (!loc) loc = '[Location]';
             let rep = repInput ? repInput.value : '';
@@ -827,6 +880,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const skipRedirect = cb ? !cb.checked : false;
 
         executeDiscordAction(type, false, text, skipRedirect);
+
+        // Check if bodycam on duty to show rota assist
+        if (type === 'bodycam') {
+            const status = document.getElementById('bc-status') ? document.getElementById('bc-status').value : '';
+            if (status.includes('On duty')) {
+                closeModals();
+                if (window.startDutyTimer) window.startDutyTimer();
+            } else if (status.includes('Off duty')) {
+                closeModals();
+                if (window.stopDutyTimer) window.stopDutyTimer();
+            }
+        }
     };
 
     // -----------------------------------------------------
@@ -835,76 +900,35 @@ document.addEventListener('DOMContentLoaded', () => {
     let timerInterval = null;
     let timerSeconds = 0;
     
-    window.startDutyTimer = (resume = false) => {
-        const display = document.getElementById('main-timer');
-        if(!display) return;
+    window.startDutyTimer = () => {
+        const defaultView = document.getElementById('tb-default-view');
+        const setupView = document.getElementById('tb-setup-view');
+        const compactView = document.getElementById('tb-compact-view');
+        const confirmView = document.getElementById('tb-confirm-view');
         
-        if (timerInterval) clearInterval(timerInterval);
+        if (defaultView) defaultView.classList.add('hidden');
+        if (compactView) compactView.classList.add('hidden');
+        if (confirmView) confirmView.classList.add('hidden');
+        if (setupView) setupView.classList.remove('hidden');
         
-        if (!resume) {
-            state.dutyStartTime = Date.now();
-            saveState();
-            timerSeconds = 0;
-        } else {
-            if (state.dutyStartTime) {
-                timerSeconds = Math.floor((Date.now() - state.dutyStartTime) / 1000);
-            } else {
-                timerSeconds = 0;
-            }
-        }
-        
-        const updateDisplay = () => {
-            const h = Math.floor(timerSeconds / 3600);
-            const m = Math.floor((timerSeconds % 3600) / 60);
-            const s = timerSeconds % 60;
-            const mm = String(m).padStart(2, '0');
-            const ss = String(s).padStart(2, '0');
-            
-            const hourText = h === 1 ? "1 hour" : `${h} hours`;
-            display.textContent = `Total: ${hourText} + 00:${mm}:${ss}`;
-            
-            const fill = document.getElementById('timer-fill');
-            if (fill) {
-                const goal = 3600; // 1 hour
-                let percent = (timerSeconds / goal) * 100;
-                if (percent > 100) percent = 100;
-                fill.style.width = `${percent}%`;
-                
-                if (percent >= 100) {
-                    fill.style.background = 'var(--primary)';
-                    display.style.color = 'var(--primary)';
-                } else {
-                    fill.style.background = 'var(--secondary)';
-                    display.style.color = 'var(--secondary)';
-                }
-            }
-        };
-        
-        updateDisplay();
-        timerInterval = setInterval(() => {
-            timerSeconds++;
-            updateDisplay();
-            if (timerSeconds > 0 && timerSeconds % 1800 === 0) { // Every 30 minutes
-                window.playDutyChime();
-            }
-        }, 1000);
+        const startBtn = document.getElementById('btn-rota-start');
+        if (startBtn) startBtn.disabled = false;
     };
 
     window.stopDutyTimer = () => {
-        if (timerInterval) clearInterval(timerInterval);
+        if (window.rotaTimerInterval) clearInterval(window.rotaTimerInterval);
         state.dutyStartTime = null;
         saveState();
         
-        const display = document.getElementById('main-timer');
-        if (display) {
-            display.textContent = 'Total: 0 hour + 00:00:00';
-            display.style.color = 'var(--secondary)';
-        }
-        const fill = document.getElementById('timer-fill');
-        if (fill) {
-            fill.style.width = '0%';
-            fill.style.background = 'var(--secondary)';
-        }
+        const defaultView = document.getElementById('tb-default-view');
+        const setupView = document.getElementById('tb-setup-view');
+        const compactView = document.getElementById('tb-compact-view');
+        const confirmView = document.getElementById('tb-confirm-view');
+        
+        if (setupView) setupView.classList.add('hidden');
+        if (compactView) compactView.classList.add('hidden');
+        if (confirmView) confirmView.classList.add('hidden');
+        if (defaultView) defaultView.classList.remove('hidden');
     };
     // -----------------------------------------------------
     // LIVE CLOCK (BODYCAM LOGS)
@@ -929,7 +953,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const bigClockEl = document.getElementById('big-live-clock');
         if (bigClockEl) {
-            bigClockEl.textContent = `${edinH}:${edinM}:${edinS} (Edinburgh) | ${userH}:${userM}:${userS} (Local)`;
+            bigClockEl.innerHTML = `<span>${edinH}:${edinM}:${edinS} (Edinburgh)</span><span style="font-size: 0.85rem; color: var(--text-muted);">${userH}:${userM}:${userS} (Local)</span>`;
         }
         
         const liveDateEl = document.getElementById('lr-live-date');
@@ -1110,7 +1134,237 @@ document.addEventListener('DOMContentLoaded', () => {
         closeAddCommandModal();
     };
 
+    // -----------------------------------------------------
+    // ROTA ASSIST LOGIC
+    // -----------------------------------------------------
+    window.rotaTimerInterval = null;
+    
+    window.startRotaShift = () => {
+        const setupView = document.getElementById('tb-setup-view');
+        const compactView = document.getElementById('tb-compact-view');
+        const loc = document.getElementById('rota-location').value;
+        
+        state.dutyStartTime = Date.now();
+        state.rotaLocation = loc;
+        saveState();
+        
+        if (setupView) setupView.classList.add('hidden');
+        if (compactView) compactView.classList.remove('hidden');
+        
+        startRotaTimer();
+    };
+
+    function startRotaTimer() {
+        const display = document.getElementById('compact-main-timer');
+        const outlineRect = document.getElementById('progress-outline-rect');
+        if (!display) return;
+        
+        if (window.rotaTimerInterval) clearInterval(window.rotaTimerInterval);
+        
+        const updateRotaDisplay = () => {
+            if (!state.dutyStartTime) return;
+            const timerSeconds = Math.floor((Date.now() - state.dutyStartTime) / 1000);
+            
+            const h = Math.floor(timerSeconds / 3600);
+            const m = Math.floor((timerSeconds % 3600) / 60);
+            const s = timerSeconds % 60;
+            const mm = String(m).padStart(2, '0');
+            const ss = String(s).padStart(2, '0');
+            
+            display.textContent = `${h} hr ${mm}:${ss}`;
+            
+            if (outlineRect) {
+                // Outline progress 0 to 1 hour (3600s)
+                const currentHourSeconds = timerSeconds % 3600;
+                let percent = (currentHourSeconds / 3600);
+                if (percent > 1) percent = 1;
+                // Dash array is 1000, offset goes from 1000 to 0
+                const offset = 1000 - (1000 * percent);
+                outlineRect.style.strokeDashoffset = offset;
+            }
+        };
+        
+        updateRotaDisplay();
+        window.rotaTimerInterval = setInterval(() => {
+            if (!state.dutyStartTime) {
+                clearInterval(window.rotaTimerInterval);
+                return;
+            }
+            const timerSeconds = Math.floor((Date.now() - state.dutyStartTime) / 1000);
+            updateRotaDisplay();
+            
+            // Hourly Notification
+            if (timerSeconds > 0 && timerSeconds % 3600 === 0) {
+                if (state.rotaLocation !== 'Labs') {
+                    const hoursCompleted = timerSeconds / 3600;
+                    notifyRotaHourlyBonus(hoursCompleted);
+                }
+            }
+        }, 1000);
+    }
+    
+    function notifyRotaHourlyBonus(hoursCompleted) {
+        window.playDutyChime();
+        
+        const startTime = new Date(state.dutyStartTime).toLocaleString("en-US", {timeZone: "Europe/London"});
+        const startHour = new Date(startTime).getHours();
+        const loc = state.rotaLocation || "PH Front";
+        
+        let rate = 0;
+        const rates = state.shiftRates;
+        
+        if (startHour >= 0 && startHour < 6) { // Night Shift
+            if (loc.includes('PH')) rate = rates.nightPH;
+            else if (loc.includes('SH')) rate = rates.nightSH;
+            else if (loc.includes('Calls')) rate = rates.nightCalls;
+        } else { // Day Shift
+            if (loc.includes('PH')) rate = rates.dayPH;
+            else if (loc.includes('SH')) rate = rates.daySH;
+            else if (loc.includes('Calls')) rate = rates.dayCalls;
+        }
+        
+        const bonus = rate * hoursCompleted;
+        const msg = `Completed ${hoursCompleted} hr(s) on ${loc}! Earned so far: $${bonus.toLocaleString()}`;
+        
+        const toast = document.createElement('div');
+        toast.style.position = 'fixed';
+        toast.style.top = '100px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.background = 'rgba(0, 255, 255, 0.9)';
+        toast.style.color = '#000';
+        toast.style.padding = '1rem 2rem';
+        toast.style.borderRadius = '8px';
+        toast.style.fontWeight = 'bold';
+        toast.style.zIndex = '9999';
+        toast.style.boxShadow = '0 0 20px rgba(0, 255, 255, 0.5)';
+        toast.innerText = msg;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => { toast.remove(); }, 5000);
+    }
+
+    window.showConfirmRotaEnd = () => {
+        const compactView = document.getElementById('tb-compact-view');
+        const confirmView = document.getElementById('tb-confirm-view');
+        if (compactView) compactView.classList.add('hidden');
+        if (confirmView) confirmView.classList.remove('hidden');
+    };
+
+    window.cancelConfirmRotaEnd = () => {
+        const compactView = document.getElementById('tb-compact-view');
+        const confirmView = document.getElementById('tb-confirm-view');
+        if (confirmView) confirmView.classList.add('hidden');
+        if (compactView) compactView.classList.remove('hidden');
+    };
+
+    window.confirmRotaEnd = () => {
+        if (window.rotaTimerInterval) clearInterval(window.rotaTimerInterval);
+        
+        if (state.rotaLocation === 'Labs') {
+            state.dutyStartTime = null;
+            saveState();
+            
+            const defaultView = document.getElementById('tb-default-view');
+            const setupView = document.getElementById('tb-setup-view');
+            const confirmView = document.getElementById('tb-confirm-view');
+            
+            if (confirmView) confirmView.classList.add('hidden');
+            if (setupView) setupView.classList.remove('hidden');
+            
+            openModal('sub-rota');
+            return;
+        }
+        
+        const now = new Date();
+        const offTime = new Date(now.toLocaleString("en-US", {timeZone: "Europe/London"}));
+        const offH = String(offTime.getHours()).padStart(2, '0');
+        const offM = String(offTime.getMinutes()).padStart(2, '0');
+        
+        const onTime = new Date(new Date(state.dutyStartTime).toLocaleString("en-US", {timeZone: "Europe/London"}));
+        const onH = String(onTime.getHours()).padStart(2, '0');
+        const onM = String(onTime.getMinutes()).padStart(2, '0');
+        
+        const loc = state.rotaLocation || "PH Front";
+        const template = `On duty ${loc} : ${onH}:${onM}\nOff duty ${loc} : ${offH}:${offM}`;
+        
+        // Calculate duration and bonus
+        const timerSeconds = Math.floor((now.getTime() - state.dutyStartTime) / 1000);
+        const hoursCompleted = Math.floor(timerSeconds / 3600);
+        const m = Math.floor((timerSeconds % 3600) / 60);
+        
+        let rate = 0;
+        const rates = state.shiftRates;
+        const startHour = onTime.getHours();
+        
+        if (startHour >= 0 && startHour < 6) { // Night Shift
+            if (loc.includes('PH')) rate = rates.nightPH;
+            else if (loc.includes('SH')) rate = rates.nightSH;
+            else if (loc.includes('Calls')) rate = rates.nightCalls;
+        } else { // Day Shift
+            if (loc.includes('PH')) rate = rates.dayPH;
+            else if (loc.includes('SH')) rate = rates.daySH;
+            else if (loc.includes('Calls')) rate = rates.dayCalls;
+        }
+        
+        const bonus = rate * hoursCompleted;
+        const durationStr = `${hoursCompleted} hr ${m} min`;
+        const bonusStr = hoursCompleted > 0 ? `\nBonus Earned: $${bonus.toLocaleString()}` : '\nNo full hour completed (No bonus)';
+        
+        navigator.clipboard.writeText(template).then(() => {
+            const toast = document.createElement('div');
+            toast.style.position = 'fixed';
+            toast.style.top = '50%';
+            toast.style.left = '50%';
+            toast.style.transform = 'translate(-50%, -50%)';
+            toast.style.background = 'rgba(46, 204, 113, 0.95)';
+            toast.style.color = '#fff';
+            toast.style.padding = '2rem';
+            toast.style.borderRadius = '12px';
+            toast.style.zIndex = '99999';
+            toast.style.textAlign = 'center';
+            toast.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
+            toast.style.fontSize = '1.1rem';
+            toast.style.fontWeight = 'bold';
+            
+            toast.innerHTML = `
+                <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">Copied!</div>
+                <div style="font-family: monospace; background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    ${template.replace(/\n/g, '<br>')}
+                </div>
+                <div>Shift Duration: ${durationStr}</div>
+                <div>${bonusStr.replace('\n', '')}</div>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => { toast.remove(); }, 6000);
+        }).catch(err => alert("Failed to copy text."));
+        
+        state.dutyStartTime = null;
+        saveState();
+        
+        setTimeout(() => {
+            const defaultView = document.getElementById('tb-default-view');
+            const setupView = document.getElementById('tb-setup-view');
+            const confirmView = document.getElementById('tb-confirm-view');
+            
+            if (confirmView) confirmView.classList.add('hidden');
+            if (setupView) setupView.classList.remove('hidden');
+            // We go back to setup view, so they can start again, or maybe default view?
+            // "reset to enabled the user to start a new shift at a new place" - setup view
+        }, 5000);
+    };
+
     loadState();
+
+    // Auto-resume timer if page reloaded
+    if (state && state.dutyStartTime) {
+        const defaultView = document.getElementById('tb-default-view');
+        const compactView = document.getElementById('tb-compact-view');
+        if (defaultView) defaultView.classList.add('hidden');
+        if (compactView) compactView.classList.remove('hidden');
+        startRotaTimer();
+    }
 });
 
 // Dept Commands Logic

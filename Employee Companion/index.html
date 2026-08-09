@@ -57,21 +57,60 @@
     <!-- Background Blur Overlay -->
     <div class="bg-blur"></div>
 
-    <!-- TOP STATUS BAR -->
-    <div class="top-bar">
-        <div class="progress-container" style="width: 100%; max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.5rem; padding: 0 1rem;">
+    <!-- TOP RIGHT CLOCK -->
+    <div id="big-live-clock" style="position: fixed; top: 15px; right: 20px; font-size: 1rem; color: var(--text-main); font-family: monospace; font-weight: bold; text-align: right; text-shadow: 0 0 10px rgba(255,255,255,0.3); z-index: 1000; display: flex; flex-direction: column; gap: 2px;">
+        <span>--:--:-- (Edinburgh)</span>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">--:--:-- (IST)</span>
+    </div>
 
-            <!-- Duty Timer -->
-            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 600; color: var(--secondary); margin-top: 0.5rem;">
-                <span>DUTY TIME</span>
-                <span id="main-timer">Total: 0 hour + 00:00:00</span>
+    <!-- TOP STATUS BAR (Dynamic Island) -->
+    <div class="top-bar dynamic-island" id="rota-top-bar">
+        <div class="progress-container di-view" id="tb-default-view">
+            <div style="text-align: center; font-size: 0.85rem; color: var(--text-muted); font-weight: bold;">
+                Complete Bodycam logs to start shift
             </div>
-            <div class="progress-track" style="height: 6px;">
-                <div class="progress-fill" id="timer-fill" style="width: 0%; background: var(--secondary); transition: all 1s linear;"></div>
+        </div>
+
+        <div class="progress-container hidden di-view" id="tb-setup-view">
+            <select id="rota-location" class="rota-select" style="min-width: 150px;">
+                <option value="">-- Select Location --</option>
+                <option value="PH Front">PH Front</option>
+                <option value="PH Back">PH Back</option>
+                <option value="SH">SH (Sandy Shores)</option>
+                <option value="Calls">Calls</option>
+                <option value="Labs">Labs</option>
+                <option value="Training">Training</option>
+                <option value="Other...">Other...</option>
+            </select>
+            <input type="text" id="locInputCustom" class="rota-select" placeholder="Type custom location..." style="display:none; min-width: 150px;">
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="btn btn-success btn-icon di-btn" id="btn-rota-start" onclick="startRotaShift()">
+                    <span>▶</span>
+                </button>
+                <button class="btn btn-danger btn-icon di-btn" id="btn-rota-end-disabled" disabled>
+                    <span>⏹</span>
+                </button>
             </div>
-            <!-- Big Live Clock -->
-            <div id="big-live-clock" style="font-size: 1.4rem; color: var(--text-main); font-family: monospace; font-weight: bold; text-align: center; margin-top: 0.2rem; text-shadow: 0 0 10px rgba(255,255,255,0.3);">
-                --:--:-- (Edinburgh) | --:--:-- (IST)
+        </div>
+
+        <div class="progress-container hidden di-view" id="tb-compact-view">
+            <div class="rota-compact-timer" id="compact-main-timer" style="font-size: 1.1rem; font-family: monospace; font-weight: bold; min-width: 120px; text-align: center;">
+                0 hr 00:00:00
+            </div>
+            <button class="btn btn-danger btn-icon di-btn" id="btn-rota-end" onclick="showConfirmRotaEnd()">
+                <span>⏹</span>
+            </button>
+            <!-- Outline progress animation container -->
+            <svg class="progress-outline-svg" style="position: absolute; top: -2px; left: -2px; width: calc(100% + 4px); height: calc(100% + 4px); pointer-events: none; overflow: visible;">
+                <rect class="progress-outline-rect" id="progress-outline-rect" x="0" y="0" width="100%" height="100%" rx="22"></rect>
+            </svg>
+        </div>
+
+        <div class="progress-container hidden di-view" id="tb-confirm-view">
+            <div style="text-align: center; font-size: 1rem; font-weight: bold; color: var(--danger); margin-bottom: 0.5rem;">Confirm End?</div>
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="btn btn-secondary di-btn-wide" onclick="cancelConfirmRotaEnd()">Cancel</button>
+                <button class="btn btn-danger di-btn-wide" onclick="confirmRotaEnd()">End Shift</button>
             </div>
         </div>
     </div>
@@ -96,6 +135,35 @@
                     <div class="input-group">
                         <label>ID</label>
                         <input type="text" id="myId" placeholder="e.g. 62692">
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-section">
+                <div class="section-title">Shift Rates ($/hr)</div>
+                <div class="grid-layout">
+                    <div class="input-group">
+                        <label>Night Shift (00:00-06:00)</label>
+                        <div style="display: flex; gap: 0.5rem; flex-direction: column;">
+                            <input type="number" id="rateNightPH" placeholder="PH (25000)">
+                            <input type="number" id="rateNightSH" placeholder="SH (40000)">
+                            <input type="number" id="rateNightCalls" placeholder="Calls (20000)">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Day Shift</label>
+                        <div style="display: flex; gap: 0.5rem; flex-direction: column;">
+                            <input type="number" id="rateDayPH" placeholder="PH (10000)">
+                            <input type="number" id="rateDaySH" placeholder="SH (30000)">
+                            <input type="number" id="rateDayCalls" placeholder="Calls (15000)">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Lab Duties</label>
+                        <div style="display: flex; gap: 0.5rem; flex-direction: column;">
+                            <input type="number" id="rateLabCaptcha" placeholder="Captcha (5000)">
+                            <input type="number" id="rateLabMedicine" placeholder="Medicine (10000)">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -423,21 +491,6 @@
 
             <div class="glass-section" style="margin-bottom: 1rem;">
                 <div class="grid-layout">
-                    <div class="input-group">
-                        <label>Current Location / Post</label>
-                        <select id="locSelect">
-                            <option value="">-- Select Location --</option>
-                            <option value="PH front">PH front</option>
-                            <option value="PH back">PH back</option>
-                            <option value="SH">SH (Sandy Shores)</option>
-                            <option value="Calls">Calls</option>
-                            <option value="Labs">Labs</option>
-                            <option value="Training">Training</option>
-                            <option value="Other...">Other...</option>
-                        </select>
-                        <input type="text" id="locInputCustom" placeholder="Type custom location..."
-                            style="display:none; margin-top:0.5rem;">
-                    </div>
                     <div class="input-group">
                         <label>Replacing Employee</label>
                         <input list="hc-list" id="repInput" placeholder="Search or type name..." autocomplete="off">
@@ -1474,7 +1527,10 @@
                     </div>
                 </div>
             </div>
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+            <div id="lr-bonus-display" style="margin-top: 1rem; padding: 0.8rem; background: rgba(46, 204, 113, 0.2); border-radius: 4px; text-align: center; color: #2ecc71; font-weight: bold; font-size: 1.1rem; border: 1px solid rgba(46, 204, 113, 0.3);">
+                Bonus Earned: $0
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
                 <label style="font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.3rem; color: var(--text-muted); font-weight: normal;">
                     <input type="checkbox" id="cb-rota" checked> Open Discord
                 </label>
