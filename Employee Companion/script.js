@@ -117,6 +117,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    window.switchRadioTab = (tabId) => {
+        const modal = document.getElementById('modal-radio');
+        if (!modal) return;
+        const tabsBody = modal.querySelector('.tabs-body');
+        if (tabsBody) {
+            tabsBody.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        }
+        const targetContent = document.getElementById(tabId);
+        if(targetContent) targetContent.classList.add('active');
+    };
+
     // -----------------------------------------------------
     // STATE MANAGEMENT (Settings & Tasks)
     // -----------------------------------------------------
@@ -953,7 +964,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const bigClockEl = document.getElementById('big-live-clock');
         if (bigClockEl) {
-            bigClockEl.innerHTML = `<span>${edinH}:${edinM}:${edinS} (Edinburgh)</span><span style="font-size: 0.85rem; color: var(--text-muted);">${userH}:${userM}:${userS} (Local)</span>`;
+            bigClockEl.innerHTML = `<span>${edinH}:${edinM}:${edinS} (IC)</span><span style="font-size: 0.85rem; color: var(--text-muted);">${userH}:${userM}:${userS} (Local)</span>`;
         }
         
         const liveDateEl = document.getElementById('lr-live-date');
@@ -966,7 +977,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const userMo = String(userTime.getMonth() + 1).padStart(2, '0');
             const userY = userTime.getFullYear();
             
-            liveDateEl.textContent = `${edinD}/${edinM}/${edinY} (Edinburgh) | ${userD}/${userMo}/${userY} (Local)`;
+            liveDateEl.textContent = `${edinD}/${edinM}/${edinY} (IC) | ${userD}/${userMo}/${userY} (Local)`;
         }
     }, 1000);
 
@@ -1002,13 +1013,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     // Add custom command buttons to sections (conditionally)
     let secIndex = 0;
-    document.querySelectorAll('.modal-content .glass-section .section-body, #modal-radio .tabs-body .tab-content').forEach(body => {
+    document.querySelectorAll('.modal-content .glass-section .section-body, #modal-radio .tabs-body .tab-content, #tab-rc-dept .glass-section.collapsible').forEach(body => {
         body.dataset.secIndex = secIndex++;
         if (body.querySelector('.copy-block')) {
             const addBtnContainer = document.createElement('div');
             addBtnContainer.className = 'btn-add-cmd-container';
             addBtnContainer.style.marginTop = '0.5rem';
-            addBtnContainer.innerHTML = `<button class="btn btn-primary btn-add-cmd" onclick="addCustomCommand(this, '${body.dataset.secIndex}')" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">+ Add Command</button>`;
+            
+            if (body.closest('#tab-rc-dept')) {
+                addBtnContainer.innerHTML = `<button class="btn btn-success" onclick="openAddCommandModal('${body.id}')" style="font-size: 0.8rem; padding: 0.4rem 1rem; width: 100%;">+ Add Command</button>`;
+            } else {
+                addBtnContainer.innerHTML = `<button class="btn btn-primary btn-add-cmd" onclick="addCustomCommand(this, '${body.dataset.secIndex}')" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">+ Add Command</button>`;
+            }
             body.appendChild(addBtnContainer);
         }
     });
@@ -1059,16 +1075,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize
 
-    window.openAddCommandModal = () => {
+    window.openAddCommandModal = (sectionId) => {
         const select = document.getElementById('new-cmd-category');
         select.innerHTML = '';
+        let preselectIndex = null;
         
-        document.querySelectorAll('.modal-content .glass-section .section-body, #modal-radio .tabs-body .tab-content').forEach(body => {
+        document.querySelectorAll('.modal-content .glass-section .section-body, #modal-radio .tabs-body .tab-content, #tab-rc-dept .glass-section.collapsible').forEach(body => {
             if (body.closest('#modal-radio')) {
                 let name = 'General Section';
                 if (body.classList.contains('tab-content')) {
                     const tabBtn = document.querySelector(`.tab-btn[data-tab="${body.id}"]`);
                     if (tabBtn) name = tabBtn.innerText;
+                } else if (body.classList.contains('glass-section')) {
+                    const title = body.querySelector('.section-title');
+                    if (title) name = title.innerText;
                 } else {
                     const glass = body.closest('.glass-section');
                     const title = glass.querySelector('.section-title');
@@ -1079,8 +1099,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 option.value = body.dataset.secIndex;
                 option.innerText = name.replace(/[^a-zA-Z0-9 -&#;]/g, '').trim(); 
                 select.appendChild(option);
+
+                if (sectionId && body.id === sectionId) {
+                    preselectIndex = body.dataset.secIndex;
+                }
             }
         });
+
+        if (preselectIndex) {
+            select.value = preselectIndex;
+        }
 
         document.getElementById('modal-add-command').classList.add('active');
         document.getElementById('modalOverlay').classList.add('active');
