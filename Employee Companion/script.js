@@ -1312,11 +1312,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const bonusStr = hoursCompleted > 0 ? `\nBonus Earned: $${bonus.toLocaleString()}` : '\nNo full hour completed (No bonus)';
         
         navigator.clipboard.writeText(template).then(() => {
+            const overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.inset = '0';
+            overlay.style.zIndex = '99998';
+            overlay.style.background = 'rgba(0,0,0,0.5)';
+            overlay.style.transition = 'opacity 0.4s ease';
+            overlay.style.opacity = '0';
+            document.body.appendChild(overlay);
+
             const toast = document.createElement('div');
             toast.style.position = 'fixed';
             toast.style.top = '50%';
             toast.style.left = '50%';
-            toast.style.transform = 'translate(-50%, -50%)';
+            toast.style.transform = 'translate(-50%, -200%)';
+            toast.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease';
+            toast.style.opacity = '0';
             toast.style.background = 'rgba(46, 204, 113, 0.95)';
             toast.style.color = '#fff';
             toast.style.padding = '2rem';
@@ -1337,7 +1348,23 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             document.body.appendChild(toast);
             
-            setTimeout(() => { toast.remove(); }, 6000);
+            // Force reflow
+            void toast.offsetWidth;
+            
+            // Slide in
+            toast.style.transform = 'translate(-50%, -50%)';
+            toast.style.opacity = '1';
+            overlay.style.opacity = '1';
+            
+            setTimeout(() => { 
+                toast.style.transform = 'translate(-50%, -200%)';
+                toast.style.opacity = '0';
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    toast.remove();
+                    overlay.remove();
+                }, 400);
+            }, 6000);
         }).catch(err => alert("Failed to copy text."));
         
         state.dutyStartTime = null;
