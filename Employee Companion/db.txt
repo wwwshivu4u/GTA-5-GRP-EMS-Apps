@@ -14,9 +14,9 @@
   "name": "Thakur Sergey",
   "id": "177919",
   "dutySteps": {
-    "od1": true,
-    "od2": true,
-    "od3": true,
+    "od1": false,
+    "od2": false,
+    "od3": false,
     "ref1": false,
     "ref2": false,
     "sav1": false,
@@ -122,6 +122,12 @@
       "secIndex": "6",
       "id": "custom-cmd-1786023053220426",
       "template": "Edit this text..."
+    },
+    {
+      "secIndex": "9",
+      "id": "custom-cmd-1786305679160823",
+      "template": "10-4! A unit is 10-17 to your base! Arriving soon!",
+      "title": "Custom Command"
     }
   ],
   "userDefaults": {
@@ -256,7 +262,8 @@
     "cmd-bank-2": "Command at 21:25",
     "cmd-bank-3": "Command at 21:30",
     "cmd-prison-1": "Command",
-    "cmd-prison-2": "Command"
+    "cmd-prison-2": "Command",
+    "custom-cmd-1786305679160823": "Custom Command"
   },
   "lastProfileVerifyDate": null,
   "selectedSubDept": "HS",
@@ -270,6 +277,7 @@
     "labCaptcha": 5000,
     "labMedicine": 10000
   },
+  "showBootScreen": true,
   "tasks": [],
   "taskStates": {},
   "enableDailyTasks": true,

@@ -92,13 +92,18 @@
             </div>
         </div>
 
-        <div class="progress-container hidden di-view" id="tb-compact-view">
-            <div class="rota-compact-timer" id="compact-main-timer" style="font-size: 1.1rem; font-family: monospace; font-weight: bold; min-width: 120px; text-align: center;">
-                0 hr 00:00:00
+        <div class="progress-container hidden di-view" id="tb-compact-view" style="flex-direction: column; gap: 0.2rem;">
+            <div style="display: flex; gap: 0.5rem; align-items: center; width: 100%; justify-content: center;">
+                <div class="rota-compact-timer" id="compact-main-timer" style="font-size: 1.1rem; font-family: monospace; font-weight: bold; min-width: 120px; text-align: center;">
+                    0 hr 00:00:00
+                </div>
+                <button class="btn btn-danger btn-icon di-btn" id="btn-rota-end" onclick="showConfirmRotaEnd()">
+                    <span>⏹</span>
+                </button>
             </div>
-            <button class="btn btn-danger btn-icon di-btn" id="btn-rota-end" onclick="showConfirmRotaEnd()">
-                <span>⏹</span>
-            </button>
+            <div id="night-shift-indicator" class="hidden" style="font-size: 0.8rem; color: #f1c40f; text-align: center; width: 100%;">
+                🌙 Night Shift Active: +$<span id="night-shift-bonus-val">0</span> / min
+            </div>
         </div>
 
         <div class="progress-container hidden di-view" id="tb-confirm-view">
@@ -155,24 +160,24 @@
                     <div class="input-group">
                         <label>Night Shift (00:00-06:00)</label>
                         <div style="display: flex; gap: 0.5rem; flex-direction: column;">
-                            <input type="number" id="rateNightPH" placeholder="PH (25000)">
-                            <input type="number" id="rateNightSH" placeholder="SH (40000)">
-                            <input type="number" id="rateNightCalls" placeholder="Calls (20000)">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;"><label style="width: 50px; margin: 0; font-size: 0.8rem;">PH</label><input type="number" id="rateNightPH" placeholder="25000" style="flex: 1;"></div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;"><label style="width: 50px; margin: 0; font-size: 0.8rem;">SH</label><input type="number" id="rateNightSH" placeholder="40000" style="flex: 1;"></div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;"><label style="width: 50px; margin: 0; font-size: 0.8rem;">Calls</label><input type="number" id="rateNightCalls" placeholder="20000" style="flex: 1;"></div>
                         </div>
                     </div>
                     <div class="input-group">
                         <label>Day Shift</label>
                         <div style="display: flex; gap: 0.5rem; flex-direction: column;">
-                            <input type="number" id="rateDayPH" placeholder="PH (10000)">
-                            <input type="number" id="rateDaySH" placeholder="SH (30000)">
-                            <input type="number" id="rateDayCalls" placeholder="Calls (15000)">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;"><label style="width: 50px; margin: 0; font-size: 0.8rem;">PH</label><input type="number" id="rateDayPH" placeholder="10000" style="flex: 1;"></div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;"><label style="width: 50px; margin: 0; font-size: 0.8rem;">SH</label><input type="number" id="rateDaySH" placeholder="30000" style="flex: 1;"></div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;"><label style="width: 50px; margin: 0; font-size: 0.8rem;">Calls</label><input type="number" id="rateDayCalls" placeholder="15000" style="flex: 1;"></div>
                         </div>
                     </div>
                     <div class="input-group">
                         <label>Lab Duties</label>
                         <div style="display: flex; gap: 0.5rem; flex-direction: column;">
-                            <input type="number" id="rateLabCaptcha" placeholder="Captcha (5000)">
-                            <input type="number" id="rateLabMedicine" placeholder="Medicine (10000)">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;"><label style="width: 70px; margin: 0; font-size: 0.8rem;">Captcha</label><input type="number" id="rateLabCaptcha" placeholder="5000" style="flex: 1;"></div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;"><label style="width: 70px; margin: 0; font-size: 0.8rem;">Medicine</label><input type="number" id="rateLabMedicine" placeholder="10000" style="flex: 1;"></div>
                         </div>
                     </div>
                 </div>
@@ -477,9 +482,11 @@
                     <div id="bc-live-time" style="font-size: 0.95rem; color: var(--secondary); background: rgba(0,0,0,0.2); padding: 0.6rem; border-radius: 4px; text-align: center; font-family: monospace; font-weight: bold; border: 1px solid rgba(255,255,255,0.1);">--:-- (Edinburgh) | --:-- (IST)</div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
-                    <label style="font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.3rem; color: var(--text-muted); font-weight: normal;">
-                        <input type="checkbox" id="cb-bodycam" checked> Open Discord
-                    </label>
+                    <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-bodycam" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room</span>
+                                </label>
                     <button class="btn btn-success" style="flex: 1; padding: 0.8rem;" onclick="generateDiscordAction('bodycam', 'cb-bodycam')">Generate, Copy & Open</button>
                 </div>
             </div>
@@ -536,8 +543,10 @@
                         <div class="copy-header">
                             <span>10-8 (Availability)</span>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <label style="font-size: 0.75rem; display: flex; align-items: center; gap: 0.2rem; cursor: pointer; color: var(--text-muted); font-weight: normal;">
-                                    <input type="checkbox" checked> Open Discord
+                                <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-1" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room</span>
                                 </label>
                                 <button class="btn copy-btn" data-target="rc108" data-discord-key="radiocodes">📋</button>
                             </div>
@@ -549,8 +558,10 @@
                         <div class="copy-header">
                             <span>10-20 (Specify Location)</span>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <label style="font-size: 0.75rem; display: flex; align-items: center; gap: 0.2rem; cursor: pointer; color: var(--text-muted); font-weight: normal;">
-                                    <input type="checkbox" checked> Open Discord
+                                <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-2" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room</span>
                                 </label>
                                 <button class="btn copy-btn" data-target="rc1020" data-discord-key="radiocodes">📋</button>
                             </div>
@@ -564,8 +575,10 @@
                         <div class="copy-header">
                             <span>10-9 (Taking Break - 10 min)</span>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <label style="font-size: 0.75rem; display: flex; align-items: center; gap: 0.2rem; cursor: pointer; color: var(--text-muted); font-weight: normal;">
-                                    <input type="checkbox" checked> Open Discord
+                                <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-3" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room</span>
                                 </label>
                                 <button class="btn copy-btn" data-target="rc109" data-discord-key="break">📋</button>
                             </div>
@@ -577,8 +590,10 @@
                         <div class="copy-header">
                             <span>10-9 (Taking Break - Covered By)</span>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <label style="font-size: 0.75rem; display: flex; align-items: center; gap: 0.2rem; cursor: pointer; color: var(--text-muted); font-weight: normal;">
-                                    <input type="checkbox" checked> Open Discord
+                                <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-4" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room</span>
                                 </label>
                                 <button class="btn copy-btn" data-target="rc109cov" data-discord-key="break">📋</button>
                             </div>
@@ -590,8 +605,10 @@
                         <div class="copy-header">
                             <span>10-8 (Back from break)</span>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <label style="font-size: 0.75rem; display: flex; align-items: center; gap: 0.2rem; cursor: pointer; color: var(--text-muted); font-weight: normal;">
-                                    <input type="checkbox" checked> Open Discord
+                                <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-5" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room</span>
                                 </label>
                                 <button class="btn copy-btn" data-target="rc108b" data-discord-key="break">📋</button>
                             </div>
@@ -610,9 +627,11 @@
                             </select>
                         </div>
                         <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
-                            <label style="font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.3rem; color: var(--text-muted); font-weight: normal;">
-                                <input type="checkbox" id="cb-break" checked> Open Discord
-                            </label>
+                            <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-break" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room</span>
+                                </label>
                             <button class="btn btn-success" style="flex: 1; padding: 0.8rem;" onclick="generateDiscordAction('break', 'cb-break')">Generate, Copy & Open</button>
                         </div>
                     </div>
@@ -623,8 +642,10 @@
                         <div class="copy-header">
                             <span>10-5 (On Duty / Replacing)</span>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <label style="font-size: 0.75rem; display: flex; align-items: center; gap: 0.2rem; cursor: pointer; color: var(--text-muted); font-weight: normal;">
-                                    <input type="checkbox" checked> Open Discord
+                                <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-6" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room</span>
                                 </label>
                                 <button class="btn copy-btn" data-target="rc105" data-discord-key="replacementlogs">📋</button>
                             </div>
@@ -636,8 +657,10 @@
                         <div class="copy-header">
                             <span>10-7 (Need Replacement - 10 min prior)</span>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <label style="font-size: 0.75rem; display: flex; align-items: center; gap: 0.2rem; cursor: pointer; color: var(--text-muted); font-weight: normal;">
-                                    <input type="checkbox" checked> Open Discord
+                                <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-7" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room</span>
                                 </label>
                                 <button class="btn copy-btn" data-target="rc107a" data-discord-key="replacementlogs">📋</button>
                             </div>
@@ -649,8 +672,10 @@
                         <div class="copy-header">
                             <span>10-7 (Off Duty / Replaced By)</span>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <label style="font-size: 0.75rem; display: flex; align-items: center; gap: 0.2rem; cursor: pointer; color: var(--text-muted); font-weight: normal;">
-                                    <input type="checkbox" checked> Open Discord
+                                <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-8" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room</span>
                                 </label>
                                 <button class="btn copy-btn" data-target="rc107b" data-discord-key="replacementlogs">📋</button>
                             </div>
@@ -679,9 +704,11 @@
                             <input type="text" id="ca-tags" placeholder="@Name" value="@Employee @High Command ">
                         </div>
                         <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
-                            <label style="font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.3rem; color: var(--text-muted); font-weight: normal;">
-                                <input type="checkbox" id="cb-codea" checked> Open Discord
-                            </label>
+                            <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-codea" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room</span>
+                                </label>
                             <button class="btn btn-success" style="flex: 1; padding: 0.8rem;" onclick="generateDiscordAction('codea', 'cb-codea')">Generate, Copy & Open</button>
                         </div>
                     </div>
@@ -1506,9 +1533,11 @@
                 ">Before</button>
             </div>
             <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
-                <label style="font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.3rem; color: var(--text-muted); font-weight: normal;">
-                    <input type="checkbox" id="cb-supplies" checked> Open Discord
-                </label>
+                <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-supplies" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room</span>
+                                </label>
                 <button class="btn btn-success" style="flex: 1; padding: 0.8rem;" onclick="generateDiscordAction('supplies', 'cb-supplies')">Generate, Copy & Open</button>
             </div>
         </div>
@@ -1542,9 +1571,11 @@
                 Bonus Earned: $0
             </div>
             <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
-                <label style="font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.3rem; color: var(--text-muted); font-weight: normal;">
-                    <input type="checkbox" id="cb-rota" checked> Open Discord
-                </label>
+                <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-rota" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room</span>
+                                </label>
                 <button class="btn btn-success" style="flex: 1; padding: 0.8rem;" onclick="generateDiscordAction('rota', 'cb-rota')">Generate, Copy & Open</button>
             </div>
         </div>

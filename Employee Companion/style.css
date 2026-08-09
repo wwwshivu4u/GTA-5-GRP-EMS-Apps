@@ -1357,3 +1357,93 @@ input:checked + .slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
+
+/* Discord Toggle UI */
+/* Custom Discord Toggle & Popover */
+.discord-toggle-label {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+    margin-right: 5px;
+}
+
+.discord-toggle-checkbox {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.2);
+    transition: .4s;
+    border-radius: 20px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.discord-toggle-checkbox:checked + .toggle-slider {
+    background-color: #5865F2; /* Discord blurple */
+}
+
+.discord-toggle-checkbox:checked + .toggle-slider:before {
+    transform: translateX(16px);
+}
+
+/* Tooltip Popover */
+.tooltip-container {
+    /* position is already relative */
+}
+
+.tooltip-text {
+    visibility: hidden;
+    width: 110px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1000;
+    top: 130%; /* Position below */
+    left: 50%;
+    margin-left: -55px; /* Center it */
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.75rem;
+    pointer-events: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.tooltip-text::after {
+    content: "";
+    position: absolute;
+    bottom: 100%; /* Top of tooltip */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #333 transparent;
+}
+
+.tooltip-container:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}

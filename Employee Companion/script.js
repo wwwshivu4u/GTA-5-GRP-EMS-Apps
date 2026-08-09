@@ -302,6 +302,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (typeof startRotaTimer === 'function') {
                 startRotaTimer();
             }
+        } else {
+            const bcStatusEl = document.getElementById('bc-status');
+            if (bcStatusEl && bcStatusEl.value === 'On duty') {
+                bcStatusEl.value = 'Off duty';
+                state.bcStatus = 'Off duty';
+                // saveState() is already called after loadState via other means, but let's do it here to be safe.
+                saveState();
+            }
         }
 
     }
@@ -335,6 +343,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    window.openDiscordChannel = (serverId, channelId) => {
+        if (!serverId || !channelId) return;
+        const appUrl = `discord://-/channels/${serverId}/${channelId}`;
+        const webUrl = `https://discord.com/channels/${serverId}/${channelId}`;
+        
+        const startTime = Date.now();
+        window.location.href = appUrl;
+
+        setTimeout(() => {
+            const endTime = Date.now();
+            if (!document.hidden && endTime - startTime < 700) {
+                window.open(webUrl, '_blank');
+            }
+        }, 500);
+    };
+
     window.testDiscordChannel = (key) => {
         const serverId = document.getElementById('discord-server-id').value.trim() || state.discordServerId;
         const inputEl = document.querySelector(`.discord-channel-id[data-key="${key}"]`);
@@ -345,8 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const webUrl = `https://discord.com/channels/${serverId}/${channelId}`;
-        window.open(webUrl, '_blank');
+        window.openDiscordChannel(serverId, channelId);
     };
 
     window.saveSettings = () => {
@@ -817,14 +840,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const discordKey = btn.getAttribute('data-discord-key');
                 if (discordKey) {
-                    const cb = btn.parentElement.querySelector('input[type="checkbox"]');
+                    const block = btn.closest('.copy-block') || btn.parentElement;
+                    const cb = block.querySelector('input[type="checkbox"]');
                     const shouldOpen = cb ? cb.checked : true;
                     if (shouldOpen) {
                         const serverId = state.discordServerId;
                         const channelId = state.discordChannels[discordKey];
                         if (serverId && channelId) {
-                            const webUrl = `https://discord.com/channels/${serverId}/${channelId}`;
-                            window.open(webUrl, '_blank');
+                            window.openDiscordChannel(serverId, channelId);
                         } else {
                             alert("Discord Server ID or Channel ID is missing in Settings.");
                         }
@@ -869,8 +892,6 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Please configure the Server ID and Channel ID for this log in Settings first!");
             return;
         }
-
-        const appUrl = `discord://-/channels/${serverId}/${channelId}`;
         
         if (!skipCopy && textToCopy) {
             try {
@@ -882,7 +903,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (!skipRedirect) {
-            window.location.href = appUrl;
+            window.openDiscordChannel(serverId, channelId);
         }
         // closeModals();
     };
@@ -1226,6 +1247,31 @@ document.addEventListener('DOMContentLoaded', () => {
         startRotaTimer();
     };
 
+    window.checkNightShiftUI = () => {
+        const hour = new Date().getHours();
+        const indicator = document.getElementById('night-shift-indicator');
+        const bonusValEl = document.getElementById('night-shift-bonus-val');
+        const timerEl = document.getElementById('compact-main-timer');
+        
+        if (hour >= 0 && hour < 6) {
+            if (indicator) indicator.classList.remove('hidden');
+            const nightPH = state.shiftRates && state.shiftRates.nightPH ? parseInt(state.shiftRates.nightPH) : 25000;
+            const bonusPerMin = Math.floor(nightPH / 60);
+            if (bonusValEl) bonusValEl.innerText = bonusPerMin;
+            
+            if (timerEl) {
+                timerEl.style.color = '#f1c40f';
+                timerEl.style.textShadow = '0 0 5px rgba(241,196,15,0.5)';
+            }
+        } else {
+            if (indicator) indicator.classList.add('hidden');
+            if (timerEl) {
+                timerEl.style.color = '';
+                timerEl.style.textShadow = '';
+            }
+        }
+    };
+
     function startRotaTimer() {
         const display = document.getElementById('compact-main-timer');
         const outlineRect = document.getElementById('progress-outline-rect');
@@ -1264,6 +1310,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const timerSeconds = Math.floor((Date.now() - state.dutyStartTime) / 1000);
             updateRotaDisplay();
+            
+            checkNightShiftUI();
             
             // Hourly Notification
             if (timerSeconds > 0 && timerSeconds % 3600 === 0) {
@@ -1455,15 +1503,23 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     loadState();
+    
+    // Initialize Discord Checkboxes State
+    document.querySelectorAll('.discord-toggle-checkbox').forEach(cb => {
+        const id = cb.id;
+        if (id && state.discordToggles && state.discordToggles.hasOwnProperty(id)) {
+            cb.checked = state.discordToggles[id];
+        }
+        cb.addEventListener('change', (e) => {
+            if (id) {
+                if (!state.discordToggles) state.discordToggles = {};
+                state.discordToggles[id] = e.target.checked;
+                saveState();
+            }
+        });
+    });
 
-    // Auto-resume timer if page reloaded
-    if (state && state.dutyStartTime) {
-        const defaultView = document.getElementById('tb-default-view');
-        const compactView = document.getElementById('tb-compact-view');
-        if (defaultView) defaultView.classList.add('hidden');
-        if (compactView) compactView.classList.remove('hidden');
-        startRotaTimer();
-    }
+    checkNightShiftUI();
 });
 
 // Dept Commands Logic
