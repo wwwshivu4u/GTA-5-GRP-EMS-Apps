@@ -299,6 +299,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (setupView) setupView.classList.add('hidden');
             if (compactView) compactView.classList.remove('hidden');
             
+            const bcStatusEl = document.getElementById('bc-status');
+            if (bcStatusEl && (!state.bcStatus || state.bcStatus !== 'On duty')) {
+                bcStatusEl.value = 'On duty';
+                state.bcStatus = 'On duty';
+                saveState();
+            }
+            
             if (typeof startRotaTimer === 'function') {
                 startRotaTimer();
             }
@@ -762,7 +769,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.fillBodycamDiscordForm = (statusText) => {
         const bcStatus = document.getElementById('bc-status');
-        if (bcStatus) bcStatus.value = statusText;
+        if (bcStatus) {
+            bcStatus.value = statusText;
+            state.bcStatus = statusText;
+            saveState();
+        }
     };
 
     window.attachCopyEvent = (btn) => {
@@ -1518,6 +1529,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    const bcStatusEl = document.getElementById('bc-status');
+    if (bcStatusEl) {
+        bcStatusEl.addEventListener('change', (e) => {
+            state.bcStatus = e.target.value;
+            saveState();
+        });
+    }
 
     checkNightShiftUI();
 });
