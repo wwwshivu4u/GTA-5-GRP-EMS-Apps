@@ -1259,7 +1259,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.checkNightShiftUI = () => {
-        const hour = new Date().getHours();
+        const now = new Date();
+        const icTimeStr = now.toLocaleString("en-US", {timeZone: "Europe/London"});
+        const hour = new Date(icTimeStr).getHours();
+        
         const indicator = document.getElementById('night-shift-indicator');
         const bonusValEl = document.getElementById('night-shift-bonus-val');
         const timerEl = document.getElementById('compact-main-timer');
