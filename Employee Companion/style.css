@@ -1274,10 +1274,6 @@ input:checked + .slider:before {
     transform: translateX(16px);
 }
 
-/* Tooltip Popover */
-.tooltip-container {
-    /* position is already relative */
-}
 
 .tooltip-text {
     visibility: hidden;
