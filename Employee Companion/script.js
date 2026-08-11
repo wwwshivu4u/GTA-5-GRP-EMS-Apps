@@ -172,6 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
         customTitles: {},
         lastProfileVerifyDate: null,
         selectedSubDept: 'HS',
+        mainNavService: 'hs',
         shiftRates: {
             nightPH: 25000, nightSH: 40000, nightCalls: 20000,
             dayPH: 10000, daySH: 30000, dayCalls: 15000,
@@ -1020,40 +1021,38 @@ document.addEventListener('DOMContentLoaded', () => {
     // -----------------------------------------------------
     // LIVE CLOCK (BODYCAM LOGS)
     // -----------------------------------------------------
+    const bcLiveTimeEl = document.getElementById('bc-live-time');
+    const bigClockEl = document.getElementById('big-live-clock');
+    const lrLiveDateEl = document.getElementById('lr-live-date');
+    const dtFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    
     setInterval(() => {
-        const now = new Date();
-        const edinTime = new Date(now.toLocaleString("en-US", {timeZone: "Europe/London"}));
-        const userTime = new Date(); // Local user time
-        
-        const edinH = String(edinTime.getHours()).padStart(2, '0');
-        const edinM = String(edinTime.getMinutes()).padStart(2, '0');
-        const edinS = String(edinTime.getSeconds()).padStart(2, '0');
+        const userTime = new Date();
+        const icStr = dtFormatter.format(userTime); 
+        // Example: "08/11/2026, 24:22:10" or "08/11/2026, 05:22:10"
+        const [datePart, timePart] = icStr.split(', ');
+        const [edinMo, edinD, edinY] = datePart.split('/');
+        let [edinH, edinM, edinS] = timePart.split(':');
+        if (edinH === '24') edinH = '00';
         
         const userH = String(userTime.getHours()).padStart(2, '0');
         const userM = String(userTime.getMinutes()).padStart(2, '0');
         const userS = String(userTime.getSeconds()).padStart(2, '0');
         
-        const liveTimeEl = document.getElementById('bc-live-time');
-        if (liveTimeEl) {
-            liveTimeEl.textContent = `${edinH}:${edinM} (Edinburgh) | ${userH}:${userM} (Local)`;
+        if (bcLiveTimeEl) {
+            bcLiveTimeEl.textContent = `${edinH}:${edinM} (IC) | ${userH}:${userM} (Local)`;
         }
         
-        const bigClockEl = document.getElementById('big-live-clock');
         if (bigClockEl) {
             bigClockEl.innerHTML = `<span>${edinH}:${edinM}:${edinS} (IC)</span><span style="font-size: 0.85rem; color: var(--text-muted);">${userH}:${userM}:${userS} (Local)</span>`;
         }
         
-        const liveDateEl = document.getElementById('lr-live-date');
-        if (liveDateEl) {
-            const edinD = String(edinTime.getDate()).padStart(2, '0');
-            const edinM = String(edinTime.getMonth() + 1).padStart(2, '0');
-            const edinY = edinTime.getFullYear();
-            
+        if (lrLiveDateEl) {
             const userD = String(userTime.getDate()).padStart(2, '0');
-            const userMo = String(userTime.getMonth() + 1).padStart(2, '0');
+            const userMoLocal = String(userTime.getMonth() + 1).padStart(2, '0');
             const userY = userTime.getFullYear();
             
-            liveDateEl.textContent = `${edinD}/${edinM}/${edinY} (IC) | ${userD}/${userMo}/${userY} (Local)`;
+            lrLiveDateEl.textContent = `${edinD}/${edinMo}/${edinY} (IC) | ${userD}/${userMoLocal}/${userY} (Local)`;
         }
     }, 1000);
 
@@ -1258,30 +1257,66 @@ document.addEventListener('DOMContentLoaded', () => {
         startRotaTimer();
     };
 
+    const nsIndicatorEl = document.getElementById('night-shift-indicator');
+    const nsTimerEl = document.getElementById('compact-main-timer');
+    const nsDtFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/London', hour: 'numeric', hour12: false });
+    
+    let lastNSCalcTotalMinutes = -1;
+    let cachedNSEarnedBonus = 0;
+    
     window.checkNightShiftUI = () => {
         const now = new Date();
-        const icTimeStr = now.toLocaleString("en-US", {timeZone: "Europe/London"});
-        const hour = new Date(icTimeStr).getHours();
+        const hourStr = nsDtFormatter.format(now);
+        let hour = parseInt(hourStr, 10);
+        if (hour === 24) hour = 0;
         
-        const indicator = document.getElementById('night-shift-indicator');
-        const bonusValEl = document.getElementById('night-shift-bonus-val');
-        const timerEl = document.getElementById('compact-main-timer');
+        const nightPH = state.shiftRates && state.shiftRates.nightPH ? parseInt(state.shiftRates.nightPH) : 25000;
+        const bonusPerMin = Math.floor(nightPH / 60);
         
-        if (hour >= 0 && hour < 6) {
-            if (indicator) indicator.classList.remove('hidden');
-            const nightPH = state.shiftRates && state.shiftRates.nightPH ? parseInt(state.shiftRates.nightPH) : 25000;
-            const bonusPerMin = Math.floor(nightPH / 60);
-            if (bonusValEl) bonusValEl.innerText = bonusPerMin;
+        if (state.dutyStartTime) {
+            const start = new Date(state.dutyStartTime).getTime();
+            const totalMinutes = Math.floor((now.getTime() - start) / 60000);
             
-            if (timerEl) {
-                timerEl.style.color = '#f1c40f';
-                timerEl.style.textShadow = '0 0 5px rgba(241,196,15,0.5)';
+            if (totalMinutes !== lastNSCalcTotalMinutes) {
+                lastNSCalcTotalMinutes = totalMinutes;
+                cachedNSEarnedBonus = 0;
+                for (let i = 0; i < totalMinutes; i++) {
+                    const minTime = new Date(start + i * 60000);
+                    let h = parseInt(nsDtFormatter.format(minTime), 10);
+                    if (h === 24) h = 0;
+                    if (h >= 0 && h < 6) {
+                        cachedNSEarnedBonus += bonusPerMin;
+                    }
+                }
             }
         } else {
-            if (indicator) indicator.classList.add('hidden');
-            if (timerEl) {
-                timerEl.style.color = '';
-                timerEl.style.textShadow = '';
+            lastNSCalcTotalMinutes = -1;
+            cachedNSEarnedBonus = 0;
+        }
+        
+        if (hour >= 0 && hour < 6) {
+            if (nsIndicatorEl) {
+                nsIndicatorEl.classList.remove('hidden');
+                nsIndicatorEl.style.color = '#f1c40f';
+                nsIndicatorEl.innerHTML = `🌙 Night Shift Active: +$${bonusPerMin.toLocaleString()} / min` + (cachedNSEarnedBonus > 0 ? ` <br> Earned: <span style="font-weight: bold;">$${cachedNSEarnedBonus.toLocaleString()}</span>` : ``);
+            }
+            if (nsTimerEl) {
+                nsTimerEl.style.color = '#f1c40f';
+                nsTimerEl.style.textShadow = '0 0 5px rgba(241,196,15,0.5)';
+            }
+        } else {
+            if (nsIndicatorEl) {
+                if (cachedNSEarnedBonus > 0 && state.dutyStartTime) {
+                    nsIndicatorEl.classList.remove('hidden');
+                    nsIndicatorEl.style.color = '#bdc3c7'; // Grey out if inactive but has earned bonus
+                    nsIndicatorEl.innerHTML = `🌙 Night Shift Inactive <br> Earned: <span style="font-weight: bold;">$${cachedNSEarnedBonus.toLocaleString()}</span>`;
+                } else {
+                    nsIndicatorEl.classList.add('hidden');
+                }
+            }
+            if (nsTimerEl) {
+                nsTimerEl.style.color = '';
+                nsTimerEl.style.textShadow = '';
             }
         }
     };
@@ -1542,6 +1577,97 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     checkNightShiftUI();
+
+    // Bottom Nav Dynamic Logic
+    const bottomNavServices = [
+        { id: 'hs', icon: '🏥', text: 'HOSPITAL<br>SERVICES', smallText: 'HOSPITAL<br>SERVICES', modal: 'modal-hs' },
+        { id: 'gs', icon: '🚑', text: 'GROUND<br>SERVICES', smallText: 'GROUND<br>SERVICES', modal: 'modal-gs' },
+        { id: 'labtech', icon: '🔬', text: 'LABTECH', smallText: 'LABTECH', modal: 'modal-discord' }
+    ];
+    const settingsItem = { id: 'settings', icon: '⚙️', smallText: 'SETTINGS', modal: 'modal-settings' };
+    const logGenItem = { id: 'loggen', icon: '📸', smallText: 'LOG GEN', modal: 'modal-discord-bodycam' };
+
+    window.renderBottomNav = () => {
+        const currentMainId = state.mainNavService || 'hs';
+        const mainService = bottomNavServices.find(s => s.id === currentMainId) || bottomNavServices[0];
+        
+        // Update Main Card
+        const mainIcon = document.getElementById('main-icon');
+        const mainText = document.getElementById('main-text');
+        const mainCard = document.getElementById('main-service-card');
+        
+        if (mainIcon) mainIcon.innerHTML = mainService.icon;
+        if (mainText) mainText.innerHTML = mainService.text;
+        if (mainCard) {
+            mainCard.onclick = (e) => {
+                if(e.target.closest('.nav-dropdown-btn') || e.target.closest('.nav-dropdown-menu')) return;
+                if(typeof openModal === 'function') openModal(mainService.modal);
+            };
+        }
+
+        // Update Dropdown Menu
+        const dropdown = document.getElementById('service-dropdown');
+        if (dropdown) {
+            dropdown.innerHTML = '';
+            bottomNavServices.forEach(s => {
+                if (s.id !== currentMainId) {
+                    const div = document.createElement('div');
+                    div.className = 'nav-dropdown-item';
+                    div.innerHTML = `<span>${s.icon}</span> <span>${s.text.replace('<br>', ' ')}</span>`;
+                    div.onclick = (e) => {
+                        e.stopPropagation();
+                        state.mainNavService = s.id;
+                        if(typeof saveState === 'function') saveState();
+                        dropdown.classList.remove('active');
+                        window.renderBottomNav();
+                    };
+                    dropdown.appendChild(div);
+                }
+            });
+        }
+
+        // Update Grid
+        const secondaryGrid = document.getElementById('secondary-grid');
+        if (secondaryGrid) {
+            secondaryGrid.innerHTML = '';
+            
+            const otherServices = bottomNavServices.filter(s => s.id !== currentMainId);
+            const allGridItems = [
+                ...otherServices,
+                settingsItem,
+                logGenItem
+            ];
+
+            allGridItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'small-nav-item';
+                div.onclick = () => { if(typeof openModal === 'function') openModal(item.modal); };
+                div.innerHTML = `
+                    <div class="nav-icon-small">${item.icon}</div>
+                    <div class="nav-text-small">${item.smallText}</div>
+                `;
+                secondaryGrid.appendChild(div);
+            });
+        }
+    };
+
+    window.toggleDropdown = (event) => {
+        event.stopPropagation();
+        const dropdown = document.getElementById('service-dropdown');
+        if (dropdown) {
+            dropdown.classList.toggle('active');
+        }
+    };
+
+    document.addEventListener('click', () => {
+        const dropdown = document.getElementById('service-dropdown');
+        if (dropdown) {
+            dropdown.classList.remove('active');
+        }
+    });
+
+    // Run initial render
+    window.renderBottomNav();
 });
 
 // Dept Commands Logic
@@ -1610,13 +1736,27 @@ window.filterDeptCommands = () => {
                 b.style.display = 'none';
             }
         });
+        const chip = document.querySelector(`button[onclick="jumpToSection('${sec.id}')"]`);
         
-        if (loc2 === 'ALL') {
-            sec.classList.remove('collapsed');
-        } else if (hasVisibleBlock) {
-            sec.classList.remove('collapsed');
+        if (hasVisibleBlock) {
+            sec.style.display = '';
+            if (chip) {
+                chip.disabled = false;
+                chip.style.opacity = '1';
+                chip.style.cursor = 'pointer';
+            }
+            if (loc2 === 'ALL' || searchVal !== '') {
+                sec.classList.remove('collapsed');
+            } else {
+                sec.classList.add('collapsed');
+            }
         } else {
-            sec.classList.add('collapsed');
+            sec.style.display = 'none';
+            if (chip) {
+                chip.disabled = true;
+                chip.style.opacity = '0.3';
+                chip.style.cursor = 'not-allowed';
+            }
         }
     });
 };

@@ -93,7 +93,7 @@
         </div>
 
         <div class="progress-container hidden di-view" id="tb-compact-view" style="flex-direction: column; gap: 0.2rem;">
-            <div style="display: flex; gap: 0.5rem; align-items: center; width: 100%; justify-content: center;">
+            <div style="display: flex;gap: 0.5rem;align-items: center;width: 100%;justify-content: flex-start;">
                 <div class="rota-compact-timer" id="compact-main-timer" style="font-size: 1.1rem; font-family: monospace; font-weight: bold; min-width: 120px; text-align: center;">
                     0 hr 00:00:00
                 </div>
@@ -101,13 +101,13 @@
                     <span>⏹</span>
                 </button>
             </div>
-            <div id="night-shift-indicator" class="hidden" style="font-size: 0.8rem; color: #f1c40f; text-align: center; width: 100%;">
-                🌙 Night Shift Active: +$<span id="night-shift-bonus-val">0</span> / min
+            <div id="night-shift-indicator" class="hidden" style="font-size: 0.8rem; color: #f1c40f; width: 100%;">
+                🌙 Night Shift Active: +$<span id="night-shift-bonus-val">0</span> / min <br>💵  Bonus: $<span id="night-shift-earned-val">0</span> ⏰ <span id="ns-timer">{every next tuesday IST}</span>
             </div>
         </div>
 
         <div class="progress-container hidden di-view" id="tb-confirm-view">
-            <div style="text-align: center; font-size: 1rem; font-weight: bold; color: var(--danger); margin-bottom: 0.5rem;">Confirm End?</div>
+            <div style="font-size: 1rem; font-weight: bold; color: var(--danger); margin-bottom: 0.5rem;">⚠️ Confirm End?</div>
             <div style="display: flex; gap: 0.5rem;">
                 <button class="btn btn-secondary di-btn-wide" onclick="cancelConfirmRotaEnd()">Cancel</button>
                 <button class="btn btn-danger di-btn-wide" onclick="confirmRotaEnd()">End Shift</button>
@@ -296,7 +296,6 @@
                 <button class="tab-btn disabled" data-tab="tab-refresh" id="btn-tab-refresh" disabled>Refresh</button>
                 <button class="tab-btn disabled" data-tab="tab-save" id="btn-tab-save" disabled>Save</button>
                 <button class="tab-btn disabled" data-tab="tab-offduty" id="btn-tab-offduty" disabled>Off Duty</button>
-                <button class="tab-btn disabled" data-tab="tab-state-wave" id="btn-tab-state-wave" disabled>State Wave</button>
             </div>
 
             <div class="tabs-body">
@@ -379,6 +378,262 @@
                     </div>
                 </div>
 
+            </div>
+        </div>
+
+        <!-- MODAL: DISCORD BODYCAM -->
+        <div class="modal-content" id="modal-discord-bodycam">
+            <button class="close-btn" onclick="closeModals()">✕</button>
+            <div class="modal-header">💬 Discord Generator (Bodycam Logs)</div>
+            
+            <div class="glass-section" style="background: transparent; padding: 0;">
+                <div class="input-group">
+                    <label>Duty Status</label>
+                    <select id="bc-status">
+                        <option value="On duty">On Duty</option>
+                        <option value="Off duty">Off Duty</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Time</label>
+                    <div id="bc-live-time" style="font-size: 0.95rem; color: var(--secondary); background: rgba(0,0,0,0.2); padding: 0.6rem; border-radius: 4px; text-align: center; font-family: monospace; font-weight: bold; border: 1px solid rgba(255,255,255,0.1);">--:-- (IC) | --:-- (Local)</div>
+                </div>
+                <div style="display: flex;align-items: center;gap: 0.5rem;margin-top: 0.5rem;justify-content: flex-end;">
+                    <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-bodycam" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room after copy</span>
+                                </label>
+                    <button class="btn btn-success" style="padding: 0.8rem 0.4em;" onclick="generateDiscordAction('bodycam', 'cb-bodycam')">Generate, Copy & Open</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: COMMS & LOGS -->
+        <div class="modal-content" id="modal-radio">
+            <button class="close-btn" onclick="closeModals()">✕</button>
+            <div class="modal-header">📡 Comms & Logs</div>
+
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; text-align: center;">Quick Codes (Copies instantly to clipboard)</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 1.5rem;">
+                <button class="btn btn-secondary" onclick="copySimple('10-4')" style="font-size:0.8rem; padding: 1rem 0.5rem;">10-4 (Affirmative)</button>
+                <button class="btn btn-secondary" onclick="copySimple('10-2')" style="font-size:0.8rem; padding: 1rem 0.5rem;">10-2 (Negative)</button>
+                <button class="btn btn-secondary" onclick="copySimple('10-20')" style="font-size:0.8rem; padding: 1rem 0.5rem;">10-20 (Report)</button>
+                <button class="btn btn-secondary" onclick="copySimple('10-6')" style="font-size:0.8rem; padding: 1rem 0.5rem;">10-6 (Ignore Last)</button>
+                <button class="btn btn-secondary" onclick="copySimple('10-17 [A to B] ///CID +1 units')" style="font-size:0.8rem; padding: 1rem 0.5rem;">10-17</button>
+            </div>
+
+            <!-- <div class="glass-section" style="margin-bottom: 1rem;">
+                <div class="grid-layout">
+                    <div class="input-group">
+                        <label>Replacing Employee</label>
+                        <input list="hc-list" id="repInput" placeholder="Search or type name..." autocomplete="off">
+                        <datalist id="hc-list">
+                            <option value="Jerry Uchiha">
+                            <option value="Ace Uchiha">
+                            <option value="Max Uchiha">
+                            <option value="Paras Uchiha">
+                            <option value="Saikat Snider">
+                        </datalist>
+                    </div>
+                </div>
+            </div> -->
+
+            <!-- TABS HEADER (Dropdown) -->
+            <div class="input-group" style="margin-bottom: 1rem;">
+                <select id="radio-tabs-select" onchange="switchRadioTab(this.value)">
+                    <option value="tab-rc-general">#RADIO-CODES</option>
+                    <option value="tab-rc-break">#BREAK-ROOM</option>
+                    <option value="tab-rc-replacements">#REPLACEMENT-LOGS</option>
+                    <option value="tab-rc-codea">#CODE-A</option>
+                    <option value="tab-state-wave">#STATE-WAVE</option>
+                    <option value="tab-rc-dept">#DEPT-COMMANDS</option>
+                </select>
+            </div>
+
+            <!-- TABS BODY -->
+            <div class="tabs-body">
+                <div class="tab-content active" id="tab-rc-general">
+                    <button class="btn btn-primary" style="margin-bottom: 1.5rem;" onclick="testDiscordChannel('radiocodes')">🔗 Open #RADIO-CODES Channel</button>
+
+
+                    <div class="copy-block">
+                        <div class="copy-header">
+                            <span>10-8 (Availability)</span>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-1" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room after copy</span>
+                                </label>
+                                <button class="btn copy-btn" data-target="rc108" data-discord-key="radiocodes">📋</button>
+                            </div>
+                        </div>
+                        <div class="copy-content" id="rc108" contenteditable="true">10-8 where am I needed?</div>
+                    </div>
+
+                    <div class="copy-block">
+                        <div class="copy-header">
+                            <span>10-20 (Specify Location)</span>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-2" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room after copy</span>
+                                </label>
+                                <button class="btn copy-btn" data-target="rc1020" data-discord-key="radiocodes">📋</button>
+                            </div>
+                        </div>
+                        <div class="copy-content" id="rc1020" contenteditable="true">10-4 {LOC}</div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-rc-break"><button class="btn btn-primary" style="margin-bottom: 1.5rem;" onclick="testDiscordChannel('break')">🔗 Open #BREAK-ROOM Channel</button>
+                    <div class="copy-block">
+                        <div class="copy-header">
+                            <span>10-9 (Taking Break - 10 min)</span>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-3" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room after copy</span>
+                                </label>
+                                <button class="btn copy-btn" data-target="rc109" data-discord-key="break">📋</button>
+                            </div>
+                        </div>
+                        <div class="copy-content" id="rc109" contenteditable="true">Need 10-9 {LOC} for 10 minute</div>
+                    </div>
+
+                    <div class="copy-block">
+                        <div class="copy-header">
+                            <span>10-9 (Taking Break - Covered By)</span>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-4" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room after copy</span>
+                                </label>
+                                <button class="btn copy-btn" data-target="rc109cov" data-discord-key="break">📋</button>
+                            </div>
+                        </div>
+                        <div class="copy-content" id="rc109cov" contenteditable="true">10-9 {LOC} for 10 minute covered by {REP}</div>
+                    </div>
+
+                    <div class="copy-block">
+                        <div class="copy-header">
+                            <span>10-8 (Back from break)</span>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-5" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room after copy</span>
+                                </label>
+                                <button class="btn copy-btn" data-target="rc108b" data-discord-key="break">📋</button>
+                            </div>
+                        </div>
+                        <div class="copy-content" id="rc108b" contenteditable="true">10-8 {LOC} back from 10-9</div>
+                    </div>
+
+                    <!-- Discord Generator for Break Room -->
+                    <div class="glass-section" style="margin-top: 1.5rem; background: rgba(0,0,0,0.3);">
+                        <div class="section-title" style="margin-bottom: 0.5rem; font-size: 0.95rem; color: #5865F2;">💬 Discord Log Generator</div>
+                        <div class="input-group">
+                            <label>Action</label>
+                            <select id="br-action">
+                                <option value="Going 10-9 (Break)">Going 10-9 (Break)</option>
+                                <option value="Back 10-8 (Available)">Back 10-8 (Available)</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                            <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-break" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room after copy</span>
+                                </label>
+                            <button class="btn btn-success" style="flex: 1; padding: 0.8rem;" onclick="generateDiscordAction('break', 'cb-break')">Generate, Copy & Open</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-rc-replacements"><button class="btn btn-primary" style="margin-bottom: 1.5rem;" onclick="testDiscordChannel('replacementlogs')">🔗 Open #REPLACEMENT-LOGS Channel</button>
+                    <div class="copy-block">
+                        <div class="copy-header">
+                            <span>10-5 (On Duty / Replacing)</span>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-6" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room after copy</span>
+                                </label>
+                                <button class="btn copy-btn" data-target="rc105" data-discord-key="replacementlogs">📋</button>
+                            </div>
+                        </div>
+                        <div class="copy-content" id="rc105" contenteditable="true">10-5 {LOC} replacing {REP}</div>
+                    </div>
+
+                    <div class="copy-block">
+                        <div class="copy-header">
+                            <span>10-7 (Need Replacement - 10 min prior)</span>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-7" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room after copy</span>
+                                </label>
+                                <button class="btn copy-btn" data-target="rc107a" data-discord-key="replacementlogs">📋</button>
+                            </div>
+                        </div>
+                        <div class="copy-content" id="rc107a" contenteditable="true">10-7 {LOC} need replacement in 10 minute</div>
+                    </div>
+
+                    <div class="copy-block">
+                        <div class="copy-header">
+                            <span>10-7 (Off Duty / Replaced By)</span>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-8" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room after copy after copy</span>
+                                </label>
+                                <button class="btn copy-btn" data-target="rc107b" data-discord-key="replacementlogs">📋</button>
+                            </div>
+                        </div>
+                        <div class="copy-content" id="rc107b" contenteditable="true">10-7 {LOC} replaced by {REP}</div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-rc-codea">
+                    <!-- Discord Generator for Code A -->
+                    <div class="glass-section" style="background: rgba(0,0,0,0.3);">
+                        <div class="section-title" style="margin-bottom: 0.5rem; font-size: 0.95rem; color: #5865F2;">💬 Discord Log Generator</div>
+                        <div class="input-group">
+                            <label>Location</label>
+                            <input type="text" id="ca-loc" placeholder="e.g. PH back">
+                        </div>
+                        <div class="input-group">
+                            <label>Status</label>
+                            <select id="ca-status">
+                                <option value="flying back">Flying back</option>
+                                <option value="cannot fly back">Cannot fly back</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Tags (e.g. @Employee @HC)</label>
+                            <input type="text" id="ca-tags" placeholder="@Name" value="@Employee @HighCommand ">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                            <label class="discord-toggle-label tooltip-container">
+                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-codea" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="tooltip-text">open Mails room after copy</span>
+                                </label>
+                            <button class="btn btn-success" style="flex: 1; padding: 0.8rem;" onclick="generateDiscordAction('codea', 'cb-codea')">Generate, Copy & Open</button>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="margin-bottom: 1.5rem;" onclick="testDiscordChannel('codea')">🔗 Open #CODE-A Channel</button>
+
+                </div>
                 <!-- STATE WAVE TAB -->
                 <div class="tab-content" id="tab-state-wave">
                     
@@ -461,258 +716,7 @@
                     </div>
 
                 </div>
-            </div>
-        </div>
 
-        <!-- MODAL: DISCORD BODYCAM -->
-        <div class="modal-content" id="modal-discord-bodycam" style="max-width: 500px;">
-            <button class="close-btn" onclick="closeModals()">✕</button>
-            <div class="modal-header">💬 Discord Generator (Bodycam Logs)</div>
-            
-            <div class="glass-section" style="background: transparent; padding: 0;">
-                <div class="input-group">
-                    <label>Duty Status</label>
-                    <select id="bc-status">
-                        <option value="On duty">On Duty</option>
-                        <option value="Off duty">Off Duty</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Time</label>
-                    <div id="bc-live-time" style="font-size: 0.95rem; color: var(--secondary); background: rgba(0,0,0,0.2); padding: 0.6rem; border-radius: 4px; text-align: center; font-family: monospace; font-weight: bold; border: 1px solid rgba(255,255,255,0.1);">--:-- (Edinburgh) | --:-- (IST)</div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
-                    <label class="discord-toggle-label tooltip-container">
-                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-bodycam" checked>
-                                    <span class="toggle-slider"></span>
-                                    <span class="tooltip-text">open Mails room</span>
-                                </label>
-                    <button class="btn btn-success" style="flex: 1; padding: 0.8rem;" onclick="generateDiscordAction('bodycam', 'cb-bodycam')">Generate, Copy & Open</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- MODAL: COMMS & LOGS -->
-        <div class="modal-content" id="modal-radio">
-            <button class="close-btn" onclick="closeModals()">✕</button>
-            <div class="modal-header">📡 Comms & Logs</div>
-
-            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; text-align: center;">Quick Codes (Copies instantly to clipboard)</div>
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 1.5rem;">
-                <button class="btn btn-secondary" onclick="copySimple('10-4')" style="font-size:0.8rem; padding: 1rem 0.5rem;">10-4 (Affirmative)</button>
-                <button class="btn btn-secondary" onclick="copySimple('10-2')" style="font-size:0.8rem; padding: 1rem 0.5rem;">10-2 (Negative)</button>
-                <button class="btn btn-secondary" onclick="copySimple('10-20')" style="font-size:0.8rem; padding: 1rem 0.5rem;">10-20 (Report)</button>
-                <button class="btn btn-secondary" onclick="copySimple('10-6')" style="font-size:0.8rem; padding: 1rem 0.5rem;">10-6 (Ignore Last)</button>
-                <button class="btn btn-secondary" onclick="copySimple('10-17 [A to B] ///CID +1 units')" style="font-size:0.8rem; padding: 1rem 0.5rem;">10-17</button>
-            </div>
-
-            <div class="glass-section" style="margin-bottom: 1rem;">
-                <div class="grid-layout">
-                    <div class="input-group">
-                        <label>Replacing Employee</label>
-                        <input list="hc-list" id="repInput" placeholder="Search or type name..." autocomplete="off">
-                        <datalist id="hc-list">
-                            <option value="Jerry Uchiha">
-                            <option value="Ace Uchiha">
-                            <option value="Max Uchiha">
-                            <option value="Paras Uchiha">
-                            <option value="Saikat Snider">
-                        </datalist>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TABS HEADER (Dropdown) -->
-            <div class="input-group" style="margin-bottom: 1rem;">
-                <select id="radio-tabs-select" onchange="switchRadioTab(this.value)">
-                    <option value="tab-rc-general">#RADIO-CODES</option>
-                    <option value="tab-rc-break">#BREAK-ROOM</option>
-                    <option value="tab-rc-replacements">#REPLACEMENT-LOGS</option>
-                    <option value="tab-rc-codea">#CODE-A</option>
-                    <option value="tab-rc-dept">#DEPT-COMMANDS</option>
-                </select>
-            </div>
-
-            <!-- TABS BODY -->
-            <div class="tabs-body">
-                <div class="tab-content active" id="tab-rc-general">
-                    <button class="btn btn-primary" style="width: 100%; margin-bottom: 1.5rem;" onclick="testDiscordChannel('radiocodes')">🔗 Open #RADIO-CODES Channel</button>
-
-
-                    <div class="copy-block">
-                        <div class="copy-header">
-                            <span>10-8 (Availability)</span>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <label class="discord-toggle-label tooltip-container">
-                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-1" checked>
-                                    <span class="toggle-slider"></span>
-                                    <span class="tooltip-text">open Mails room</span>
-                                </label>
-                                <button class="btn copy-btn" data-target="rc108" data-discord-key="radiocodes">📋</button>
-                            </div>
-                        </div>
-                        <div class="copy-content" id="rc108" contenteditable="true">10-8 where am I needed?</div>
-                    </div>
-
-                    <div class="copy-block">
-                        <div class="copy-header">
-                            <span>10-20 (Specify Location)</span>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <label class="discord-toggle-label tooltip-container">
-                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-2" checked>
-                                    <span class="toggle-slider"></span>
-                                    <span class="tooltip-text">open Mails room</span>
-                                </label>
-                                <button class="btn copy-btn" data-target="rc1020" data-discord-key="radiocodes">📋</button>
-                            </div>
-                        </div>
-                        <div class="copy-content" id="rc1020" contenteditable="true">10-4 {LOC}</div>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="tab-rc-break"><button class="btn btn-primary" style="width: 100%; margin-bottom: 1.5rem;" onclick="testDiscordChannel('break')">🔗 Open #BREAK-ROOM Channel</button>
-                    <div class="copy-block">
-                        <div class="copy-header">
-                            <span>10-9 (Taking Break - 10 min)</span>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <label class="discord-toggle-label tooltip-container">
-                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-3" checked>
-                                    <span class="toggle-slider"></span>
-                                    <span class="tooltip-text">open Mails room</span>
-                                </label>
-                                <button class="btn copy-btn" data-target="rc109" data-discord-key="break">📋</button>
-                            </div>
-                        </div>
-                        <div class="copy-content" id="rc109" contenteditable="true">Need 10-9 {LOC} for 10 minute</div>
-                    </div>
-
-                    <div class="copy-block">
-                        <div class="copy-header">
-                            <span>10-9 (Taking Break - Covered By)</span>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <label class="discord-toggle-label tooltip-container">
-                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-4" checked>
-                                    <span class="toggle-slider"></span>
-                                    <span class="tooltip-text">open Mails room</span>
-                                </label>
-                                <button class="btn copy-btn" data-target="rc109cov" data-discord-key="break">📋</button>
-                            </div>
-                        </div>
-                        <div class="copy-content" id="rc109cov" contenteditable="true">10-9 {LOC} for 10 minute covered by {REP}</div>
-                    </div>
-
-                    <div class="copy-block">
-                        <div class="copy-header">
-                            <span>10-8 (Back from break)</span>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <label class="discord-toggle-label tooltip-container">
-                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-5" checked>
-                                    <span class="toggle-slider"></span>
-                                    <span class="tooltip-text">open Mails room</span>
-                                </label>
-                                <button class="btn copy-btn" data-target="rc108b" data-discord-key="break">📋</button>
-                            </div>
-                        </div>
-                        <div class="copy-content" id="rc108b" contenteditable="true">10-8 {LOC} back from 10-9</div>
-                    </div>
-
-                    <!-- Discord Generator for Break Room -->
-                    <div class="glass-section" style="margin-top: 1.5rem; background: rgba(0,0,0,0.3);">
-                        <div class="section-title" style="margin-bottom: 0.5rem; font-size: 0.95rem; color: #5865F2;">💬 Discord Log Generator</div>
-                        <div class="input-group">
-                            <label>Action</label>
-                            <select id="br-action">
-                                <option value="Going 10-9 (Break)">Going 10-9 (Break)</option>
-                                <option value="Back 10-8 (Available)">Back 10-8 (Available)</option>
-                            </select>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
-                            <label class="discord-toggle-label tooltip-container">
-                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-break" checked>
-                                    <span class="toggle-slider"></span>
-                                    <span class="tooltip-text">open Mails room</span>
-                                </label>
-                            <button class="btn btn-success" style="flex: 1; padding: 0.8rem;" onclick="generateDiscordAction('break', 'cb-break')">Generate, Copy & Open</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="tab-rc-replacements"><button class="btn btn-primary" style="width: 100%; margin-bottom: 1.5rem;" onclick="testDiscordChannel('replacementlogs')">🔗 Open #REPLACEMENT-LOGS Channel</button>
-                    <div class="copy-block">
-                        <div class="copy-header">
-                            <span>10-5 (On Duty / Replacing)</span>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <label class="discord-toggle-label tooltip-container">
-                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-6" checked>
-                                    <span class="toggle-slider"></span>
-                                    <span class="tooltip-text">open Mails room</span>
-                                </label>
-                                <button class="btn copy-btn" data-target="rc105" data-discord-key="replacementlogs">📋</button>
-                            </div>
-                        </div>
-                        <div class="copy-content" id="rc105" contenteditable="true">10-5 {LOC} replacing {REP}</div>
-                    </div>
-
-                    <div class="copy-block">
-                        <div class="copy-header">
-                            <span>10-7 (Need Replacement - 10 min prior)</span>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <label class="discord-toggle-label tooltip-container">
-                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-7" checked>
-                                    <span class="toggle-slider"></span>
-                                    <span class="tooltip-text">open Mails room</span>
-                                </label>
-                                <button class="btn copy-btn" data-target="rc107a" data-discord-key="replacementlogs">📋</button>
-                            </div>
-                        </div>
-                        <div class="copy-content" id="rc107a" contenteditable="true">10-7 {LOC} need replacement in 10 minute</div>
-                    </div>
-
-                    <div class="copy-block">
-                        <div class="copy-header">
-                            <span>10-7 (Off Duty / Replaced By)</span>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <label class="discord-toggle-label tooltip-container">
-                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-8" checked>
-                                    <span class="toggle-slider"></span>
-                                    <span class="tooltip-text">open Mails room</span>
-                                </label>
-                                <button class="btn copy-btn" data-target="rc107b" data-discord-key="replacementlogs">📋</button>
-                            </div>
-                        </div>
-                        <div class="copy-content" id="rc107b" contenteditable="true">10-7 {LOC} replaced by {REP}</div>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="tab-rc-codea"><button class="btn btn-primary" style="width: 100%; margin-bottom: 1.5rem;" onclick="testDiscordChannel('codea')">🔗 Open #CODE-A Channel</button>
-                    <!-- Discord Generator for Code A -->
-                    <div class="glass-section" style="background: rgba(0,0,0,0.3);">
-                        <div class="section-title" style="margin-bottom: 0.5rem; font-size: 0.95rem; color: #5865F2;">💬 Discord Log Generator</div>
-                        <div class="input-group">
-                            <label>Location</label>
-                            <input type="text" id="ca-loc" placeholder="e.g. PH back">
-                        </div>
-                        <div class="input-group">
-                            <label>Status</label>
-                            <select id="ca-status">
-                                <option value="flying back">Flying back</option>
-                                <option value="cannot fly back">Cannot fly back</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label>Tags (e.g. @Employee @HC)</label>
-                            <input type="text" id="ca-tags" placeholder="@Name" value="@Employee @High Command ">
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
-                            <label class="discord-toggle-label tooltip-container">
-                                    <input type="checkbox" class="discord-toggle-checkbox" id="cb-codea" checked>
-                                    <span class="toggle-slider"></span>
-                                    <span class="tooltip-text">open Mails room</span>
-                                </label>
-                            <button class="btn btn-success" style="flex: 1; padding: 0.8rem;" onclick="generateDiscordAction('codea', 'cb-codea')">Generate, Copy & Open</button>
-                        </div>
-                    </div>
-                </div>
                 <div class="tab-content" id="tab-rc-dept">
 
 <div class="glass-section" style="padding: 1rem; margin-bottom: 1rem; background: rgba(0,0,0,0.5);">
@@ -1469,13 +1473,13 @@
         <!-- MODAL: LABTECH & MED LOGS -->
         <div class="modal-content" id="modal-discord">
             <button class="close-btn" onclick="closeModals()">✕</button>
-            <div class="modal-header">🔬 Labtech & Med Logs</div>
+            <div class="modal-header">🔬 Labtech & Med Logs<br><small style="color: #6d6d6d;color: #6d6d6d;font-size: 16px;">Check Pinned Messaged in each channel for the required information</small></div>
 
             <div class="discord-grid">
 
                 <div class="discord-card">
                     <div class="channel-name">#MAKING-MEDICAL-SUPPLIES</div>
-                    <div class="desc">Medlabs: before starting & after finishing.</div>
+                    <div class="desc">Medlabs: before & after finishing.</div>
                     <div class="discord-action-row">
                         <button class="btn btn-primary" onclick="openSubModal('sub-supplies')">Generate & Open</button>
                     </div>
@@ -1492,19 +1496,17 @@
                 <!-- Simple actions (just open link) -->
                 <div class="discord-card">
                     <div class="channel-name">#PROOF-OF-CAPTCHA</div>
-                    <div class="desc">Just paste screenshot.</div>
                     <div class="discord-action-row">
                         <button class="btn btn-primary" onclick="executeDiscordAction('captcha', false)">Open
-                            App</button>
+                            Discord Channel</button>
                     </div>
                 </div>
 
                 <div class="discord-card">
                     <div class="channel-name">#MEDICAL-DELIVERIES</div>
-                    <div class="desc">Just paste screenshot.</div>
                     <div class="discord-action-row">
                         <button class="btn btn-primary" onclick="executeDiscordAction('deliveries', false)">Open
-                            App</button>
+                            Discord Channel</button>
                     </div>
                 </div>
 
@@ -1536,7 +1538,7 @@
                 <label class="discord-toggle-label tooltip-container">
                                     <input type="checkbox" class="discord-toggle-checkbox" id="cb-supplies" checked>
                                     <span class="toggle-slider"></span>
-                                    <span class="tooltip-text">open Mails room</span>
+                                    <span class="tooltip-text">open Mails room after copy</span>
                                 </label>
                 <button class="btn btn-success" style="flex: 1; padding: 0.8rem;" onclick="generateDiscordAction('supplies', 'cb-supplies')">Generate, Copy & Open</button>
             </div>
@@ -1574,7 +1576,7 @@
                 <label class="discord-toggle-label tooltip-container">
                                     <input type="checkbox" class="discord-toggle-checkbox" id="cb-rota" checked>
                                     <span class="toggle-slider"></span>
-                                    <span class="tooltip-text">open Mails room</span>
+                                    <span class="tooltip-text">open Mails room after copy</span>
                                 </label>
                 <button class="btn btn-success" style="flex: 1; padding: 0.8rem;" onclick="generateDiscordAction('rota', 'cb-rota')">Generate, Copy & Open</button>
             </div>
@@ -1780,27 +1782,16 @@
         </div>
         <!-- Row 2 -->
         <div class="nav-row">
-            <div class="nav-item-grid">
-                <div class="small-nav-item" onclick="openModal('modal-hs')">
-                    <div class="nav-icon-small">🏥</div>
-                    <div class="nav-text-small">HOSPITAL<br>SERVICES</div>
-                </div>
-                <div class="small-nav-item" onclick="openModal('modal-gs')">
-                    <div class="nav-icon-small">🚑</div>
-                    <div class="nav-text-small">GROUND<br>SERVICES</div>
-                </div>
-                <div class="small-nav-item" onclick="openModal('modal-discord')">
-                    <div class="nav-icon-small">🔬</div>
-                    <div class="nav-text-small">LABTECH</div>
-                </div>
-                <div class="small-nav-item" onclick="openModal('modal-discord-bodycam')">
-                    <div class="nav-icon-small">📸</div>
-                    <div class="nav-text-small">LOG GEN</div>
+            <div class="nav-item has-dropdown" id="main-service-card">
+                <div class="nav-icon" id="main-icon">🏥</div>
+                <div class="nav-text" id="main-text">HOSPITAL<br>SERVICES</div>
+                <button class="nav-dropdown-btn" onclick="toggleDropdown(event)">▼</button>
+                <div class="nav-dropdown-menu" id="service-dropdown">
+                    <!-- Dropdown items will be populated by JS -->
                 </div>
             </div>
-            <div class="nav-item" onclick="openModal('modal-settings')">
-                <div class="nav-icon">⚙️</div>
-                <div class="nav-text">SETTINGS</div>
+            <div class="nav-item-grid" id="secondary-grid">
+                <!-- Grid items will be populated by JS -->
             </div>
         </div>
     </div>

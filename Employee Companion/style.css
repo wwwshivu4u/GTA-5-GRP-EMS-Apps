@@ -133,6 +133,7 @@ body {
     width: max-content;
     justify-content: space-between;
     align-items: stretch;
+    flex:0 0 50%;
 }
 .progress-text {
     font-weight: 600;
@@ -256,6 +257,58 @@ body {
     .bottom-nav { gap: 0.5rem; padding: 1rem 0.5rem; }
 }
 
+/* Bottom Nav Dropdown Styles */
+.nav-dropdown-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    z-index: 2;
+    transition: background 0.2s;
+}
+.nav-dropdown-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+.nav-dropdown-menu {
+    position: absolute;
+    top: 45px;
+    right: 10px;
+    background: #222;
+    border: 1px solid #555;
+    border-radius: 8px;
+    display: none;
+    flex-direction: column;
+    z-index: 10;
+    overflow: hidden;
+    min-width: 180px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+.nav-dropdown-menu.active {
+    display: flex;
+}
+.nav-dropdown-item {
+    padding: 12px 15px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+.nav-dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
 /* Modal Overlay */
 .modal-overlay {
     position: fixed;
@@ -349,6 +402,7 @@ body {
     outline: none;
     transition: border-color 0.2s;
     font-size: 1rem;
+    height: 64px;
 }
 .input-group input:focus, .input-group select:focus { border-color: var(--secondary); }
 
@@ -411,196 +465,7 @@ input::-webkit-calendar-picker-indicator {
 /* Discord Channels */
 .discord-grid {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-}
-.discord-card {
-    background: rgba(0,0,0,0.5);
-    border: 1px solid var(--card-border);
-    padding: 1rem;
-    border-radius: 8px;
-}
-.discord-card .channel-name {
-    color: #5865F2;
-    font-weight: 700;
-    font-size: 1.05rem;
-    margin-bottom: 0.3rem;
-}
-.discord-card .desc { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 0.75rem;}
-
-.discord-action-row {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-}
-
-/* Task Manager */
-.task-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(0,0,0,0.5);
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    border: 1px solid var(--card-border);
-}
-.task-row-actions button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.2rem;
-    color: var(--text-muted);
-    transition: color 0.2s;
-}
-.task-row-actions button:hover { color: var(--primary); }
-
-/* Sub Modals */
-.sub-modal {
-    display: none;
-    z-index: 110;
-    border: 1px solid var(--secondary);
-    box-shadow: 0 10px 50px rgba(59, 130, 246, 0.2);
-}
-.sub-modal.active {
-    display: block;
-}
-
-/* Scrollbar styling */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 4px; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.5); }
-
-/* Tabs */
-.tabs-header {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    border-bottom: 2px solid var(--card-border);
-    padding-bottom: 0.5rem;
-}
-.tab-btn {
-    background: transparent;
-    color: var(--text-muted);
-    border: none;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    cursor: pointer;
-    border-radius: 6px;
-    font-weight: 600;
-    transition: all 0.2s;
-}
-.tab-btn:hover:not(:disabled) {
-    background: var(--surface-hover);
-    color: var(--text-main);
-}
-.tab-btn.active {
-    background: var(--primary);
-    color: white;
-}
-.tab-btn:disabled, .tab-btn.disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
-.tab-content {
-    display: none;
-}
-.tab-content.active {
-    display: block;
-    animation: fadeIn 0.3s ease;
-}
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-@keyframes modalGlowAnim {
-    0% { box-shadow: 0 10px 40px rgba(0,0,0,0.9), 0 0 0px var(--glow-color, rgba(255,255,255,0.5)); }
-    30% { box-shadow: 0 10px 40px rgba(0,0,0,0.9), 0 0 30px var(--glow-color, rgba(255,255,255,0.5)); }
-    100% { box-shadow: 0 10px 40px rgba(0,0,0,0.9), 0 0 0px var(--glow-color, rgba(255,255,255,0.5)); }
-}
-.modal-glow-anim {
-    animation: modalGlowAnim 1s ease-out !important;
-}
-
-
-/* Grid for 4 small buttons inside bottom nav */
-.nav-item-grid {
-    display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 0.5rem;
-    width: 22vw;
-    height: 30vh;
-}
-.small-nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    gap: 0.5rem;
-    transition: all 0.2s ease;
-    opacity: 0.95;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 0.5rem;
-    backdrop-filter: blur(8px);
-}
-.small-nav-item:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateY(-5px);
-}
-.nav-icon-small {
-    font-size: 2rem;
-    filter: drop-shadow(0 0 10px rgba(255,255,255,0.4));
-}
-.copy-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 1rem;
-    background: var(--surface);
-    border-bottom: 1px solid var(--card-border);
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-.copy-content {
-    padding: 1rem;
-    font-family: monospace;
-    font-size: 0.95rem;
-    color: var(--text-muted);
-    white-space: pre-wrap;
-    word-break: break-all;
-}
-
-.btn {
-    background: var(--surface-hover);
-    color: var(--text-main);
-    border: 1px solid var(--card-border);
-    padding: 0.4rem 0.6rem;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 1.2rem; /* Size of the icon */
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-}
-.btn:hover:not([disabled]) { background: rgba(255, 255, 255, 0.15); transform: scale(1.1); }
-.btn.success { background: var(--success); border-color: var(--success); color: #fff; }
-.btn[disabled], .btn.disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-    background: rgba(255, 255, 255, 0.05);
-}
-
-/* Discord Channels */
-.discord-grid {
-    display: grid;
-    grid-template-columns: 1fr;
     gap: 1rem;
 }
 .discord-card {
@@ -770,8 +635,8 @@ input::-webkit-calendar-picker-indicator {
     align-items: center;
 }
 .glass-section.collapsible .section-title::after {
-    content: '▼';
-    font-size: 0.8rem;
+    content: '🔽';
+    font-size: 2rem;
     transition: transform 0.2s;
 }
 .glass-section.collapsible.collapsed .section-title::after {
@@ -1395,7 +1260,7 @@ input:checked + .slider:before {
     left: 3px;
     bottom: 3px;
     background-color: white;
-    transition: .4s;
+    transition: 0.4s;
     border-radius: 50%;
 }
 
@@ -1446,4 +1311,10 @@ input:checked + .slider:before {
 .tooltip-container:hover .tooltip-text {
     visibility: visible;
     opacity: 1;
+}
+
+.top-bar.compact {
+    max-width: max-content !important;
+    padding: 0.4rem 1rem !important;
+    border-radius: 20px !important;
 }

@@ -59,11 +59,11 @@
     "od1": "/me Takes out Bodycam and attaches Bodycam to chest and checks its ballistic, water proof",
     "od2": "/me Makes sure it is recording and checks for the red light",
     "od3": "/do It is recording, and its ballistic, water proof",
-    "sw1_1": "Dear Citizens of Los Santos, got the courage to answer the call",
-    "sw1_2": "Join Emergency Medical Services and become the difference between life and death",
-    "sw1_3": "Head over to PH Front as interviews are happening right now",
+    "sw1_1": "Dear Citizens of Los Santos, do you have what it takes to own the night?",
+    "sw1_2": "Join Emergency Medical Services for Night Shift Recruitment and protect the city while it sleeps",
+    "sw1_3": "Head over to {LOC} as night shift interviews are officially underway right now",
     "sw1_4": "Make sure your record is clean and no tattoos on your hands or face",
-    "sw1_5": "Be the reason someone lives to see another day because EMS needs you",
+    "sw1_5": "Be the hero in the dark because EMS needs night shift medics today",
     "cmd-acc-1": "EMS To ALL: Doctors are loading adrenaline and preparing for the ACC! See you there!",
     "cmd-acc-2": "EMS To ALL: Doctors have arrived at the situation. Come to the EMS vehicle for adrenaline shots!!",
     "cmd-acc-3": "EMS To ALL: Good luck at the ACC! Stay safe and watch your backs.",
@@ -110,24 +110,23 @@
     "cmd-prison-1": "EMS To ALL: Doctors loading adrenaline readying for Prison Protection! Hope to see you there!",
     "cmd-prison-2": "EMS To ALL: Doctors start giving the Adrenaline, Please come near the EMS vehicle!",
     "cmd-bgc-9": "EMS To SAHP: 10-4! Appreciate your help always!",
-    "cmd-bgc-11": "EMS To NG: 10-4! Appreciate your help always!"
+    "cmd-bgc-11": "EMS To NG: 10-4! Appreciate your help always!",
+    "rc108": "10-8 where am I needed?",
+    "rc1020": "10-4 {LOC}",
+    "hs-rc-108": "10-8 where am I needed?",
+    "hs-rc-105": "10-5 {LOC} replacing [Replacement Name]",
+    "hs-rc-107a": "10-7 {LOC} need replacement in 10 minute",
+    "hs-rc-107b": "10-7 {LOC} replaced by [Replacement Name]",
+    "hs-rc-109": "Need 10-9 {LOC} for 10 minute",
+    "custom-cmd-1786322808209604": "Edit this text...",
+    "hs-rc-codea": "Code A at {LOC} flying back/cannot fly back @Employee @HighCommand"
   },
   "userAddedCommands": [
     {
-      "secIndex": "6",
-      "id": "custom-cmd-1786023052454772",
-      "template": "Edit this text..."
-    },
-    {
-      "secIndex": "6",
-      "id": "custom-cmd-1786023053220426",
-      "template": "Edit this text..."
-    },
-    {
-      "secIndex": "9",
-      "id": "custom-cmd-1786305679160823",
-      "template": "10-4! A unit is 10-17 to your base! Arriving soon!",
-      "title": "Custom Command"
+      "secIndex": "17",
+      "id": "custom-cmd-1786322808209604",
+      "template": "Edit this text...",
+      "title": "Off Duty Step"
     }
   ],
   "userDefaults": {
@@ -141,11 +140,19 @@
     "off1": "/me Switches off the bodycam and checks for the Green Light\n",
     "off2": "/do Bodycam footage has been saved to SD Card",
     "off3": "/me Uploads the bodycam footage to the EMS Cloud Server",
-    "sw1_1": "Dear Citizens of Los Santos, got the courage to answer the call",
-    "sw1_2": "Join Emergency Medical Services and become the difference between life and death",
-    "sw1_3": "Head over to PH Front as interviews are happening right now",
+    "rc108": "10-8 where am I needed?",
+    "rc1020": "10-4 {LOC}",
+    "rc109": "Need 10-9 {LOC} for 10 minute",
+    "rc109cov": "10-9 {LOC} for 10 minute covered by {REP}",
+    "rc108b": "10-8 [Location] back from 10-9",
+    "rc105": "10-5 {LOC} replacing {REP}",
+    "rc107a": "10-7 {LOC} need replacement in 10 minute",
+    "rc107b": "10-7 {LOC} replaced by [Replacement Name]",
+    "sw1_1": "Dear Citizens of Los Santos, do you have what it takes to own the night?",
+    "sw1_2": "Join Emergency Medical Services for Night Shift Recruitment and protect the city while it sleeps",
+    "sw1_3": "Head over to {LOC} as night shift interviews are officially underway right now",
     "sw1_4": "Make sure your record is clean and no tattoos on your hands or face",
-    "sw1_5": "Be the reason someone lives to see another day because EMS needs you",
+    "sw1_5": "Be the hero in the dark because EMS needs night shift medics today",
     "sw2_1": "Dear Citizens of Los Santos, this is Kuro Vukovic Chief of EMS",
     "sw2_2": "We are still live with open EMS recruitment and time is ticking",
     "sw2_3": "If you have the will to help and a heart that beats for others then come to PH Front now",
@@ -156,18 +163,9 @@
     "sw3_3": "If you dream of saving lives and making a real impact now is your moment",
     "sw3_4": "Come to PH Front with no criminal record and no hand or face tattoos",
     "sw3_5": "Heroes act fast we hope to see you there",
-    "rc108": "10-8 where am I needed?",
-    "rc1020": "10-4 {LOC}",
-    "rc109": "Need 10-9 {LOC} for 10 minute",
-    "rc109cov": "10-9 {LOC} for 10 minute covered by {REP}",
-    "rc108b": "10-8 {LOC} back from 10-9",
-    "rc105": "10-5 {LOC} replacing {REP}",
-    "rc107a": "10-7 {LOC} need replacement in 10 minute",
-    "rc107b": "10-7 {LOC} replaced by [Replacement Name]",
     "cmd-acc-1": "EMS To ALL: Doctors are loading adrenaline and preparing for the ACC! See you there!",
     "cmd-acc-2": "EMS To ALL: Doctors have arrived at the situation. Come to the EMS vehicle for adrenaline shots!!",
     "cmd-acc-3": "EMS To ALL: Good luck at the ACC! Stay safe and watch your backs.",
-    "cmd-acc-4": "...",
     "cmd-meet-1": "EMS To LSPD: How copy?",
     "cmd-meet-2": "EMS To FIB: How copy?",
     "cmd-meet-3": "EMS To SAHP: How copy?",
@@ -232,21 +230,24 @@
     "cmd-subs-2": "EMS To ALL: Doctors have arrived at the situation. Come to the EMS vehicle for adrenaline shots!!",
     "cmd-subs-3": "EMS To ALL: Good luck at the SUBS! Stay safe and watch your backs!",
     "cmd-subs-4": "...",
+    "custom-cmd-1786322808209604": "Edit this text...",
     "hs-bc-on": "/me Takes out Bodycam and attaches Bodycam to chest and checks its ballistic, water proof\n\n/me Makes sure it is recording and checks for the red light\n\n/do It is recording, and its ballistic, water proof | {NAME} ({ID})",
     "hs-bc-ref": "/me Refreshes the bodycam\n\n/do It is recording, and its ballistic, water proof | {NAME} ({ID})",
     "hs-bc-sav": "/me Saves bodycam, uploads it to the EMS Cloud Server\n\n/do It is recording, and its ballistic, water proof | {NAME} ({ID})",
     "hs-bc-off": "/me Switches off the bodycam and checks for the Green Light\n\n/do Bodycam footage has been saved to SD Card | {NAME} ({ID})\n\n/me Uploads the bodycam footage to the EMS Cloud Server",
     "hs-rc-108": "10-8 where am I needed?",
-    "hs-rc-105": "10-5 {LOC} replacing {REP}",
+    "hs-rc-105": "10-5 {LOC} replacing [Replacement Name]",
     "hs-rc-107a": "10-7 {LOC} need replacement in 10 minute",
-    "hs-rc-107b": "10-7 {LOC} replaced by {REP}",
+    "hs-rc-107b": "10-7 {LOC} replaced by [Replacement Name]",
     "hs-rc-empty": "10-7 {LOC} no replacement found after 10 minutes, {LOC} is now empty",
     "hs-rc-109": "Need 10-9 {LOC} for 10 minute",
-    "hs-rc-codea": "Code A at {LOC} flying back/cannot fly back @Employee @High Command",
+    "hs-rc-codea": "Code A at {LOC} flying back/cannot fly back @Employee @HighCommand",
     "gs-rc-vest": "Any HC available, I need a vest for GS Calls?",
     "gs-rp-arr": "Hello sir! I am from EMS, I am going to patch you up. Don't worry you will be fine."
   },
-  "deletedCommands": [],
+  "deletedCommands": [
+    "cmd-acc-4"
+  ],
   "customTitles": {
     "hs-bc-on": "On Duty",
     "cmd-acc-2": "Command at 21:25",
@@ -263,10 +264,13 @@
     "cmd-bank-3": "Command at 21:30",
     "cmd-prison-1": "Command",
     "cmd-prison-2": "Command",
-    "custom-cmd-1786305679160823": "Custom Command"
+    "sw1_1": "Step 1",
+    "hs-bc-off": "Off Duty",
+    "custom-cmd-1786322808209604": "Off Duty Step"
   },
   "lastProfileVerifyDate": null,
   "selectedSubDept": "HS",
+  "mainNavService": "hs",
   "shiftRates": {
     "nightPH": 25000,
     "nightSH": 40000,
@@ -281,5 +285,11 @@
   "tasks": [],
   "taskStates": {},
   "enableDailyTasks": true,
-  "rotaLocation": "PH Front"
+  "rotaLocation": "PH Front",
+  "discordToggles": {
+    "cb-generic-1": false,
+    "cb-generic-2": true,
+    "cb-bodycam": false
+  },
+  "bcStatus": "Off duty"
 }
