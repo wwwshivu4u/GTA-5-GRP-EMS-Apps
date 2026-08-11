@@ -1,4 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const RATE_INPUTS_MAP = {
+        rateNightPH: 'nightPH', rateNightSH: 'nightSH', rateNightCalls: 'nightCalls',
+        rateDayPH: 'dayPH', rateDaySH: 'daySH', rateDayCalls: 'dayCalls',
+        rateLabCaptcha: 'labCaptcha', rateLabMedicine: 'labMedicine'
+    };
+    const ALL_DUTY_STEPS = ['od1','od2','od3','ref1','ref2','sav1','sav2','off1','off2','off3', 'sw1_1','sw1_2','sw1_3','sw1_4','sw1_5','sw1_6','sw1_7', 'sw2_1','sw2_2','sw2_3','sw2_4','sw2_5', 'sw3_1','sw3_2','sw3_3','sw3_4','sw3_5'];
+
     // -----------------------------------------------------
     // SPLASH SCREEN LOGIC
     // -----------------------------------------------------
@@ -198,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (typeof state.showBootScreen === 'undefined') state.showBootScreen = true;
 
                 if (!state.dutySteps) state.dutySteps = {};
-                ['od1','od2','od3','ref1','ref2','sav1','sav2','off1','off2','off3', 'sw1_1','sw1_2','sw1_3','sw1_4','sw1_5','sw2_1','sw2_2','sw2_3','sw2_4','sw2_5', 'sw3_1','sw3_2','sw3_3','sw3_4','sw3_5'].forEach(step => {
+                ALL_DUTY_STEPS.forEach(step => {
                     if (typeof state.dutySteps[step] === 'undefined') state.dutySteps[step] = false;
                 });
                 if (!state.customCommands) state.customCommands = {};
@@ -482,12 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePreviews();
     });
 
-    const rateInputs = {
-        rateNightPH: 'nightPH', rateNightSH: 'nightSH', rateNightCalls: 'nightCalls',
-        rateDayPH: 'dayPH', rateDaySH: 'daySH', rateDayCalls: 'dayCalls',
-        rateLabCaptcha: 'labCaptcha', rateLabMedicine: 'labMedicine'
-    };
-    for (const [id, key] of Object.entries(rateInputs)) {
+    for (const [id, key] of Object.entries(RATE_INPUTS_MAP)) {
         const el = document.getElementById(id);
         if (el) {
             el.addEventListener('input', () => {
@@ -574,17 +576,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetId = el.id;
             let newTemplate = el.innerText;
             
-            const name = state.name || '[Name]';
-            const id = state.id || '[ID]';
-            const rotaLocSelect = document.getElementById('rota-location');
-            const locInputCustom = document.getElementById('locInputCustom');
-            const repInput = document.getElementById('repInput');
-            
-            let loc = rotaLocSelect ? rotaLocSelect.value : '';
-            if (loc === 'Other...') loc = locInputCustom ? locInputCustom.value : '';
-            if (!loc) loc = '[Location]';
-            let rep = repInput ? repInput.value : '';
-            if (!rep) rep = '[Replacement Name]';
+            const { name, id, loc, rep } = getTemplateVars();
             
             if (loc && loc !== '[Location]') newTemplate = newTemplate.split(loc).join('{LOC}');
             if (rep && rep !== '[Replacement Name]') newTemplate = newTemplate.split(rep).join('{REP}');
@@ -618,31 +610,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    function getTemplateVars() {
+        const name = state.name || '[Name]';
+        const id = state.id || '[ID]';
+        const rotaLocSelect = document.getElementById('rota-location');
+        const locInputCustom = document.getElementById('locInputCustom');
+        const repInput = document.getElementById('repInput');
+        let loc = rotaLocSelect ? rotaLocSelect.value : '';
+        if (loc === 'Other...') loc = locInputCustom ? locInputCustom.value : '';
+        if (!loc) loc = '[Location]';
+        let rep = repInput ? repInput.value : '';
+        if (!rep) rep = '[Replacement Name]';
+        return { name, id, loc, rep };
+    }
+
     function updatePreviews() {
         nameInput.value = state.name || '';
         idInput.value = state.id || '';
 
-        const rateInputs = {
-            rateNightPH: 'nightPH', rateNightSH: 'nightSH', rateNightCalls: 'nightCalls',
-            rateDayPH: 'dayPH', rateDaySH: 'daySH', rateDayCalls: 'dayCalls',
-            rateLabCaptcha: 'labCaptcha', rateLabMedicine: 'labMedicine'
-        };
-        for (const [id, key] of Object.entries(rateInputs)) {
+        for (const [id, key] of Object.entries(RATE_INPUTS_MAP)) {
             const el = document.getElementById(id);
             if (el && state.shiftRates) {
                 el.value = state.shiftRates[key] || '';
             }
         }
 
-        const name = state.name || '[Name]';
-        const id = state.id || '[ID]';
-        
-        let loc = rotaLocSelect ? rotaLocSelect.value : '';
-        if (loc === 'Other...') loc = locInputCustom ? locInputCustom.value : '';
-        if (!loc) loc = '[Location]';
-
-        let rep = repInput ? repInput.value : '';
-        if (!rep) rep = '[Replacement Name]';
+        const { name, id, loc, rep } = getTemplateVars();
 
         document.querySelectorAll('.copy-content').forEach(el => {
             let text = el.dataset.template;
@@ -660,41 +653,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function checkDutyState() {
-        const btns = {
-            od2: document.querySelector('[data-target="od2"]'),
-            od3: document.querySelector('[data-target="od3"]'),
-            ref2: document.querySelector('[data-target="ref2"]'),
-            sav2: document.querySelector('[data-target="sav2"]'),
-            off2: document.querySelector('[data-target="off2"]'),
-            off3: document.querySelector('[data-target="off3"]')
-        };
-        ['sw1_2','sw1_3','sw1_4','sw1_5','sw1_6','sw1_7','sw2_2','sw2_3','sw2_4','sw2_5','sw3_2','sw3_3','sw3_4','sw3_5'].forEach(id => {
-            btns[id] = document.querySelector(`[data-target="${id}"]`);
-        });
-
-        if (state.dutySteps.od1 && btns.od2) { btns.od2.disabled = false; btns.od2.classList.remove('disabled'); }
-        if (state.dutySteps.od2 && btns.od3) { btns.od3.disabled = false; btns.od3.classList.remove('disabled'); }
-        if (state.dutySteps.ref1 && btns.ref2) { btns.ref2.disabled = false; btns.ref2.classList.remove('disabled'); }
-        if (state.dutySteps.sav1 && btns.sav2) { btns.sav2.disabled = false; btns.sav2.classList.remove('disabled'); }
-        if (state.dutySteps.off1 && btns.off2) { btns.off2.disabled = false; btns.off2.classList.remove('disabled'); }
-        if (state.dutySteps.off2 && btns.off3) { btns.off3.disabled = false; btns.off3.classList.remove('disabled'); }
+        const stepDependencies = [
+            ['od1', 'od2'], ['od2', 'od3'], 
+            ['ref1', 'ref2'], 
+            ['sav1', 'sav2'], 
+            ['off1', 'off2'], ['off2', 'off3'],
+            ['sw1_1', 'sw1_2'], ['sw1_2', 'sw1_3'], ['sw1_3', 'sw1_4'], ['sw1_4', 'sw1_5'], ['sw1_5', 'sw1_6'], ['sw1_6', 'sw1_7'],
+            ['sw2_1', 'sw2_2'], ['sw2_2', 'sw2_3'], ['sw2_3', 'sw2_4'], ['sw2_4', 'sw2_5'],
+            ['sw3_1', 'sw3_2'], ['sw3_2', 'sw3_3'], ['sw3_3', 'sw3_4'], ['sw3_4', 'sw3_5']
+        ];
         
-        if (state.dutySteps.sw1_1 && btns.sw1_2) { btns.sw1_2.disabled = false; btns.sw1_2.classList.remove('disabled'); }
-        if (state.dutySteps.sw1_2 && btns.sw1_3) { btns.sw1_3.disabled = false; btns.sw1_3.classList.remove('disabled'); }
-        if (state.dutySteps.sw1_3 && btns.sw1_4) { btns.sw1_4.disabled = false; btns.sw1_4.classList.remove('disabled'); }
-        if (state.dutySteps.sw1_4 && btns.sw1_5) { btns.sw1_5.disabled = false; btns.sw1_5.classList.remove('disabled'); }
-        if (state.dutySteps.sw1_5 && btns.sw1_6) { btns.sw1_6.disabled = false; btns.sw1_6.classList.remove('disabled'); }
-        if (state.dutySteps.sw1_6 && btns.sw1_7) { btns.sw1_7.disabled = false; btns.sw1_7.classList.remove('disabled'); }
-
-        if (state.dutySteps.sw2_1 && btns.sw2_2) { btns.sw2_2.disabled = false; btns.sw2_2.classList.remove('disabled'); }
-        if (state.dutySteps.sw2_2 && btns.sw2_3) { btns.sw2_3.disabled = false; btns.sw2_3.classList.remove('disabled'); }
-        if (state.dutySteps.sw2_3 && btns.sw2_4) { btns.sw2_4.disabled = false; btns.sw2_4.classList.remove('disabled'); }
-        if (state.dutySteps.sw2_4 && btns.sw2_5) { btns.sw2_5.disabled = false; btns.sw2_5.classList.remove('disabled'); }
-
-        if (state.dutySteps.sw3_1 && btns.sw3_2) { btns.sw3_2.disabled = false; btns.sw3_2.classList.remove('disabled'); }
-        if (state.dutySteps.sw3_2 && btns.sw3_3) { btns.sw3_3.disabled = false; btns.sw3_3.classList.remove('disabled'); }
-        if (state.dutySteps.sw3_3 && btns.sw3_4) { btns.sw3_4.disabled = false; btns.sw3_4.classList.remove('disabled'); }
-        if (state.dutySteps.sw3_4 && btns.sw3_5) { btns.sw3_5.disabled = false; btns.sw3_5.classList.remove('disabled'); }
+        stepDependencies.forEach(([prev, next]) => {
+            const btn = document.querySelector(`[data-target="${next}"]`);
+            if (state.dutySteps[prev] && btn) { 
+                btn.disabled = false; 
+                btn.classList.remove('disabled'); 
+            }
+        });
 
         const onDutyDone = state.dutySteps.od1 && state.dutySteps.od2 && state.dutySteps.od3;
         const offDutyDone = state.dutySteps.off1 && state.dutySteps.off2 && state.dutySteps.off3;
@@ -732,7 +707,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (offDutyDone) {
             state.dutySteps = {};
-            ['od1','od2','od3','ref1','ref2','sav1','sav2','off1','off2','off3', 'sw1_1','sw1_2','sw1_3','sw1_4','sw1_5','sw1_6','sw1_7', 'sw2_1','sw2_2','sw2_3','sw2_4','sw2_5', 'sw3_1','sw3_2','sw3_3','sw3_4','sw3_5'].forEach(step => state.dutySteps[step] = false);
+            ALL_DUTY_STEPS.forEach(step => state.dutySteps[step] = false);
             state.rotaCap = 0;
             state.rotaDel = 0;
             saveState();
@@ -788,13 +763,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Save modified radio command
             if (!state.customCommands) state.customCommands = {};
             let newTemplate = textToCopy;
-            const name = state.name || '[Name]';
-            const id = state.id || '[ID]';
-            let loc = rotaLocSelect ? rotaLocSelect.value : '';
-            if (loc === 'Other...') loc = locInputCustom ? locInputCustom.value : '';
-            if (!loc) loc = '[Location]';
-            let rep = repInput ? repInput.value : '';
-            if (!rep) rep = '[Replacement Name]';
+            const { name, id, loc, rep } = getTemplateVars();
             
             if (loc && loc !== '[Location]') newTemplate = newTemplate.split(loc).join('{LOC}');
             if (rep && rep !== '[Replacement Name]') newTemplate = newTemplate.split(rep).join('{REP}');
@@ -1372,26 +1341,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     }
     
+    function getShiftRate(loc, startHour, rates) {
+        if (startHour >= 0 && startHour < 6) { // Night Shift
+            if (loc.includes('PH')) return rates.nightPH;
+            if (loc.includes('SH')) return rates.nightSH;
+            if (loc.includes('Calls')) return rates.nightCalls;
+        } else { // Day Shift
+            if (loc.includes('PH')) return rates.dayPH;
+            if (loc.includes('SH')) return rates.daySH;
+            if (loc.includes('Calls')) return rates.dayCalls;
+        }
+        return 0;
+    }
+
     function notifyRotaHourlyBonus(hoursCompleted) {
-        window.playDutyChime();
+        window.playDutyChime && window.playDutyChime();
         
         const startTime = new Date(state.dutyStartTime).toLocaleString("en-US", {timeZone: "Europe/London"});
         const startHour = new Date(startTime).getHours();
         const loc = state.rotaLocation || "PH Front";
         
-        let rate = 0;
-        const rates = state.shiftRates;
-        
-        if (startHour >= 0 && startHour < 6) { // Night Shift
-            if (loc.includes('PH')) rate = rates.nightPH;
-            else if (loc.includes('SH')) rate = rates.nightSH;
-            else if (loc.includes('Calls')) rate = rates.nightCalls;
-        } else { // Day Shift
-            if (loc.includes('PH')) rate = rates.dayPH;
-            else if (loc.includes('SH')) rate = rates.daySH;
-            else if (loc.includes('Calls')) rate = rates.dayCalls;
-        }
-        
+        const rate = getShiftRate(loc, startHour, state.shiftRates);
         const bonus = rate * hoursCompleted;
         const msg = `Completed ${hoursCompleted} hr(s) on ${loc}! Earned so far: $${bonus.toLocaleString()}`;
         
@@ -1462,20 +1432,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const hoursCompleted = Math.floor(timerSeconds / 3600);
         const m = Math.floor((timerSeconds % 3600) / 60);
         
-        let rate = 0;
-        const rates = state.shiftRates;
         const startHour = onTime.getHours();
-        
-        if (startHour >= 0 && startHour < 6) { // Night Shift
-            if (loc.includes('PH')) rate = rates.nightPH;
-            else if (loc.includes('SH')) rate = rates.nightSH;
-            else if (loc.includes('Calls')) rate = rates.nightCalls;
-        } else { // Day Shift
-            if (loc.includes('PH')) rate = rates.dayPH;
-            else if (loc.includes('SH')) rate = rates.daySH;
-            else if (loc.includes('Calls')) rate = rates.dayCalls;
-        }
-        
+        const rate = getShiftRate(loc, startHour, state.shiftRates);
         const bonus = rate * hoursCompleted;
         const durationStr = `${hoursCompleted} hr ${m} min`;
         const bonusStr = hoursCompleted > 0 ? `\nBonus Earned: $${bonus.toLocaleString()}` : '\nNo full hour completed (No bonus)';

@@ -70,18 +70,19 @@ body {
 /* TOP STATUS BAR (Dynamic Island) */
 .top-bar {
     position: absolute;
-    top: 10px;
-    left: 10px;
-    right: 10px;
-    padding: 0.4rem;
-    max-width: 500px;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    padding: 1rem 1.5rem;
+    max-width: 600px;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 100;
-    background: #000;
-    border-radius: 10px;
+    background: rgba(10, 10, 10, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
     transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     min-width: 120px;
@@ -109,7 +110,8 @@ body {
 }
 
 .di-btn {
-    width: 76px !important;
+    /* width: 76px !important; */
+    width: 100% !important;
     height: 36px !important;
     padding: 0 !important;
     border-radius: 15px !important;

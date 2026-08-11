@@ -67,42 +67,38 @@
         </svg>
 
         <div class="progress-container di-view" id="tb-default-view">
-            <div style="font-size: 0.85rem;color: var(--text-muted);font-weight: bold;margin-left: 1rem;">
+            <div style="font-size: 0.95rem;color: var(--text-muted);font-weight: bold;">
                 Complete Bodycam logs to start shift
             </div>
         </div>
 
         <div class="progress-container hidden di-view" id="tb-setup-view">
-            <select id="rota-location" class="rota-select" style="min-width: 150px;">
-                <option value="PH Front">PH Front</option>
-                <option value="PH Back">PH Back</option>
-                <option value="SH">SH (Sandy Shores)</option>
-                <option value="Calls">Calls</option>
-                <option value="Labs">Labs</option>
-                <option value="Training">Training</option>
-            </select>
-            <input type="text" id="locInputCustom" class="rota-select" placeholder="Type custom location..." style="display:none; min-width: 150px;">
-            <div style="display: flex; gap: 0.5rem;justify-content: space-between;">
-                <button class="btn btn-success btn-icon di-btn" id="btn-rota-start" onclick="startRotaShift()">
-                    <span>▶</span>
-                </button>
-                <button class="btn btn-danger btn-icon di-btn" id="btn-rota-end-disabled" disabled>
-                    <span>⏹</span>
+            <div style="display: flex; gap: 0.75rem; align-items: center; width: 100%;">
+                <select id="rota-location" class="rota-select" style="flex: 1; padding: 0.5rem; background: rgba(0,0,0,0.6); color: white; border: 1px solid var(--card-border); border-radius: 8px;">
+                    <option value="PH Front">PH Front</option>
+                    <option value="PH Back">PH Back</option>
+                    <option value="SH">SH (Sandy Shores)</option>
+                    <option value="Calls">Calls</option>
+                    <option value="Labs">Labs</option>
+                    <option value="Training">Training</option>
+                </select>
+                <button class="btn btn-success btn-icon di-btn" id="btn-rota-start" onclick="startRotaShift()" style="width: auto !important; padding: 0 1rem !important; height: 38px !important;">
+                    <span>▶ Start</span>
                 </button>
             </div>
+            <input type="text" id="locInputCustom" class="rota-select" placeholder="Type custom location..." style="display:none; width: 100%; padding: 0.5rem; background: rgba(0,0,0,0.6); color: white; border: 1px solid var(--card-border); border-radius: 8px; margin-top: 0.25rem;">
         </div>
 
         <div class="progress-container hidden di-view" id="tb-compact-view" style="flex-direction: column; gap: 0.2rem;">
-            <div style="display: flex;gap: 0.5rem;align-items: center;width: 100%;justify-content: flex-start;">
-                <div class="rota-compact-timer" id="compact-main-timer" style="font-size: 1.1rem; font-family: monospace; font-weight: bold; min-width: 120px; text-align: center;">
+            <div style="display: flex; gap: 1rem; align-items: center; justify-content: space-between; width: 100%;">
+                <div class="rota-compact-timer" id="compact-main-timer" style="font-size: 1.3rem; font-family: monospace; font-weight: bold; text-align: center;">
                     0 hr 00:00:00
                 </div>
-                <button class="btn btn-danger btn-icon di-btn" id="btn-rota-end" onclick="showConfirmRotaEnd()">
-                    <span>⏹</span>
+                <button class="btn btn-danger btn-icon di-btn" id="btn-rota-end" onclick="showConfirmRotaEnd()" style="width: auto !important; padding: 0 1rem !important; height: 32px !important;">
+                    <span>⏹ End</span>
                 </button>
             </div>
-            <div id="night-shift-indicator" class="hidden" style="font-size: 0.8rem; color: #f1c40f; width: 100%;">
-                🌙 Night Shift Active: +$<span id="night-shift-bonus-val">0</span> / min <br>💵  Bonus: $<span id="night-shift-earned-val">0</span> ⏰ <span id="ns-timer">{every next tuesday IST}</span>
+            <div id="night-shift-indicator" class="hidden" style="font-size: 0.85rem; width: 100%;">
             </div>
         </div>
 
