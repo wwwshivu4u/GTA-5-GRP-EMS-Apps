@@ -14,9 +14,9 @@
   "name": "Thakur Sergey",
   "id": "177919",
   "dutySteps": {
-    "od1": false,
-    "od2": false,
-    "od3": false,
+    "od1": true,
+    "od2": true,
+    "od3": true,
     "ref1": false,
     "ref2": false,
     "sav1": false,
@@ -42,7 +42,7 @@
     "sw3_4": false,
     "sw3_5": false
   },
-  "dutyStartTime": null,
+  "dutyStartTime": 1786490177923,
   "rotaCap": 0,
   "rotaDel": 0,
   "customCommands": {
@@ -118,10 +118,21 @@
     "hs-rc-107a": "10-7 {LOC} need replacement in 10 minute",
     "hs-rc-107b": "10-7 {LOC} replaced by [Replacement Name]",
     "hs-rc-109": "Need 10-9 {LOC} for 10 minute",
-    "custom-cmd-1786322808209604": "Edit this text...",
+    "gs-rc-vest": "Any HC available, I need a vest for GS Calls?",
+    "gs-rp-arr": "Hello sir! I am from EMS, I am going to patch you up. Don't worry you will be fine.",
     "hs-rc-codea": "Code A at {LOC} flying back/cannot fly back @Employee @HighCommand"
   },
   "userAddedCommands": [
+    {
+      "secIndex": "6",
+      "id": "custom-cmd-1786023052454772",
+      "template": "Edit this text..."
+    },
+    {
+      "secIndex": "6",
+      "id": "custom-cmd-1786023053220426",
+      "template": "Edit this text..."
+    },
     {
       "secIndex": "17",
       "id": "custom-cmd-1786322808209604",
@@ -158,6 +169,8 @@
     "sw2_3": "If you have the will to help and a heart that beats for others then come to PH Front now",
     "sw2_4": "You must have a clean record and no tattoos on your hands or face",
     "sw2_5": "The city is calling for real heroes will you rise to the challenge",
+    "custom-cmd-1786023052454772": "Edit this text...",
+    "custom-cmd-1786023053220426": "Edit this text...",
     "sw3_1": "Final call Los Santos this is Kuro Vukovic Chief of EMS",
     "sw3_2": "We are finishing recruitment very soon and this is your last chance",
     "sw3_3": "If you dream of saving lives and making a real impact now is your moment",
@@ -166,6 +179,7 @@
     "cmd-acc-1": "EMS To ALL: Doctors are loading adrenaline and preparing for the ACC! See you there!",
     "cmd-acc-2": "EMS To ALL: Doctors have arrived at the situation. Come to the EMS vehicle for adrenaline shots!!",
     "cmd-acc-3": "EMS To ALL: Good luck at the ACC! Stay safe and watch your backs.",
+    "cmd-acc-4": "...",
     "cmd-meet-1": "EMS To LSPD: How copy?",
     "cmd-meet-2": "EMS To FIB: How copy?",
     "cmd-meet-3": "EMS To SAHP: How copy?",
@@ -245,9 +259,7 @@
     "gs-rc-vest": "Any HC available, I need a vest for GS Calls?",
     "gs-rp-arr": "Hello sir! I am from EMS, I am going to patch you up. Don't worry you will be fine."
   },
-  "deletedCommands": [
-    "cmd-acc-4"
-  ],
+  "deletedCommands": [],
   "customTitles": {
     "hs-bc-on": "On Duty",
     "cmd-acc-2": "Command at 21:25",
@@ -266,7 +278,8 @@
     "cmd-prison-2": "Command",
     "sw1_1": "Step 1",
     "hs-bc-off": "Off Duty",
-    "custom-cmd-1786322808209604": "Off Duty Step"
+    "custom-cmd-1786322808209604": "Off Duty Step",
+    "gs-rp-arr": "RP Arrival Script"
   },
   "lastProfileVerifyDate": null,
   "selectedSubDept": "HS",
@@ -281,15 +294,15 @@
     "labCaptcha": 5000,
     "labMedicine": 10000
   },
-  "showBootScreen": true,
+  "showBootScreen": false,
   "tasks": [],
   "taskStates": {},
   "enableDailyTasks": true,
   "rotaLocation": "PH Front",
+  "bcStatus": "On duty",
   "discordToggles": {
-    "cb-generic-1": false,
+    "cb-generic-1": true,
     "cb-generic-2": true,
-    "cb-bodycam": false
-  },
-  "bcStatus": "Off duty"
+    "cb-bodycam": true
+  }
 }
