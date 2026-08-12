@@ -1256,11 +1256,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     nsIndicatorEl.style.color = '#bdc3c7'; // Grey out if inactive but has earned bonus
                     nsIndicatorEl.innerHTML = `💵💵<br>Night Shift Bonus<br>Inactive!<br>Earned: <span style="font-weight: bold;">$${cachedNSEarnedBonus.toLocaleString()}</span>`;
                 } else {
-                    nsIndicatorEl.classList.add('hidden');
+                    // nsIndicatorEl.classList.add('hidden');
                 }
             }
             if (nsTimerEl) {
-                nsTimerEl.style.color = '';
+                nsTimerEl.style.color = '#bdc3c7';
                 nsTimerEl.style.textShadow = '';
             }
         }
