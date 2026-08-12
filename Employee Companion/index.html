@@ -91,15 +91,16 @@
 
         <div class="progress-container hidden di-view" id="tb-compact-view" style="flex-direction: column; gap: 0.2rem;">
             <div style="display: flex; gap: 1rem; align-items: center; justify-content: space-between; width: 100%;">
-                <div class="rota-compact-timer" id="compact-main-timer" style="font-size: 1.3rem; font-family: monospace; font-weight: bold; text-align: center;">
-                    0 hr 00:00:00
-                </div>
-                <button class="btn btn-danger btn-icon di-btn" id="btn-rota-end" onclick="showConfirmRotaEnd()" style="width: auto !important; padding: 0 1rem !important; height: 32px !important;">
+                <button class="btn btn-danger btn-icon di-btn" id="btn-rota-end" onclick="showConfirmRotaEnd()" style="width: auto !important;padding: 0 1rem !important;height: 70px !important;margin-right: 0.8rem;">
                     <span>⏹ End</span>
                 </button>
+                <div class="rota-compact-timer" id="compact-main-timer" style="font-size: 1.3rem; font-family: monospace; font-weight: bold;">
+                    0 hr 00:00:00
+                </div>
+                <div id="night-shift-indicator" class="hidden" style="font-size: 0.85rem; width: 100%;">
+                </div>
             </div>
-            <div id="night-shift-indicator" class="hidden" style="font-size: 0.85rem; width: 100%;">
-            </div>
+
         </div>
 
         <div class="progress-container hidden di-view" id="tb-confirm-view">

@@ -1239,35 +1239,11 @@ document.addEventListener('DOMContentLoaded', () => {
         let hour = parseInt(hourStr, 10);
         if (hour === 24) hour = 0;
         
-        const nightPH = state.shiftRates && state.shiftRates.nightPH ? parseInt(state.shiftRates.nightPH) : 25000;
-        const bonusPerMin = Math.floor(nightPH / 60);
-        
-        if (state.dutyStartTime) {
-            const start = new Date(state.dutyStartTime).getTime();
-            const totalMinutes = Math.floor((now.getTime() - start) / 60000);
-            
-            if (totalMinutes !== lastNSCalcTotalMinutes) {
-                lastNSCalcTotalMinutes = totalMinutes;
-                cachedNSEarnedBonus = 0;
-                for (let i = 0; i < totalMinutes; i++) {
-                    const minTime = new Date(start + i * 60000);
-                    let h = parseInt(nsDtFormatter.format(minTime), 10);
-                    if (h === 24) h = 0;
-                    if (h >= 0 && h < 6) {
-                        cachedNSEarnedBonus += bonusPerMin;
-                    }
-                }
-            }
-        } else {
-            lastNSCalcTotalMinutes = -1;
-            cachedNSEarnedBonus = 0;
-        }
-        
         if (hour >= 0 && hour < 6) {
             if (nsIndicatorEl) {
                 nsIndicatorEl.classList.remove('hidden');
                 nsIndicatorEl.style.color = '#f1c40f';
-                nsIndicatorEl.innerHTML = `🌙 Night Shift Active: +$${bonusPerMin.toLocaleString()} / min` + (cachedNSEarnedBonus > 0 ? ` <br> Earned: <span style="font-weight: bold;">$${cachedNSEarnedBonus.toLocaleString()}</span>` : ``);
+                nsIndicatorEl.innerHTML = `💵💵<br>Night Shift<br>Bonus Active!<br>Earned: <span style="font-weight: bold;">$${cachedNSEarnedBonus.toLocaleString()}</span>`;
             }
             if (nsTimerEl) {
                 nsTimerEl.style.color = '#f1c40f';
@@ -1278,7 +1254,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (cachedNSEarnedBonus > 0 && state.dutyStartTime) {
                     nsIndicatorEl.classList.remove('hidden');
                     nsIndicatorEl.style.color = '#bdc3c7'; // Grey out if inactive but has earned bonus
-                    nsIndicatorEl.innerHTML = `🌙 Night Shift Inactive <br> Earned: <span style="font-weight: bold;">$${cachedNSEarnedBonus.toLocaleString()}</span>`;
+                    nsIndicatorEl.innerHTML = `💵💵<br>Night Shift Bonus<br>Inactive!<br>Earned: <span style="font-weight: bold;">$${cachedNSEarnedBonus.toLocaleString()}</span>`;
                 } else {
                     nsIndicatorEl.classList.add('hidden');
                 }
