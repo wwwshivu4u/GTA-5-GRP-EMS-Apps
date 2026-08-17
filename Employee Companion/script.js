@@ -995,6 +995,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const lrLiveDateEl = document.getElementById('lr-live-date');
     const dtFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
     
+    let lastBcTimeText = '';
+    let lastBigClockHTML = '';
+    let lastLrDateText = '';
+
     setInterval(() => {
         const userTime = new Date();
         const icStr = dtFormatter.format(userTime); 
@@ -1009,11 +1013,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const userS = String(userTime.getSeconds()).padStart(2, '0');
         
         if (bcLiveTimeEl) {
-            bcLiveTimeEl.textContent = `${edinH}:${edinM} (IC) | ${userH}:${userM} (Local)`;
+            const newBcTime = `${edinH}:${edinM} (IC) | ${userH}:${userM} (Local)`;
+            if (lastBcTimeText !== newBcTime) {
+                bcLiveTimeEl.textContent = newBcTime;
+                lastBcTimeText = newBcTime;
+            }
         }
         
         if (bigClockEl) {
-            bigClockEl.innerHTML = `<span>${edinH}:${edinM}:${edinS} (IC)</span><span style="font-size: 0.85rem; color: var(--text-muted);">${userH}:${userM}:${userS} (Local)</span>`;
+            const newBigClock = `<span>${edinH}:${edinM}:${edinS} (IC)</span><span style="font-size: 0.85rem; color: var(--text-muted);">${userH}:${userM}:${userS} (Local)</span>`;
+            if (lastBigClockHTML !== newBigClock) {
+                bigClockEl.innerHTML = newBigClock;
+                lastBigClockHTML = newBigClock;
+            }
         }
         
         if (lrLiveDateEl) {
@@ -1021,7 +1033,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const userMoLocal = String(userTime.getMonth() + 1).padStart(2, '0');
             const userY = userTime.getFullYear();
             
-            lrLiveDateEl.textContent = `${edinD}/${edinMo}/${edinY} (IC) | ${userD}/${userMoLocal}/${userY} (Local)`;
+            const newLrDate = `${edinD}/${edinMo}/${edinY} (IC) | ${userD}/${userMoLocal}/${userY} (Local)`;
+            if (lastLrDateText !== newLrDate) {
+                lrLiveDateEl.textContent = newLrDate;
+                lastLrDateText = newLrDate;
+            }
         }
     }, 1000);
 
@@ -1232,6 +1248,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let lastNSCalcTotalMinutes = -1;
     let cachedNSEarnedBonus = 0;
+    let lastNSUIState = '';
     
     window.checkNightShiftUI = () => {
         const now = new Date();
@@ -1239,11 +1256,39 @@ document.addEventListener('DOMContentLoaded', () => {
         let hour = parseInt(hourStr, 10);
         if (hour === 24) hour = 0;
         
-        if (hour >= 0 && hour < 6) {
+        const isNightShift = (hour >= 0 && hour < 6);
+        
+        if (state.dutyStartTime) {
+            if (state.rotaLocation === 'Labs') {
+                const capRate = (state.shiftRates && state.shiftRates.labCaptcha) || 0;
+                const delRate = (state.shiftRates && state.shiftRates.labMedicine) || 0;
+                cachedNSEarnedBonus = (state.rotaCap * capRate) + (state.rotaDel * delRate);
+            } else {
+                const timerSeconds = Math.floor((now.getTime() - state.dutyStartTime) / 1000);
+                const hoursCompleted = Math.floor(timerSeconds / 3600);
+                
+                const startTimeStr = new Date(state.dutyStartTime).toLocaleString("en-US", {timeZone: "Europe/London"});
+                const startHour = new Date(startTimeStr).getHours();
+                
+                const loc = state.rotaLocation || "PH Front";
+                const rate = getShiftRate(loc, startHour, state.shiftRates);
+                
+                cachedNSEarnedBonus = rate * hoursCompleted;
+            }
+        } else {
+            cachedNSEarnedBonus = 0;
+        }
+
+        const stateKey = `${isNightShift}_${cachedNSEarnedBonus}_${!!state.dutyStartTime}`;
+        
+        if (lastNSUIState === stateKey) return;
+        lastNSUIState = stateKey;
+        
+        if (isNightShift) {
             if (nsIndicatorEl) {
                 nsIndicatorEl.classList.remove('hidden');
                 nsIndicatorEl.style.color = '#f1c40f';
-                nsIndicatorEl.innerHTML = `💵💵<br>Night Shift<br>Bonus Active!<br>Earned: <span style="font-weight: bold;">$${cachedNSEarnedBonus.toLocaleString()}</span>`;
+                nsIndicatorEl.innerHTML = `<div style="font-size: 1.5rem; line-height: 1; margin-bottom: 2px;">💵</div><div style="font-size: 0.9rem; font-weight: bold;">$${cachedNSEarnedBonus.toLocaleString()}</div>`;
             }
             if (nsTimerEl) {
                 nsTimerEl.style.color = '#f1c40f';
@@ -1254,7 +1299,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (cachedNSEarnedBonus > 0 && state.dutyStartTime) {
                     nsIndicatorEl.classList.remove('hidden');
                     nsIndicatorEl.style.color = '#bdc3c7'; // Grey out if inactive but has earned bonus
-                    nsIndicatorEl.innerHTML = `💵💵<br>Night Shift Bonus<br>Inactive!<br>Earned: <span style="font-weight: bold;">$${cachedNSEarnedBonus.toLocaleString()}</span>`;
+                    nsIndicatorEl.innerHTML = `<div style="font-size: 1.5rem; line-height: 1; margin-bottom: 2px; filter: grayscale(1);">💵</div><div style="font-size: 0.9rem; font-weight: bold;">$${cachedNSEarnedBonus.toLocaleString()}</div>`;
                 } else {
                     // nsIndicatorEl.classList.add('hidden');
                 }
