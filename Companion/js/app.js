@@ -55,9 +55,9 @@
     ];
 
     const BOTTOM_NAV_SERVICES = [
-        { id: 'hs', icon: '🏥', text: 'HOSPITAL<br>SERVICES', smallText: 'HOSPITAL<br>SERVICES', modal: 'modal-hs' },
-        { id: 'gs', icon: '🚑', text: 'GROUND<br>SERVICES', smallText: 'GROUND<br>SERVICES', modal: 'modal-gs' },
-        { id: 'labtech', icon: '🔬', text: 'LABTECH', smallText: 'LABTECH', modal: 'modal-discord' }
+        { id: 'hs', icon: '<span class="material-symbols-outlined icon-gradient-emerald">local_hospital</span>', text: 'HOSPITAL<br>SERVICES', smallText: 'HOSPITAL<br>SERVICES', modal: 'modal-hs' },
+        { id: 'gs', icon: '<span class="material-symbols-outlined icon-gradient-cyan">medical_services</span>', text: 'GROUND<br>SERVICES', smallText: 'GROUND<br>SERVICES', modal: 'modal-gs' },
+        { id: 'labtech', icon: '<span class="material-symbols-outlined icon-gradient-purple">science</span>', text: 'LABTECH', smallText: 'LABTECH', modal: 'modal-discord' }
     ];
 
     // -----------------------------------------------------
@@ -624,7 +624,7 @@
                     nsIndicatorEl.classList.remove('hidden');
                     nsIndicatorEl.style.color = '#f1c40f';
                     nsIndicatorEl.innerHTML = `
-                        <div style="font-size: 1.3rem; line-height: 1; margin-bottom: 2px;">🌙</div>
+                        <div style="line-height: 1; margin-bottom: 2px;"><span class="material-symbols-outlined icon-gradient-amber" style="font-size:1.3rem;">dark_mode</span></div>
                         <div style="font-size: 0.85rem; font-weight: bold;">$${bonus.toLocaleString()}</div>
                     `;
                     if (nsTimerEl) {
@@ -636,7 +636,7 @@
                         nsIndicatorEl.classList.remove('hidden');
                         nsIndicatorEl.style.color = '#10b981';
                         nsIndicatorEl.innerHTML = `
-                            <div style="font-size: 1.3rem; line-height: 1; margin-bottom: 2px;">☀️</div>
+                            <div style="line-height: 1; margin-bottom: 2px;"><span class="material-symbols-outlined icon-gradient-emerald" style="font-size:1.3rem;">light_mode</span></div>
                             <div style="font-size: 0.85rem; font-weight: bold;">$${bonus.toLocaleString()}</div>
                         `;
                     } else {
@@ -675,7 +675,7 @@
                 text-align: center;
                 animation: popIn 0.3s ease;
             `;
-            toast.innerHTML = `🎉 Completed ${hoursCompleted} hr(s) on ${loc}!<br><span style="font-size:1.15rem; color:#fef08a;">Earned so far: $${bonus.toLocaleString()}</span>`;
+            toast.innerHTML = `<span class="material-symbols-outlined icon-gradient-amber" style="font-size:1.4rem; vertical-align:middle; margin-right:4px;">celebration</span> Completed ${hoursCompleted} hr(s) on ${loc}!<br><span style="font-size:1.15rem; color:#fef08a;">Earned so far: $${bonus.toLocaleString()}</span>`;
             document.body.appendChild(toast);
 
             setTimeout(() => toast.remove(), 5000);
@@ -767,7 +767,7 @@
             `;
 
             modal.innerHTML = `
-                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎉</div>
+                <div style="margin-bottom: 0.5rem;"><span class="material-symbols-outlined icon-gradient-amber" style="font-size: 3rem;">celebration</span></div>
                 <h2 style="font-size: 1.4rem; font-weight: 700; color: var(--success); margin-bottom: 0.5rem;">Shift Completed & Log Copied!</h2>
                 <div style="font-family: monospace; background: rgba(0,0,0,0.4); border: 1px solid var(--card-border); padding: 1rem; border-radius: 8px; margin: 1rem 0; text-align: left; font-size: 0.95rem; color: #38bdf8;">
                     ${template.replace(/\n/g, '<br>')}
@@ -1219,15 +1219,90 @@
                 });
             };
 
-            window.saveSettings = () => {
-                const serverIdInput = document.getElementById('discord-server-id');
-                if (serverIdInput) stateManager.set('discordServerId', serverIdInput.value.trim());
+            window.showFloatingSaveBtn = () => {
+                document.getElementById('floating-save-settings')?.classList.remove('hidden');
+            };
 
+            window.hideFloatingSaveBtn = () => {
+                document.getElementById('floating-save-settings')?.classList.add('hidden');
+            };
+
+            window.toggleSectionCollapse = (titleEl) => {
+                const section = titleEl.closest('.glass-section.collapsible');
+                if (section) {
+                    section.classList.toggle('collapsed');
+                }
+            };
+
+            window.toggleEditSection = (e, sectionId) => {
+                e.stopPropagation();
+                const container = document.getElementById(sectionId);
+                const btn = e.currentTarget;
+                if (!container) return;
+
+                const parentSection = container.closest('.glass-section.collapsible');
+                if (parentSection && parentSection.classList.contains('collapsed')) {
+                    parentSection.classList.remove('collapsed');
+                }
+
+                const inputs = container.querySelectorAll('input');
+                const isCurrentlyReadonly = inputs[0]?.hasAttribute('readonly') ?? true;
+
+                if (isCurrentlyReadonly) {
+                    inputs.forEach(inp => inp.removeAttribute('readonly'));
+                    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.95rem; vertical-align:middle; margin-right:3px;">lock</span> Done';
+                    btn.classList.add('btn-primary');
+                    btn.classList.remove('btn-secondary');
+                    inputs[0]?.focus();
+                } else {
+                    inputs.forEach(inp => inp.setAttribute('readonly', 'true'));
+                    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.95rem; vertical-align:middle; margin-right:3px;">edit</span> Edit';
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-secondary');
+                }
+            };
+
+            window.saveSettings = () => {
+                const nameInput = document.getElementById('myName');
+                if (nameInput) stateManager.set('name', nameInput.value.trim());
+
+                const idInput = document.getElementById('myId');
+                if (idInput) stateManager.set('id', idInput.value.trim());
+
+                const rateMap = {
+                    rateNightPH: 'nightPH', rateNightSH: 'nightSH', rateNightCalls: 'nightCalls',
+                    rateDayPH: 'dayPH', rateDaySH: 'daySH', rateDayCalls: 'dayCalls',
+                    rateLabCaptcha: 'labCaptcha', rateLabMedicine: 'labMedicine'
+                };
+
+                if (!stateManager.state.shiftRates) stateManager.state.shiftRates = {};
+                for (const [inputId, rateKey] of Object.entries(rateMap)) {
+                    const input = document.getElementById(inputId);
+                    if (input) {
+                        stateManager.state.shiftRates[rateKey] = parseInt(input.value, 10) || 0;
+                        input.setAttribute('readonly', 'true');
+                    }
+                }
+
+                const serverIdInput = document.getElementById('discord-server-id');
+                if (serverIdInput) {
+                    stateManager.set('discordServerId', serverIdInput.value.trim());
+                    serverIdInput.setAttribute('readonly', 'true');
+                }
+
+                if (!stateManager.state.discordChannels) stateManager.state.discordChannels = {};
                 document.querySelectorAll('.discord-channel-id').forEach(input => {
                     const key = input.getAttribute('data-key');
                     if (key) {
                         stateManager.state.discordChannels[key] = input.value.trim();
                     }
+                    input.setAttribute('readonly', 'true');
+                });
+
+                document.querySelectorAll('.edit-section-btn').forEach(btn => {
+                    btn.innerHTML = '✏️ Edit';
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-secondary');
                 });
 
                 const bootScreenToggle = document.getElementById('settingShowBootScreen');
@@ -1236,8 +1311,11 @@
                 }
 
                 stateManager.save();
+                this.updatePreviews();
+                window.hideFloatingSaveBtn();
+
+                sound.playSuccessSound?.() || sound.playCopySound();
                 alert('Settings Saved Successfully!');
-                modalManager.closeAll();
             };
 
             window.exportDb = () => stateManager.exportDb();
@@ -1305,16 +1383,22 @@
             if (nameInput) {
                 nameInput.value = stateManager.get('name') || '';
                 nameInput.addEventListener('input', () => {
-                    stateManager.set('name', nameInput.value);
                     this.updatePreviews();
+                    window.showFloatingSaveBtn();
                 });
             }
             if (idInput) {
                 idInput.value = stateManager.get('id') || '';
                 idInput.addEventListener('input', () => {
-                    stateManager.set('id', idInput.value);
                     this.updatePreviews();
+                    window.showFloatingSaveBtn();
                 });
+            }
+
+            const bootToggle = document.getElementById('settingShowBootScreen');
+            if (bootToggle) {
+                bootToggle.checked = stateManager.get('showBootScreen') !== false;
+                bootToggle.addEventListener('change', () => window.showFloatingSaveBtn());
             }
 
             const rateMap = {
@@ -1327,13 +1411,23 @@
                 const input = document.getElementById(inputId);
                 if (input) {
                     input.value = stateManager.get('shiftRates')?.[rateKey] ?? '';
-                    input.addEventListener('input', () => {
-                        if (!stateManager.state.shiftRates) stateManager.state.shiftRates = {};
-                        stateManager.state.shiftRates[rateKey] = parseInt(input.value, 10) || 0;
-                        stateManager.save();
-                    });
+                    input.addEventListener('input', () => window.showFloatingSaveBtn());
                 }
             }
+
+            const discordServerInput = document.getElementById('discord-server-id');
+            if (discordServerInput) {
+                discordServerInput.value = stateManager.get('discordServerId') || '1035903890996080811';
+                discordServerInput.addEventListener('input', () => window.showFloatingSaveBtn());
+            }
+
+            document.querySelectorAll('.discord-channel-id').forEach(input => {
+                const key = input.getAttribute('data-key');
+                if (key && stateManager.state.discordChannels?.[key]) {
+                    input.value = stateManager.state.discordChannels[key];
+                }
+                input.addEventListener('input', () => window.showFloatingSaveBtn());
+            });
 
             const rotaLocSelect = document.getElementById('rota-location');
             const locInputCustom = document.getElementById('locInputCustom');
@@ -1406,7 +1500,7 @@
                             const newBlock = document.createElement('div');
                             newBlock.className = 'copy-block';
                             newBlock.innerHTML = `
-                                <div class="copy-header"><span contenteditable="true" style="outline:none; border-bottom: 1px dashed rgba(255,255,255,0.3);">${c.title || 'Custom Command'}</span><button class="btn copy-btn" data-target="${c.id}">📋</button></div>
+                                <div class="copy-header"><span contenteditable="true" style="outline:none; border-bottom: 1px dashed rgba(255,255,255,0.3);">${c.title || 'Custom Command'}</span><button class="btn copy-btn" data-target="${c.id}"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                 <div class="copy-content" id="${c.id}" contenteditable="true">${c.template}</div>
                             `;
                             const addCard = grid.querySelector('.add-command-card');
@@ -1470,7 +1564,7 @@
                     if (!block.closest('#modal-bodycam') && !block.closest('#modal-discord-bodycam')) {
                         const deleteBtn = document.createElement('button');
                         deleteBtn.className = 'btn btn-delete';
-                        deleteBtn.innerHTML = '❌';
+                        deleteBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.95rem; color:#ef4444;">close</span>';
                         deleteBtn.setAttribute('data-target', targetId);
                         deleteBtn.title = 'Hold for 3 seconds to delete';
                         btnContainer.appendChild(deleteBtn);
@@ -1749,8 +1843,8 @@
                 const otherServices = BOTTOM_NAV_SERVICES.filter(s => s.id !== currentMainId);
                 const gridItems = [
                     ...otherServices,
-                    { id: 'settings', icon: '⚙️', smallText: 'SETTINGS', modal: 'modal-settings' },
-                    { id: 'loggen', icon: '📸', smallText: 'LOG GEN', modal: 'modal-discord-bodycam' }
+                    { id: 'settings', icon: '<span class="material-symbols-outlined icon-gradient-slate">settings</span>', smallText: 'SETTINGS', modal: 'modal-settings' },
+                    { id: 'loggen', icon: '<span class="material-symbols-outlined icon-gradient-rose">badge</span>', smallText: 'LOG GEN', modal: 'modal-discord-bodycam' }
                 ];
 
                 gridItems.forEach(item => {
@@ -1846,7 +1940,7 @@
                     const newBlock = document.createElement('div');
                     newBlock.className = 'copy-block';
                     newBlock.innerHTML = `
-                        <div class="copy-header"><span contenteditable="true" style="outline:none; border-bottom: 1px dashed rgba(255,255,255,0.3);">${title}</span><button class="btn copy-btn" data-target="${newId}">📋</button></div>
+                        <div class="copy-header"><span contenteditable="true" style="outline:none; border-bottom: 1px dashed rgba(255,255,255,0.3);">${title}</span><button class="btn copy-btn" data-target="${newId}"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                         <div class="copy-content" id="${newId}" contenteditable="true">${template}</div>
                     `;
                     const addCard = grid.querySelector('.add-command-card');
@@ -1886,7 +1980,7 @@
                     const chip = document.createElement('button');
                     chip.className = 'dept-chip';
                     chip.setAttribute('data-dept-tab', dept.id);
-                    chip.innerHTML = `${dept.icon || '📁'} ${dept.name} <span class="delete-dept-chip" style="margin-left:6px; opacity:0.6; font-size:0.75rem;" title="Hold to delete">✕</span>`;
+                    chip.innerHTML = `<span class="material-symbols-outlined chip-icon">${dept.icon || 'folder'}</span> ${dept.name} <span class="delete-dept-chip" style="margin-left:6px; opacity:0.6; font-size:0.75rem;" title="Hold to delete"><span class="material-symbols-outlined" style="font-size:0.85rem; vertical-align:middle;">close</span></span>`;
                     chip.onclick = (e) => {
                         if (e.target.classList.contains('delete-dept-chip')) return;
                         DeptCommandsService.switchDeptTab(dept.id);
@@ -1931,7 +2025,7 @@
                     tabContent.className = 'dept-tab-content';
                     tabContent.innerHTML = `
                         <div class="copy-blocks-grid">
-                            <div class="copy-block add-command-card" onclick="openAddCommandModal('${dept.id}')"><div class="add-command-icon">➕</div><div class="add-command-text">Add Command</div></div>
+                            <div class="copy-block add-command-card" onclick="openAddCommandModal('${dept.id}')"><div class="add-command-icon"><span class="material-symbols-outlined" style="font-size:1.8rem; color:#38bdf8;">add_circle</span></div><div class="add-command-text">Add Command</div></div>
                         </div>
                     `;
                     tabsBody.appendChild(tabContent);
@@ -1965,7 +2059,7 @@
             const nameInput = document.getElementById('new-dept-name');
             const iconInput = document.getElementById('new-dept-icon');
             if (nameInput) nameInput.value = '';
-            if (iconInput) iconInput.value = '📁';
+            if (iconInput) iconInput.value = 'folder';
 
             document.querySelectorAll('.modal-content:not(.sub-modal)').forEach(m => m.classList.remove('active'));
             const sm = document.getElementById('modal-add-dept');
@@ -1983,7 +2077,7 @@
         }
 
         saveNewDeptCategory() {
-            const icon = document.getElementById('new-dept-icon')?.value.trim() || '📁';
+            const icon = document.getElementById('new-dept-icon')?.value.trim() || 'folder';
             const name = document.getElementById('new-dept-name')?.value.trim();
 
             if (!name) {

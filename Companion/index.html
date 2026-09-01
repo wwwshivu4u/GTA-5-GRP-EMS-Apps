@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 </head>
 <body>
     <!-- AI Splash Screen -->
@@ -66,7 +67,7 @@
                         <option value="Other...">Custom...</option>
                     </select>
                     <button class="btn btn-success di-btn" id="btn-rota-start" onclick="startRotaShift()" style="padding: 0.6rem 1rem;">
-                        <span>▶ Start</span>
+                        <span class="material-symbols-outlined" style="font-size:1.1rem;">play_arrow</span><span>Start</span>
                     </button>
                 </div>
                 <input type="text" id="locInputCustom" class="rota-select" placeholder="Type custom location..." style="display:none; width: 100%; margin-top: 0.3rem;">
@@ -76,7 +77,7 @@
             <div class="di-view hidden" id="tb-compact-view">
                 <div style="display: flex; align-items: center; gap: 1rem;">
                     <button class="btn btn-danger di-btn" id="btn-rota-end" onclick="showConfirmRotaEnd()" style="padding: 0.5rem 0.9rem;">
-                        <span>⏹ End</span>
+                        <span class="material-symbols-outlined" style="font-size:1.1rem;">stop</span><span>End</span>
                     </button>
                     <div id="compact-main-timer">0 hr 00:00</div>
                     <div id="night-shift-indicator" class="hidden" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border-radius: 10px; padding: 0.3rem 0.6rem; min-width: 60px;">
@@ -88,7 +89,7 @@
             <div class="di-view hidden" id="tb-confirm-view">
                 <div style="display: flex; gap: 0.6rem; align-items: center;">
                     <button class="btn btn-secondary di-btn" onclick="cancelConfirmRotaEnd()" style="padding: 0.5rem 0.8rem;">
-                        <span>◀ Back</span>
+                        <span class="material-symbols-outlined" style="font-size:1.1rem;">arrow_back</span><span>Back</span>
                     </button>
                     <button class="btn btn-danger di-btn" onclick="confirmRotaEnd()" style="padding: 0.5rem 1rem; font-weight: bold;">
                         Confirm End Shift?
@@ -108,11 +109,11 @@
             <!-- Row 1: Primary Controls -->
             <div class="nav-row">
                 <div class="nav-item" onclick="openModal('modal-bodycam')">
-                    <div class="nav-icon">📹</div>
+                    <div class="nav-icon"><span class="material-symbols-outlined icon-gradient-rose" style="font-size: 3.2rem;">videocam</span></div>
                     <div class="nav-text">BODYCAM</div>
                 </div>
                 <div class="nav-item" onclick="openModal('modal-radio')">
-                    <div class="nav-icon">📡</div>
+                    <div class="nav-icon"><span class="material-symbols-outlined icon-gradient-blue" style="font-size: 3.2rem;">podcasts</span></div>
                     <div class="nav-text">COMMS &amp; LOGS</div>
                 </div>
             </div>
@@ -120,9 +121,9 @@
             <!-- Row 2: Dynamic Services & Tools -->
             <div class="nav-row">
                 <div class="nav-item" id="main-service-card">
-                    <div class="nav-icon" id="main-icon">🏥</div>
+                    <div class="nav-icon" id="main-icon"><span class="material-symbols-outlined icon-gradient-emerald">local_hospital</span></div>
                     <div class="nav-text" id="main-text">HOSPITAL<br>SERVICES</div>
-                    <button class="nav-dropdown-btn" onclick="toggleDropdown(event)" title="Select Department">▼</button>
+                    <button class="nav-dropdown-btn" onclick="toggleDropdown(event)" title="Select Department">Main Department <span class="material-symbols-outlined" style="font-size:1rem; vertical-align:middle;">expand_more</span></button>
                     <div class="nav-dropdown-menu" id="service-dropdown"></div>
                 </div>
                 <div class="nav-item-grid" id="secondary-grid"></div>
@@ -136,21 +137,21 @@
 
             <!-- MODAL: SETTINGS -->
             <div class="modal-content" id="modal-settings">
-                <button class="close-btn" onclick="closeModals()">✕</button>
-                <div class="modal-header">⚙️ Settings &amp; Configuration</div>
+                <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-slate" style="font-size:1.4rem; margin-right:6px;">settings</span> Settings &amp; Configuration</div>
 
                 <div class="settings-grid-wrapper">
                     <div class="settings-col">
                         <div class="glass-section">
-                            <div class="section-title">My Profile</div>
+                            <div class="section-title"><span class="material-symbols-outlined" style="font-size:1.15rem; margin-right:4px; vertical-align:middle;">person</span> My Profile</div>
                             <div class="grid-layout">
                                 <div class="input-group">
                                     <label>Character Name</label>
-                                    <input type="text" id="myName" placeholder="e.g. Saikat Snider">
+                                    <input type="text" id="myName" placeholder="e.g. Thakur Sergey">
                                 </div>
                                 <div class="input-group">
                                     <label>Player ID</label>
-                                    <input type="text" id="myId" placeholder="e.g. 62692">
+                                    <input type="text" id="myId" placeholder="e.g. 177919">
                                 </div>
                             </div>
                             <div class="input-group" style="margin-top: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
@@ -162,37 +163,10 @@
                             </div>
                         </div>
 
-                        <div class="glass-section">
-                            <div class="section-title">Shift Rates ($/hr)</div>
-                            <div class="grid-layout">
-                                <div class="input-group">
-                                    <label>Night Shift (00:00-06:00 IC)</label>
-                                    <div style="display: flex; flex-direction: column; gap: 0.3rem;">
-                                        <div style="display: flex; align-items: center; gap: 0.4rem;"><label style="width: 45px; margin:0; font-size:0.75rem;">PH</label><input type="number" id="rateNightPH" placeholder="25000" style="flex:1;"></div>
-                                        <div style="display: flex; align-items: center; gap: 0.4rem;"><label style="width: 45px; margin:0; font-size:0.75rem;">SH</label><input type="number" id="rateNightSH" placeholder="40000" style="flex:1;"></div>
-                                        <div style="display: flex; align-items: center; gap: 0.4rem;"><label style="width: 45px; margin:0; font-size:0.75rem;">Calls</label><input type="number" id="rateNightCalls" placeholder="20000" style="flex:1;"></div>
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <label>Day Shift Rates</label>
-                                    <div style="display: flex; flex-direction: column; gap: 0.3rem;">
-                                        <div style="display: flex; align-items: center; gap: 0.4rem;"><label style="width: 45px; margin:0; font-size:0.75rem;">PH</label><input type="number" id="rateDayPH" placeholder="10000" style="flex:1;"></div>
-                                        <div style="display: flex; align-items: center; gap: 0.4rem;"><label style="width: 45px; margin:0; font-size:0.75rem;">SH</label><input type="number" id="rateDaySH" placeholder="30000" style="flex:1;"></div>
-                                        <div style="display: flex; align-items: center; gap: 0.4rem;"><label style="width: 45px; margin:0; font-size:0.75rem;">Calls</label><input type="number" id="rateDayCalls" placeholder="15000" style="flex:1;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="input-group" style="margin-top: 0.5rem;">
-                                <label>Lab Duties</label>
-                                <div class="grid-layout">
-                                    <div style="display: flex; align-items: center; gap: 0.4rem;"><label style="width: 60px; margin:0; font-size:0.75rem;">Captcha</label><input type="number" id="rateLabCaptcha" placeholder="5000" style="flex:1;"></div>
-                                    <div style="display: flex; align-items: center; gap: 0.4rem;"><label style="width: 60px; margin:0; font-size:0.75rem;">Medicine</label><input type="number" id="rateLabMedicine" placeholder="10000" style="flex:1;"></div>
-                                </div>
-                            </div>
-                        </div>
+
 
                         <div class="glass-section">
-                            <div class="section-title">Data Backup &amp; Commands</div>
+                            <div class="section-title"><span class="material-symbols-outlined" style="font-size:1.15rem; margin-right:4px; vertical-align:middle;">database</span> Data Backup &amp; Commands</div>
                             <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                                 <button class="btn btn-primary btn-sm" onclick="exportDb()">Export db.txt</button>
                                 <input type="file" id="import-db-file" style="display:none;" accept=".txt">
@@ -204,89 +178,126 @@
                     </div>
 
                     <div class="settings-col">
-                        <div class="glass-section">
-                            <div class="section-title">Discord IDs Configuration</div>
-                            <div class="input-group">
-                                <label>EMS Discord Server ID</label>
-                                <input type="text" id="discord-server-id" placeholder="e.g. 1035903890996080811">
+                        <div class="glass-section collapsible collapsed" id="section-discord-ids">
+                            <div class="section-title" onclick="toggleSectionCollapse(this)">
+                                <span class="section-title-text"><span class="material-symbols-outlined icon-gradient-blue" style="font-size:1.2rem; margin-right:4px;">tag</span> Discord IDs Configuration</span>
+                                <button class="btn btn-sm btn-secondary edit-section-btn" onclick="toggleEditSection(event, 'discord-ids-fields')"><span class="material-symbols-outlined" style="font-size:0.9rem;">edit</span> Edit</button>
                             </div>
-                            <hr style="border:none; border-top:1px solid var(--card-border); margin: 0.75rem 0;">
-                            <div class="grid-layout">
+                            <div class="section-body" id="discord-ids-fields">
                                 <div class="input-group">
-                                    <label>#BODYCAM-LOGS</label>
-                                    <div style="display: flex; gap: 0.4rem;">
-                                        <input type="text" class="discord-channel-id" data-key="bodycam" placeholder="Channel ID" style="flex:1;">
-                                        <button class="btn btn-primary" onclick="testDiscordChannel('bodycam')" title="Test Channel">🔗</button>
+                                    <label>EMS Discord Server ID</label>
+                                    <input type="text" id="discord-server-id" placeholder="e.g. 1035903890996080811" readonly>
+                                </div>
+                                <hr style="border:none; border-top:1px solid var(--card-border); margin: 0.75rem 0;">
+                                <div class="grid-layout">
+                                    <div class="input-group">
+                                        <label>#BODYCAM-LOGS</label>
+                                        <div style="display: flex; gap: 0.4rem;">
+                                            <input type="text" class="discord-channel-id" data-key="bodycam" placeholder="Channel ID" readonly style="flex:1;">
+                                            <button class="btn btn-primary" onclick="testDiscordChannel('bodycam')" title="Test Channel"><span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span></button>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>#CODE-A</label>
+                                        <div style="display: flex; gap: 0.4rem;">
+                                            <input type="text" class="discord-channel-id" data-key="codea" placeholder="Channel ID" readonly style="flex:1;">
+                                            <button class="btn btn-primary" onclick="testDiscordChannel('codea')" title="Test Channel"><span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span></button>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>#BREAK-ROOM</label>
+                                        <div style="display: flex; gap: 0.4rem;">
+                                            <input type="text" class="discord-channel-id" data-key="break" placeholder="Channel ID" readonly style="flex:1;">
+                                            <button class="btn btn-primary" onclick="testDiscordChannel('break')" title="Test Channel"><span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span></button>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>#MAKING-MEDICAL-SUPPLIES</label>
+                                        <div style="display: flex; gap: 0.4rem;">
+                                            <input type="text" class="discord-channel-id" data-key="supplies" placeholder="Channel ID" readonly style="flex:1;">
+                                            <button class="btn btn-primary" onclick="testDiscordChannel('supplies')" title="Test Channel"><span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span></button>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>#LABTECH-ROTA</label>
+                                        <div style="display: flex; gap: 0.4rem;">
+                                            <input type="text" class="discord-channel-id" data-key="rota" placeholder="Channel ID" readonly style="flex:1;">
+                                            <button class="btn btn-primary" onclick="testDiscordChannel('rota')" title="Test Channel"><span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span></button>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>#PROOF-OF-CAPTCHA</label>
+                                        <div style="display: flex; gap: 0.4rem;">
+                                            <input type="text" class="discord-channel-id" data-key="captcha" placeholder="Channel ID" readonly style="flex:1;">
+                                            <button class="btn btn-primary" onclick="testDiscordChannel('captcha')" title="Test Channel"><span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span></button>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>#MEDICAL-DELIVERIES</label>
+                                        <div style="display: flex; gap: 0.4rem;">
+                                            <input type="text" class="discord-channel-id" data-key="deliveries" placeholder="Channel ID" readonly style="flex:1;">
+                                            <button class="btn btn-primary" onclick="testDiscordChannel('deliveries')" title="Test Channel"><span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span></button>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>#RADIO-CODES</label>
+                                        <div style="display: flex; gap: 0.4rem;">
+                                            <input type="text" class="discord-channel-id" data-key="radiocodes" placeholder="Channel ID" readonly style="flex:1;">
+                                            <button class="btn btn-primary" onclick="testDiscordChannel('radiocodes')" title="Test Channel"><span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span></button>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>#REPLACEMENT-LOGS</label>
+                                        <div style="display: flex; gap: 0.4rem;">
+                                            <input type="text" class="discord-channel-id" data-key="replacementlogs" placeholder="Channel ID" readonly style="flex:1;">
+                                            <button class="btn btn-primary" onclick="testDiscordChannel('replacementlogs')" title="Test Channel"><span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span></button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="input-group">
-                                    <label>#CODE-A</label>
-                                    <div style="display: flex; gap: 0.4rem;">
-                                        <input type="text" class="discord-channel-id" data-key="codea" placeholder="Channel ID" style="flex:1;">
-                                        <button class="btn btn-primary" onclick="testDiscordChannel('codea')" title="Test Channel">🔗</button>
+                            </div>
+                        </div>
+
+                                                <div class="glass-section collapsible collapsed" id="section-shift-rates">
+                            <div class="section-title" onclick="toggleSectionCollapse(this)">
+                                <span class="section-title-text"><span class="material-symbols-outlined icon-gradient-amber" style="font-size:1.2rem; margin-right:4px;">payments</span> Shift Rates ($/hr)</span>
+                                <button class="btn btn-sm btn-secondary edit-section-btn" onclick="toggleEditSection(event, 'shift-rates-fields')"><span class="material-symbols-outlined" style="font-size:0.9rem;">edit</span> Edit</button>
+                            </div>
+                            <div class="section-body" id="shift-rates-fields">
+                                <div class="grid-layout">
+                                    <div class="input-group">
+                                        <label>Night Shift (00:00-06:00 IC)</label>
+                                        <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                                            <div style="display: flex; align-items: center; gap: 0.4rem;"><label style="width: 45px; margin:0; font-size:0.75rem;">PH</label><input type="number" id="rateNightPH" placeholder="25000" readonly style="flex:1;"></div>
+                                            <div style="display: flex; align-items: center; gap: 0.4rem;"><label style="width: 45px; margin:0; font-size:0.75rem;">SH</label><input type="number" id="rateNightSH" placeholder="40000" readonly style="flex:1;"></div>
+                                            <div style="display: flex; align-items: center; gap: 0.4rem;"><label style="width: 45px; margin:0; font-size:0.75rem;">Calls</label><input type="number" id="rateNightCalls" placeholder="20000" readonly style="flex:1;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Day Shift Rates</label>
+                                        <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                                            <div style="display: flex; align-items: center; gap: 0.4rem;"><label style="width: 45px; margin:0; font-size:0.75rem;">PH</label><input type="number" id="rateDayPH" placeholder="10000" readonly style="flex:1;"></div>
+                                            <div style="display: flex; align-items: center; gap: 0.4rem;"><label style="width: 45px; margin:0; font-size:0.75rem;">SH</label><input type="number" id="rateDaySH" placeholder="30000" readonly style="flex:1;"></div>
+                                            <div style="display: flex; align-items: center; gap: 0.4rem;"><label style="width: 45px; margin:0; font-size:0.75rem;">Calls</label><input type="number" id="rateDayCalls" placeholder="15000" readonly style="flex:1;"></div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="input-group">
-                                    <label>#BREAK-ROOM</label>
-                                    <div style="display: flex; gap: 0.4rem;">
-                                        <input type="text" class="discord-channel-id" data-key="break" placeholder="Channel ID" style="flex:1;">
-                                        <button class="btn btn-primary" onclick="testDiscordChannel('break')" title="Test Channel">🔗</button>
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <label>#MAKING-MEDICAL-SUPPLIES</label>
-                                    <div style="display: flex; gap: 0.4rem;">
-                                        <input type="text" class="discord-channel-id" data-key="supplies" placeholder="Channel ID" style="flex:1;">
-                                        <button class="btn btn-primary" onclick="testDiscordChannel('supplies')" title="Test Channel">🔗</button>
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <label>#LABTECH-ROTA</label>
-                                    <div style="display: flex; gap: 0.4rem;">
-                                        <input type="text" class="discord-channel-id" data-key="rota" placeholder="Channel ID" style="flex:1;">
-                                        <button class="btn btn-primary" onclick="testDiscordChannel('rota')" title="Test Channel">🔗</button>
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <label>#PROOF-OF-CAPTCHA</label>
-                                    <div style="display: flex; gap: 0.4rem;">
-                                        <input type="text" class="discord-channel-id" data-key="captcha" placeholder="Channel ID" style="flex:1;">
-                                        <button class="btn btn-primary" onclick="testDiscordChannel('captcha')" title="Test Channel">🔗</button>
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <label>#MEDICAL-DELIVERIES</label>
-                                    <div style="display: flex; gap: 0.4rem;">
-                                        <input type="text" class="discord-channel-id" data-key="deliveries" placeholder="Channel ID" style="flex:1;">
-                                        <button class="btn btn-primary" onclick="testDiscordChannel('deliveries')" title="Test Channel">🔗</button>
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <label>#RADIO-CODES</label>
-                                    <div style="display: flex; gap: 0.4rem;">
-                                        <input type="text" class="discord-channel-id" data-key="radiocodes" placeholder="Channel ID" style="flex:1;">
-                                        <button class="btn btn-primary" onclick="testDiscordChannel('radiocodes')" title="Test Channel">🔗</button>
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <label>#REPLACEMENT-LOGS</label>
-                                    <div style="display: flex; gap: 0.4rem;">
-                                        <input type="text" class="discord-channel-id" data-key="replacementlogs" placeholder="Channel ID" style="flex:1;">
-                                        <button class="btn btn-primary" onclick="testDiscordChannel('replacementlogs')" title="Test Channel">🔗</button>
+                                <div class="input-group" style="margin-top: 0.5rem;">
+                                    <label>Lab Duties</label>
+                                    <div class="grid-layout">
+                                        <div style="display: flex; align-items: center; gap: 0.4rem;"><label style="width: 60px; margin:0; font-size:0.75rem;">Captcha</label><input type="number" id="rateLabCaptcha" placeholder="5000" readonly style="flex:1;"></div>
+                                        <div style="display: flex; align-items: center; gap: 0.4rem;"><label style="width: 60px; margin:0; font-size:0.75rem;">Medicine</label><input type="number" id="rateLabMedicine" placeholder="10000" readonly style="flex:1;"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <button class="btn btn-success" style="width: 100%; padding: 0.8rem; font-size: 1rem; margin-top: 0.5rem;" onclick="saveSettings()">Save Settings</button>
             </div>
 
             <!-- MODAL: BODYCAM LOGS -->
             <div class="modal-content" id="modal-bodycam">
-                <button class="close-btn" onclick="closeModals()">✕</button>
-                <div class="modal-header">📹 Bodycam Logs</div>
+                <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-rose" style="font-size:1.4rem; margin-right:6px;">videocam</span> Bodycam Logs</div>
 
                 <div class="tabs-header">
                     <button class="tab-btn active" data-tab="tab-onduty" id="btn-tab-onduty">On Duty</button>
@@ -300,15 +311,15 @@
                     <div class="tab-content active" id="tab-onduty">
                         <div class="copy-blocks-grid">
                             <div class="copy-block">
-                                <div class="copy-header"><span>Step 1</span><button class="btn copy-btn bc-btn" data-target="od1">📋</button></div>
+                                <div class="copy-header"><span>Step 1</span><button class="btn copy-btn bc-btn" data-target="od1"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                 <div class="copy-content" id="od1" contenteditable="true">/me Takes out Bodycam and attaches Bodycam to chest and checks its ballistic, water proof</div>
                             </div>
                             <div class="copy-block">
-                                <div class="copy-header"><span>Step 2</span><button class="btn copy-btn bc-btn" data-target="od2" disabled>📋</button></div>
+                                <div class="copy-header"><span>Step 2</span><button class="btn copy-btn bc-btn" data-target="od2" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                 <div class="copy-content" id="od2" contenteditable="true">/me Makes sure it is recording and checks for the red light</div>
                             </div>
                             <div class="copy-block">
-                                <div class="copy-header"><span>Step 3</span><button class="btn copy-btn bc-btn" data-target="od3" disabled>📋</button></div>
+                                <div class="copy-header"><span>Step 3</span><button class="btn copy-btn bc-btn" data-target="od3" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                 <div class="copy-content" id="od3" contenteditable="true">/do It is recording, and its ballistic, water proof</div>
                             </div>
                         </div>
@@ -318,11 +329,11 @@
                     <div class="tab-content" id="tab-refresh">
                         <div class="copy-blocks-grid">
                             <div class="copy-block">
-                                <div class="copy-header"><span>Step 1</span><button class="btn copy-btn bc-btn" data-target="ref1">📋</button></div>
+                                <div class="copy-header"><span>Step 1</span><button class="btn copy-btn bc-btn" data-target="ref1"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                 <div class="copy-content" id="ref1" contenteditable="true">/me Refreshes the bodycam</div>
                             </div>
                             <div class="copy-block">
-                                <div class="copy-header"><span>Step 2</span><button class="btn copy-btn bc-btn" data-target="ref2" disabled>📋</button></div>
+                                <div class="copy-header"><span>Step 2</span><button class="btn copy-btn bc-btn" data-target="ref2" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                 <div class="copy-content" id="ref2" contenteditable="true">/do It is recording, and its ballistic, water proof</div>
                             </div>
                         </div>
@@ -332,11 +343,11 @@
                     <div class="tab-content" id="tab-save">
                         <div class="copy-blocks-grid">
                             <div class="copy-block">
-                                <div class="copy-header"><span>Step 1</span><button class="btn copy-btn bc-btn" data-target="sav1">📋</button></div>
+                                <div class="copy-header"><span>Step 1</span><button class="btn copy-btn bc-btn" data-target="sav1"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                 <div class="copy-content" id="sav1" contenteditable="true">/me Saves bodycam, uploads it to the EMS Cloud Server</div>
                             </div>
                             <div class="copy-block">
-                                <div class="copy-header"><span>Step 2</span><button class="btn copy-btn bc-btn" data-target="sav2" disabled>📋</button></div>
+                                <div class="copy-header"><span>Step 2</span><button class="btn copy-btn bc-btn" data-target="sav2" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                 <div class="copy-content" id="sav2" contenteditable="true">/do It is recording, and its ballistic, water proof</div>
                             </div>
                         </div>
@@ -346,15 +357,15 @@
                     <div class="tab-content" id="tab-offduty">
                         <div class="copy-blocks-grid">
                             <div class="copy-block">
-                                <div class="copy-header"><span>Step 1</span><button class="btn copy-btn bc-btn" data-target="off1">📋</button></div>
+                                <div class="copy-header"><span>Step 1</span><button class="btn copy-btn bc-btn" data-target="off1"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                 <div class="copy-content" id="off1" contenteditable="true">/me Switches off the bodycam and checks for the Green Light</div>
                             </div>
                             <div class="copy-block">
-                                <div class="copy-header"><span>Step 2</span><button class="btn copy-btn bc-btn" data-target="off2" disabled>📋</button></div>
+                                <div class="copy-header"><span>Step 2</span><button class="btn copy-btn bc-btn" data-target="off2" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                 <div class="copy-content" id="off2" contenteditable="true">/do Bodycam footage has been saved to SD Card</div>
                             </div>
                             <div class="copy-block">
-                                <div class="copy-header"><span>Step 3</span><button class="btn copy-btn bc-btn" data-target="off3" disabled>📋</button></div>
+                                <div class="copy-header"><span>Step 3</span><button class="btn copy-btn bc-btn" data-target="off3" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                 <div class="copy-content" id="off3" contenteditable="true">/me Uploads the bodycam footage to the EMS Cloud Server</div>
                             </div>
                         </div>
@@ -364,8 +375,8 @@
 
             <!-- MODAL: DISCORD BODYCAM LOG GENERATOR -->
             <div class="modal-content" id="modal-discord-bodycam">
-                <button class="close-btn" onclick="closeModals()">✕</button>
-                <div class="modal-header">💬 Discord Generator (Bodycam Logs)</div>
+                <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-rose" style="font-size:1.4rem; margin-right:6px;">badge</span> Discord Generator (Bodycam Logs)</div>
 
                 <div class="glass-section">
                     <div class="grid-layout" style="align-items: end;">
@@ -387,7 +398,7 @@
                             <span class="toggle-slider"></span>
                         </label>
                         <button class="btn btn-success" style="padding: 0.75rem 1.2rem; flex:1;" onclick="generateDiscordAction('bodycam', 'cb-bodycam')">
-                            Generate, Copy &amp; Open Discord
+                            <span class="material-symbols-outlined" style="font-size:1.1rem; margin-right:4px;">send</span> Generate, Copy &amp; Open Discord
                         </button>
                     </div>
                 </div>
@@ -395,8 +406,8 @@
 
             <!-- MODAL: COMMS & LOGS -->
             <div class="modal-content" id="modal-radio">
-                <button class="close-btn" onclick="closeModals()">✕</button>
-                <div class="modal-header">📡 Comms &amp; Radio Codes</div>
+                <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-blue" style="font-size:1.4rem; margin-right:6px;">podcasts</span> Comms &amp; Radio Codes</div>
 
                 <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem; text-align: center;">Quick Codes (Instant Clipboard Copy)</div>
                 <div class="quick-codes-grid">
@@ -422,7 +433,7 @@
                 <div class="tabs-body">
                     <!-- GENERAL RADIO CODES -->
                     <div class="tab-content active" id="tab-rc-general">
-                        <button class="btn btn-primary" style="margin-bottom: 0.8rem; width: 100%;" onclick="testDiscordChannel('radiocodes')">🔗 Open #RADIO-CODES Channel</button>
+                        <button class="btn btn-primary" style="margin-bottom: 0.8rem; width: 100%;" onclick="testDiscordChannel('radiocodes')"><span class="material-symbols-outlined" style="font-size:1.1rem; margin-right:4px;">open_in_new</span> Open #RADIO-CODES Channel</button>
 
                         <div class="copy-blocks-grid">
                             <div class="copy-block">
@@ -430,7 +441,7 @@
                                     <span>10-8 (Availability)</span>
                                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                                         <label class="discord-toggle-label"><input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-1" checked><span class="toggle-slider"></span></label>
-                                        <button class="btn copy-btn" data-target="rc108" data-discord-key="radiocodes">📋</button>
+                                        <button class="btn copy-btn" data-target="rc108" data-discord-key="radiocodes"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button>
                                     </div>
                                 </div>
                                 <div class="copy-content" id="rc108" contenteditable="true">10-8 where am I needed?</div>
@@ -441,7 +452,7 @@
                                     <span>10-20 (Specify Location)</span>
                                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                                         <label class="discord-toggle-label"><input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-2" checked><span class="toggle-slider"></span></label>
-                                        <button class="btn copy-btn" data-target="rc1020" data-discord-key="radiocodes">📋</button>
+                                        <button class="btn copy-btn" data-target="rc1020" data-discord-key="radiocodes"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button>
                                     </div>
                                 </div>
                                 <div class="copy-content" id="rc1020" contenteditable="true">10-4 {LOC}</div>
@@ -451,7 +462,7 @@
 
                     <!-- BREAK ROOM -->
                     <div class="tab-content" id="tab-rc-break">
-                        <button class="btn btn-primary" style="margin-bottom: 0.8rem; width: 100%;" onclick="testDiscordChannel('break')">🔗 Open #BREAK-ROOM Channel</button>
+                        <button class="btn btn-primary" style="margin-bottom: 0.8rem; width: 100%;" onclick="testDiscordChannel('break')"><span class="material-symbols-outlined" style="font-size:1.1rem; margin-right:4px;">open_in_new</span> Open #BREAK-ROOM Channel</button>
 
                         <div class="copy-blocks-grid">
                             <div class="copy-block">
@@ -459,7 +470,7 @@
                                     <span>10-9 (Taking Break - 10 min)</span>
                                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                                         <label class="discord-toggle-label"><input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-3" checked><span class="toggle-slider"></span></label>
-                                        <button class="btn copy-btn" data-target="rc109" data-discord-key="break">📋</button>
+                                        <button class="btn copy-btn" data-target="rc109" data-discord-key="break"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button>
                                     </div>
                                 </div>
                                 <div class="copy-content" id="rc109" contenteditable="true">Need 10-9 {LOC} for 10 minutes</div>
@@ -470,7 +481,7 @@
                                     <span>10-9 (Covered By)</span>
                                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                                         <label class="discord-toggle-label"><input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-4" checked><span class="toggle-slider"></span></label>
-                                        <button class="btn copy-btn" data-target="rc109cov" data-discord-key="break">📋</button>
+                                        <button class="btn copy-btn" data-target="rc109cov" data-discord-key="break"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button>
                                     </div>
                                 </div>
                                 <div class="copy-content" id="rc109cov" contenteditable="true">10-9 {LOC} for 10 minutes covered by {REP}</div>
@@ -481,7 +492,7 @@
                                     <span>10-8 (Back from break)</span>
                                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                                         <label class="discord-toggle-label"><input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-5" checked><span class="toggle-slider"></span></label>
-                                        <button class="btn copy-btn" data-target="rc108b" data-discord-key="break">📋</button>
+                                        <button class="btn copy-btn" data-target="rc108b" data-discord-key="break"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button>
                                     </div>
                                 </div>
                                 <div class="copy-content" id="rc108b" contenteditable="true">10-8 {LOC} back from 10-9</div>
@@ -490,7 +501,7 @@
 
                         <!-- Discord Generator for Break -->
                         <div class="glass-section" style="margin-top: 0.8rem;">
-                            <div class="section-title">💬 Discord Log Generator</div>
+                            <div class="section-title"><span class="material-symbols-outlined" style="font-size:1.15rem; margin-right:4px; vertical-align:middle;">chat</span> Discord Log Generator</div>
                             <div class="grid-layout" style="align-items: end;">
                                 <div class="input-group" style="margin-bottom:0;">
                                     <label>Action</label>
@@ -501,7 +512,7 @@
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                                     <label class="discord-toggle-label"><input type="checkbox" class="discord-toggle-checkbox" id="cb-break" checked><span class="toggle-slider"></span></label>
-                                    <button class="btn btn-success" style="flex:1; padding:0.75rem;" onclick="generateDiscordAction('break', 'cb-break')">Generate, Copy &amp; Open</button>
+                                    <button class="btn btn-success" style="flex:1; padding:0.75rem;" onclick="generateDiscordAction('break', 'cb-break')"><span class="material-symbols-outlined" style="font-size:1.1rem; margin-right:4px;">send</span> Generate, Copy &amp; Open</button>
                                 </div>
                             </div>
                         </div>
@@ -509,7 +520,7 @@
 
                     <!-- REPLACEMENT LOGS -->
                     <div class="tab-content" id="tab-rc-replacements">
-                        <button class="btn btn-primary" style="margin-bottom: 0.8rem; width: 100%;" onclick="testDiscordChannel('replacementlogs')">🔗 Open #REPLACEMENT-LOGS Channel</button>
+                        <button class="btn btn-primary" style="margin-bottom: 0.8rem; width: 100%;" onclick="testDiscordChannel('replacementlogs')"><span class="material-symbols-outlined" style="font-size:1.1rem; margin-right:4px;">open_in_new</span> Open #REPLACEMENT-LOGS Channel</button>
 
                         <div class="copy-blocks-grid">
                             <div class="copy-block">
@@ -517,7 +528,7 @@
                                     <span>10-5 (On Duty / Replacing)</span>
                                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                                         <label class="discord-toggle-label"><input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-6" checked><span class="toggle-slider"></span></label>
-                                        <button class="btn copy-btn" data-target="rc105" data-discord-key="replacementlogs">📋</button>
+                                        <button class="btn copy-btn" data-target="rc105" data-discord-key="replacementlogs"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button>
                                     </div>
                                 </div>
                                 <div class="copy-content" id="rc105" contenteditable="true">10-5 {LOC} replacing {REP}</div>
@@ -528,7 +539,7 @@
                                     <span>10-7 (Need Replacement - 10 min prior)</span>
                                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                                         <label class="discord-toggle-label"><input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-7" checked><span class="toggle-slider"></span></label>
-                                        <button class="btn copy-btn" data-target="rc107a" data-discord-key="replacementlogs">📋</button>
+                                        <button class="btn copy-btn" data-target="rc107a" data-discord-key="replacementlogs"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button>
                                     </div>
                                 </div>
                                 <div class="copy-content" id="rc107a" contenteditable="true">10-7 {LOC} need replacement in 10 minutes</div>
@@ -539,7 +550,7 @@
                                     <span>10-7 (Off Duty / Replaced By)</span>
                                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                                         <label class="discord-toggle-label"><input type="checkbox" class="discord-toggle-checkbox" id="cb-generic-8" checked><span class="toggle-slider"></span></label>
-                                        <button class="btn copy-btn" data-target="rc107b" data-discord-key="replacementlogs">📋</button>
+                                        <button class="btn copy-btn" data-target="rc107b" data-discord-key="replacementlogs"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button>
                                     </div>
                                 </div>
                                 <div class="copy-content" id="rc107b" contenteditable="true">10-7 {LOC} replaced by {REP}</div>
@@ -549,10 +560,10 @@
 
                     <!-- CODE A -->
                     <div class="tab-content" id="tab-rc-codea">
-                        <button class="btn btn-primary" style="margin-bottom: 0.8rem; width: 100%;" onclick="testDiscordChannel('codea')">🔗 Open #CODE-A Channel</button>
+                        <button class="btn btn-primary" style="margin-bottom: 0.8rem; width: 100%;" onclick="testDiscordChannel('codea')"><span class="material-symbols-outlined" style="font-size:1.1rem; margin-right:4px;">open_in_new</span> Open #CODE-A Channel</button>
 
                         <div class="glass-section">
-                            <div class="section-title">💬 Discord Code A Log Generator</div>
+                            <div class="section-title"><span class="material-symbols-outlined" style="font-size:1.15rem; margin-right:4px; vertical-align:middle;">chat</span> Discord Code A Log Generator</div>
                             <div class="grid-layout">
                                 <div class="input-group">
                                     <label>Location</label>
@@ -572,7 +583,7 @@
                             </div>
                             <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
                                 <label class="discord-toggle-label"><input type="checkbox" class="discord-toggle-checkbox" id="cb-codea" checked><span class="toggle-slider"></span></label>
-                                <button class="btn btn-success" style="flex:1; padding:0.75rem;" onclick="generateDiscordAction('codea', 'cb-codea')">Generate, Copy &amp; Open</button>
+                                <button class="btn btn-success" style="flex:1; padding:0.75rem;" onclick="generateDiscordAction('codea', 'cb-codea')"><span class="material-symbols-outlined" style="font-size:1.1rem; margin-right:4px;">send</span> Generate, Copy &amp; Open</button>
                             </div>
                         </div>
                     </div>
@@ -581,73 +592,73 @@
                     <div class="tab-content" id="tab-state-wave">
                         <div class="waves-horizontal-grid">
                             <div class="glass-section">
-                                <div class="section-title">🌊 Wave 1 (Start)</div>
+                                <div class="section-title"><span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.15rem; margin-right:4px; vertical-align:middle;">waves</span> Wave 1 (Start)</div>
                                 <div class="copy-block">
-                                    <div class="copy-header"><span>Step 1</span><button class="btn copy-btn bc-btn" data-target="sw1_1">📋</button></div>
+                                    <div class="copy-header"><span>Step 1</span><button class="btn copy-btn bc-btn" data-target="sw1_1"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                     <div class="copy-content" id="sw1_1" contenteditable="true">Dear Citizens of Los Santos, got the courage to answer the call</div>
                                 </div>
                                 <div class="copy-block">
-                                    <div class="copy-header"><span>Step 2</span><button class="btn copy-btn bc-btn" data-target="sw1_2" disabled>📋</button></div>
+                                    <div class="copy-header"><span>Step 2</span><button class="btn copy-btn bc-btn" data-target="sw1_2" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                     <div class="copy-content" id="sw1_2" contenteditable="true">Join Emergency Medical Services and become the difference between life and death</div>
                                 </div>
                                 <div class="copy-block">
-                                    <div class="copy-header"><span>Step 3</span><button class="btn copy-btn bc-btn" data-target="sw1_3" disabled>📋</button></div>
+                                    <div class="copy-header"><span>Step 3</span><button class="btn copy-btn bc-btn" data-target="sw1_3" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                     <div class="copy-content" id="sw1_3" contenteditable="true">Head over to PH Front as interviews are happening right now</div>
                                 </div>
                                 <div class="copy-block">
-                                    <div class="copy-header"><span>Step 4</span><button class="btn copy-btn bc-btn" data-target="sw1_4" disabled>📋</button></div>
+                                    <div class="copy-header"><span>Step 4</span><button class="btn copy-btn bc-btn" data-target="sw1_4" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                     <div class="copy-content" id="sw1_4" contenteditable="true">Make sure your record is clean and no tattoos on your hands or face</div>
                                 </div>
                                 <div class="copy-block">
-                                    <div class="copy-header"><span>Step 5</span><button class="btn copy-btn bc-btn" data-target="sw1_5" disabled>📋</button></div>
+                                    <div class="copy-header"><span>Step 5</span><button class="btn copy-btn bc-btn" data-target="sw1_5" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                     <div class="copy-content" id="sw1_5" contenteditable="true">Be the reason someone lives to see another day because EMS needs you</div>
                                 </div>
                             </div>
 
                             <div class="glass-section">
-                                <div class="section-title">🌊 Wave 2 (After 10 Mins)</div>
+                                <div class="section-title"><span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.15rem; margin-right:4px; vertical-align:middle;">waves</span> Wave 2 (After 10 Mins)</div>
                                 <div class="copy-block">
-                                    <div class="copy-header"><span>Step 1</span><button class="btn copy-btn bc-btn" data-target="sw2_1">📋</button></div>
+                                    <div class="copy-header"><span>Step 1</span><button class="btn copy-btn bc-btn" data-target="sw2_1"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                     <div class="copy-content" id="sw2_1" contenteditable="true">Dear Citizens of Los Santos, this is Kuro Vukovic Chief of EMS</div>
                                 </div>
                                 <div class="copy-block">
-                                    <div class="copy-header"><span>Step 2</span><button class="btn copy-btn bc-btn" data-target="sw2_2" disabled>📋</button></div>
+                                    <div class="copy-header"><span>Step 2</span><button class="btn copy-btn bc-btn" data-target="sw2_2" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                     <div class="copy-content" id="sw2_2" contenteditable="true">We are still live with open EMS recruitment and time is ticking</div>
                                 </div>
                                 <div class="copy-block">
-                                    <div class="copy-header"><span>Step 3</span><button class="btn copy-btn bc-btn" data-target="sw2_3" disabled>📋</button></div>
+                                    <div class="copy-header"><span>Step 3</span><button class="btn copy-btn bc-btn" data-target="sw2_3" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                     <div class="copy-content" id="sw2_3" contenteditable="true">If you have the will to help and a heart that beats for others then come to PH Front now</div>
                                 </div>
                                 <div class="copy-block">
-                                    <div class="copy-header"><span>Step 4</span><button class="btn copy-btn bc-btn" data-target="sw2_4" disabled>📋</button></div>
+                                    <div class="copy-header"><span>Step 4</span><button class="btn copy-btn bc-btn" data-target="sw2_4" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                     <div class="copy-content" id="sw2_4" contenteditable="true">You must have a clean record and no tattoos on your hands or face</div>
                                 </div>
                                 <div class="copy-block">
-                                    <div class="copy-header"><span>Step 5</span><button class="btn copy-btn bc-btn" data-target="sw2_5" disabled>📋</button></div>
+                                    <div class="copy-header"><span>Step 5</span><button class="btn copy-btn bc-btn" data-target="sw2_5" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                     <div class="copy-content" id="sw2_5" contenteditable="true">The city is calling for real heroes will you rise to the challenge</div>
                                 </div>
                             </div>
 
                             <div class="glass-section">
-                                <div class="section-title">🌊 Wave 3 (After 10 Mins)</div>
+                                <div class="section-title"><span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.15rem; margin-right:4px; vertical-align:middle;">waves</span> Wave 3 (After 10 Mins)</div>
                                 <div class="copy-block">
-                                    <div class="copy-header"><span>Step 1</span><button class="btn copy-btn bc-btn" data-target="sw3_1">📋</button></div>
+                                    <div class="copy-header"><span>Step 1</span><button class="btn copy-btn bc-btn" data-target="sw3_1"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                     <div class="copy-content" id="sw3_1" contenteditable="true">Final call Los Santos this is Kuro Vukovic Chief of EMS</div>
                                 </div>
                                 <div class="copy-block">
-                                    <div class="copy-header"><span>Step 2</span><button class="btn copy-btn bc-btn" data-target="sw3_2" disabled>📋</button></div>
+                                    <div class="copy-header"><span>Step 2</span><button class="btn copy-btn bc-btn" data-target="sw3_2" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                     <div class="copy-content" id="sw3_2" contenteditable="true">We are finishing recruitment very soon and this is your last chance</div>
                                 </div>
                                 <div class="copy-block">
-                                    <div class="copy-header"><span>Step 3</span><button class="btn copy-btn bc-btn" data-target="sw3_3" disabled>📋</button></div>
+                                    <div class="copy-header"><span>Step 3</span><button class="btn copy-btn bc-btn" data-target="sw3_3" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                     <div class="copy-content" id="sw3_3" contenteditable="true">If you dream of saving lives and making a real impact now is your moment</div>
                                 </div>
                                 <div class="copy-block">
-                                    <div class="copy-header"><span>Step 4</span><button class="btn copy-btn bc-btn" data-target="sw3_4" disabled>📋</button></div>
+                                    <div class="copy-header"><span>Step 4</span><button class="btn copy-btn bc-btn" data-target="sw3_4" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                     <div class="copy-content" id="sw3_4" contenteditable="true">Come to PH Front with no criminal record and no hand or face tattoos</div>
                                 </div>
                                 <div class="copy-block">
-                                    <div class="copy-header"><span>Step 5</span><button class="btn copy-btn bc-btn" data-target="sw3_5" disabled>📋</button></div>
+                                    <div class="copy-header"><span>Step 5</span><button class="btn copy-btn bc-btn" data-target="sw3_5" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                     <div class="copy-content" id="sw3_5" contenteditable="true">Heroes act fast we hope to see you there</div>
                                 </div>
                             </div>
@@ -665,17 +676,17 @@
 
                         <!-- Category Chips (Tabs) -->
                         <div class="dept-chips-container" id="dept-chips-bar">
-                            <button class="dept-chip active" data-dept-tab="dept-tab-bgc" onclick="switchDeptTab('dept-tab-bgc')">🕵️ Background Check</button>
-                            <button class="dept-chip" data-dept-tab="dept-tab-broadcasts" onclick="switchDeptTab('dept-tab-broadcasts')">🚨 Broadcasts</button>
-                            <button class="dept-chip" data-dept-tab="dept-tab-subs" onclick="switchDeptTab('dept-tab-subs')">🛳️ Subs</button>
-                            <button class="dept-chip" data-dept-tab="dept-tab-acc" onclick="switchDeptTab('dept-tab-acc')">🏥 ACC</button>
-                            <button class="dept-chip" data-dept-tab="dept-tab-bank" onclick="switchDeptTab('dept-tab-bank')">💰 Bank Robbery</button>
-                            <button class="dept-chip" data-dept-tab="dept-tab-prison" onclick="switchDeptTab('dept-tab-prison')">🔒 Prison</button>
-                            <button class="dept-chip" data-dept-tab="dept-tab-meetings" onclick="switchDeptTab('dept-tab-meetings')">🤝 Meetings</button>
-                            <button class="dept-chip" data-dept-tab="dept-tab-medlabs" onclick="switchDeptTab('dept-tab-medlabs')">🧪 Medlabs</button>
-                            <button class="dept-chip" data-dept-tab="dept-tab-specops" onclick="switchDeptTab('dept-tab-specops')">⚔️ Spec Ops</button>
-                            <button class="dept-chip" data-dept-tab="dept-tab-databreach" onclick="switchDeptTab('dept-tab-databreach')">💻 Data Breach</button>
-                            <button class="dept-chip add-dept-chip-btn" onclick="openAddDeptModal()">➕ Add Category</button>
+                            <button class="dept-chip active" data-dept-tab="dept-tab-bgc" onclick="switchDeptTab('dept-tab-bgc')"><span class="material-symbols-outlined chip-icon" style="color:#38bdf8;">badge</span> Background Check</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-broadcasts" onclick="switchDeptTab('dept-tab-broadcasts')"><span class="material-symbols-outlined chip-icon" style="color:#ef4444;">campaign</span> Broadcasts</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-subs" onclick="switchDeptTab('dept-tab-subs')"><span class="material-symbols-outlined chip-icon" style="color:#06b6d4;">directions_boat</span> Subs</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-acc" onclick="switchDeptTab('dept-tab-acc')"><span class="material-symbols-outlined chip-icon" style="color:#10b981;">domain</span> ACC</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-bank" onclick="switchDeptTab('dept-tab-bank')"><span class="material-symbols-outlined chip-icon" style="color:#f59e0b;">account_balance</span> Bank Robbery</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-prison" onclick="switchDeptTab('dept-tab-prison')"><span class="material-symbols-outlined chip-icon" style="color:#f97316;">lock</span> Prison</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-meetings" onclick="switchDeptTab('dept-tab-meetings')"><span class="material-symbols-outlined chip-icon" style="color:#a855f7;">groups</span> Meetings</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-medlabs" onclick="switchDeptTab('dept-tab-medlabs')"><span class="material-symbols-outlined chip-icon" style="color:#ec4899;">science</span> Medlabs</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-specops" onclick="switchDeptTab('dept-tab-specops')"><span class="material-symbols-outlined chip-icon" style="color:#eab308;">shield</span> Spec Ops</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-databreach" onclick="switchDeptTab('dept-tab-databreach')"><span class="material-symbols-outlined chip-icon" style="color:#6366f1;">terminal</span> Data Breach</button>
+                            <button class="dept-chip add-dept-chip-btn" onclick="openAddDeptModal()"><span class="material-symbols-outlined chip-icon">add</span> Add Category</button>
                         </div>
 
                         <!-- Tab Content Body -->
@@ -683,107 +694,107 @@
                             <!-- Background Check (DEFAULT ACTIVE) -->
                             <div id="dept-tab-bgc" class="dept-tab-content active">
                                 <div class="copy-blocks-grid">
-                                    <div class="copy-block"><div class="copy-header"><span>How Copy?</span><button class="btn copy-btn" data-target="cmd-bgc-1">📋</button></div><div class="copy-content" id="cmd-bgc-1" contenteditable="true">EMS To ALL: How Copy?</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Request BGC</span><button class="btn copy-btn" data-target="cmd-bgc-2">📋</button></div><div class="copy-content" id="cmd-bgc-2" contenteditable="true">EMS To [DEPT/LAST]: (Name of person) wants to join EMS. Can I have a BGC on them please? </div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>10-4 Appreciated</span><button class="btn copy-btn" data-target="cmd-bgc-3">📋</button></div><div class="copy-content" id="cmd-bgc-3" contenteditable="true">EMS To [DEPT/LAST]: 10-4! Appreciate your help always!</div></div>
-                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-bgc')"><div class="add-command-icon">➕</div><div class="add-command-text">Add Command</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>How Copy?</span><button class="btn copy-btn" data-target="cmd-bgc-1"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-bgc-1" contenteditable="true">EMS To ALL: How Copy?</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Request BGC</span><button class="btn copy-btn" data-target="cmd-bgc-2"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-bgc-2" contenteditable="true">EMS To [DEPT/LAST]: (Name of person) wants to join EMS. Can I have a BGC on them please? </div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>10-4 Appreciated</span><button class="btn copy-btn" data-target="cmd-bgc-3"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-bgc-3" contenteditable="true">EMS To [DEPT/LAST]: 10-4! Appreciate your help always!</div></div>
+                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-bgc')"><div class="add-command-icon"><span class="material-symbols-outlined" style="font-size:1.8rem; color:#38bdf8;">add_circle</span></div><div class="add-command-text">Add Command</div></div>
                                 </div>
                             </div>
 
                             <!-- Emergency Broadcasts -->
                             <div id="dept-tab-broadcasts" class="dept-tab-content">
                                 <div class="copy-blocks-grid">
-                                    <div class="copy-block"><div class="copy-header"><span>Store Robbery</span><button class="btn copy-btn" data-target="cmd-emergency-1">📋</button></div><div class="copy-content" id="cmd-emergency-1" contenteditable="true">EMS To ALL: Requesting everyone to drop a 911 call for a store robbery. Much appreciated!</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Gun Store Robbery</span><button class="btn copy-btn" data-target="cmd-emergency-2">📋</button></div><div class="copy-content" id="cmd-emergency-2" contenteditable="true">EMS To ALL: Requesting everyone to drop a 911 call for a gun store robbery. Thank you for the support!</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Hostage Situation</span><button class="btn copy-btn" data-target="cmd-emergency-3">📋</button></div><div class="copy-content" id="cmd-emergency-3" contenteditable="true">EMS To ALL: Requesting everyone to drop a 911 call for a hostage situation. We appreciate your cooperation!</div></div>
-                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-broadcasts')"><div class="add-command-icon">➕</div><div class="add-command-text">Add Command</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Store Robbery</span><button class="btn copy-btn" data-target="cmd-emergency-1"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-emergency-1" contenteditable="true">EMS To ALL: Requesting everyone to drop a 911 call for a store robbery. Much appreciated!</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Gun Store Robbery</span><button class="btn copy-btn" data-target="cmd-emergency-2"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-emergency-2" contenteditable="true">EMS To ALL: Requesting everyone to drop a 911 call for a gun store robbery. Thank you for the support!</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Hostage Situation</span><button class="btn copy-btn" data-target="cmd-emergency-3"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-emergency-3" contenteditable="true">EMS To ALL: Requesting everyone to drop a 911 call for a hostage situation. We appreciate your cooperation!</div></div>
+                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-broadcasts')"><div class="add-command-icon"><span class="material-symbols-outlined" style="font-size:1.8rem; color:#38bdf8;">add_circle</span></div><div class="add-command-text">Add Command</div></div>
                                 </div>
                             </div>
 
                             <!-- Subs Events -->
                             <div id="dept-tab-subs" class="dept-tab-content">
                                 <div class="copy-blocks-grid">
-                                    <div class="copy-block"><div class="copy-header"><span>Adrenaline Prep</span><button class="btn copy-btn" data-target="cmd-subs-1">📋</button></div><div class="copy-content" id="cmd-subs-1" contenteditable="true">EMS To ALL: Doctors loading adrenaline readying for Subs! Hope to see you there!</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Giving Adrenaline</span><button class="btn copy-btn" data-target="cmd-subs-2">📋</button></div><div class="copy-content" id="cmd-subs-2" contenteditable="true">EMS To ALL: Doctors start giving the Adrenaline, Please come near the EMS vehicle!</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Remove Barricades</span><button class="btn copy-btn" data-target="cmd-subs-3">📋</button></div><div class="copy-content" id="cmd-subs-3" contenteditable="true">EMS To ALL: Please Everyone Remove the Barricades and Thank You for Your Cooperation.</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Best Wishes</span><button class="btn copy-btn" data-target="cmd-subs-4">📋</button></div><div class="copy-content" id="cmd-subs-4" contenteditable="true">EMS To ALL: Wishing you all the best in securing and safeguarding the Subs! Stay safe out there.</div></div>
-                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-subs')"><div class="add-command-icon">➕</div><div class="add-command-text">Add Command</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Adrenaline Prep</span><button class="btn copy-btn" data-target="cmd-subs-1"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-subs-1" contenteditable="true">EMS To ALL: Doctors loading adrenaline readying for Subs! Hope to see you there!</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Giving Adrenaline</span><button class="btn copy-btn" data-target="cmd-subs-2"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-subs-2" contenteditable="true">EMS To ALL: Doctors start giving the Adrenaline, Please come near the EMS vehicle!</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Remove Barricades</span><button class="btn copy-btn" data-target="cmd-subs-3"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-subs-3" contenteditable="true">EMS To ALL: Please Everyone Remove the Barricades and Thank You for Your Cooperation.</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Best Wishes</span><button class="btn copy-btn" data-target="cmd-subs-4"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-subs-4" contenteditable="true">EMS To ALL: Wishing you all the best in securing and safeguarding the Subs! Stay safe out there.</div></div>
+                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-subs')"><div class="add-command-icon"><span class="material-symbols-outlined" style="font-size:1.8rem; color:#38bdf8;">add_circle</span></div><div class="add-command-text">Add Command</div></div>
                                 </div>
                             </div>
 
                             <!-- ACC Events -->
                             <div id="dept-tab-acc" class="dept-tab-content">
                                 <div class="copy-blocks-grid">
-                                    <div class="copy-block"><div class="copy-header"><span>Adrenaline Prep</span><button class="btn copy-btn" data-target="cmd-acc-1">📋</button></div><div class="copy-content" id="cmd-acc-1" contenteditable="true">EMS To ALL: Doctors loading adrenaline readying for ACC! Hope to see you there!</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Giving Adrenaline</span><button class="btn copy-btn" data-target="cmd-acc-2">📋</button></div><div class="copy-content" id="cmd-acc-2" contenteditable="true">EMS To ALL: Doctors start giving the Adrenaline, Please come near the EMS vehicle!</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Remove Barricades</span><button class="btn copy-btn" data-target="cmd-acc-3">📋</button></div><div class="copy-content" id="cmd-acc-3" contenteditable="true">EMS To ALL: Please Everyone Remove the Barricades and Thank You for Your Cooperation.</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Best Wishes</span><button class="btn copy-btn" data-target="cmd-acc-4">📋</button></div><div class="copy-content" id="cmd-acc-4" contenteditable="true">EMS To ALL: Wishing you all the best in securing and safeguarding the ACC! Stay safe out there.</div></div>
-                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-acc')"><div class="add-command-icon">➕</div><div class="add-command-text">Add Command</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Adrenaline Prep</span><button class="btn copy-btn" data-target="cmd-acc-1"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-acc-1" contenteditable="true">EMS To ALL: Doctors loading adrenaline readying for ACC! Hope to see you there!</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Giving Adrenaline</span><button class="btn copy-btn" data-target="cmd-acc-2"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-acc-2" contenteditable="true">EMS To ALL: Doctors start giving the Adrenaline, Please come near the EMS vehicle!</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Remove Barricades</span><button class="btn copy-btn" data-target="cmd-acc-3"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-acc-3" contenteditable="true">EMS To ALL: Please Everyone Remove the Barricades and Thank You for Your Cooperation.</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Best Wishes</span><button class="btn copy-btn" data-target="cmd-acc-4"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-acc-4" contenteditable="true">EMS To ALL: Wishing you all the best in securing and safeguarding the ACC! Stay safe out there.</div></div>
+                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-acc')"><div class="add-command-icon"><span class="material-symbols-outlined" style="font-size:1.8rem; color:#38bdf8;">add_circle</span></div><div class="add-command-text">Add Command</div></div>
                                 </div>
                             </div>
 
                             <!-- Bank Robbery -->
                             <div id="dept-tab-bank" class="dept-tab-content">
                                 <div class="copy-blocks-grid">
-                                    <div class="copy-block"><div class="copy-header"><span>Adrenaline Prep</span><button class="btn copy-btn" data-target="cmd-bank-1">📋</button></div><div class="copy-content" id="cmd-bank-1" contenteditable="true">EMS To ALL: Doctors loading adrenaline readying for Bank! Hope to see you there!</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Giving Adrenaline</span><button class="btn copy-btn" data-target="cmd-bank-2">📋</button></div><div class="copy-content" id="cmd-bank-2" contenteditable="true">EMS To ALL: Doctors start giving the Adrenaline, Please come near the EMS vehicle!</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Remove Barricades</span><button class="btn copy-btn" data-target="cmd-bank-3">📋</button></div><div class="copy-content" id="cmd-bank-3" contenteditable="true">EMS To ALL: Please Everyone Remove the Barricades and Thank You for Your Cooperation.</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Best Wishes</span><button class="btn copy-btn" data-target="cmd-bank-4">📋</button></div><div class="copy-content" id="cmd-bank-4" contenteditable="true">EMS To ALL: Wishing you all the best in securing and safeguarding the Bank! Stay safe out there.</div></div>
-                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-bank')"><div class="add-command-icon">➕</div><div class="add-command-text">Add Command</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Adrenaline Prep</span><button class="btn copy-btn" data-target="cmd-bank-1"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-bank-1" contenteditable="true">EMS To ALL: Doctors loading adrenaline readying for Bank! Hope to see you there!</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Giving Adrenaline</span><button class="btn copy-btn" data-target="cmd-bank-2"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-bank-2" contenteditable="true">EMS To ALL: Doctors start giving the Adrenaline, Please come near the EMS vehicle!</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Remove Barricades</span><button class="btn copy-btn" data-target="cmd-bank-3"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-bank-3" contenteditable="true">EMS To ALL: Please Everyone Remove the Barricades and Thank You for Your Cooperation.</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Best Wishes</span><button class="btn copy-btn" data-target="cmd-bank-4"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-bank-4" contenteditable="true">EMS To ALL: Wishing you all the best in securing and safeguarding the Bank! Stay safe out there.</div></div>
+                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-bank')"><div class="add-command-icon"><span class="material-symbols-outlined" style="font-size:1.8rem; color:#38bdf8;">add_circle</span></div><div class="add-command-text">Add Command</div></div>
                                 </div>
                             </div>
 
                             <!-- Prison Protection -->
                             <div id="dept-tab-prison" class="dept-tab-content">
                                 <div class="copy-blocks-grid">
-                                    <div class="copy-block"><div class="copy-header"><span>Adrenaline Prep</span><button class="btn copy-btn" data-target="cmd-prison-1">📋</button></div><div class="copy-content" id="cmd-prison-1" contenteditable="true">EMS To ALL: Doctors loading adrenaline readying for Prison Protection! Hope to see you there!</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Giving Adrenaline</span><button class="btn copy-btn" data-target="cmd-prison-2">📋</button></div><div class="copy-content" id="cmd-prison-2" contenteditable="true">EMS To ALL: Doctors start giving the Adrenaline, Please come near the EMS vehicle!</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Remove Barricades</span><button class="btn copy-btn" data-target="cmd-prison-3">📋</button></div><div class="copy-content" id="cmd-prison-3" contenteditable="true">EMS To ALL: Please Everyone Remove the Barricades and Thank You for Your Cooperation.</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Best Wishes</span><button class="btn copy-btn" data-target="cmd-prison-4">📋</button></div><div class="copy-content" id="cmd-prison-4" contenteditable="true">EMS To ALL: Wishing you all the best in securing and safeguarding the Prison! Stay safe out!</div></div>
-                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-prison')"><div class="add-command-icon">➕</div><div class="add-command-text">Add Command</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Adrenaline Prep</span><button class="btn copy-btn" data-target="cmd-prison-1"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-prison-1" contenteditable="true">EMS To ALL: Doctors loading adrenaline readying for Prison Protection! Hope to see you there!</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Giving Adrenaline</span><button class="btn copy-btn" data-target="cmd-prison-2"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-prison-2" contenteditable="true">EMS To ALL: Doctors start giving the Adrenaline, Please come near the EMS vehicle!</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Remove Barricades</span><button class="btn copy-btn" data-target="cmd-prison-3"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-prison-3" contenteditable="true">EMS To ALL: Please Everyone Remove the Barricades and Thank You for Your Cooperation.</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Best Wishes</span><button class="btn copy-btn" data-target="cmd-prison-4"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-prison-4" contenteditable="true">EMS To ALL: Wishing you all the best in securing and safeguarding the Prison! Stay safe out!</div></div>
+                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-prison')"><div class="add-command-icon"><span class="material-symbols-outlined" style="font-size:1.8rem; color:#38bdf8;">add_circle</span></div><div class="add-command-text">Add Command</div></div>
                                 </div>
                             </div>
 
                             <!-- Meetings -->
                             <div id="dept-tab-meetings" class="dept-tab-content">
                                 <div class="copy-blocks-grid">
-                                    <div class="copy-block"><div class="copy-header"><span>How copy?</span><button class="btn copy-btn" data-target="cmd-meet-1">📋</button></div><div class="copy-content" id="cmd-meet-1" contenteditable="true">EMS To [DEPT]: How copy?</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Good copy</span><button class="btn copy-btn" data-target="cmd-meet-2">📋</button></div><div class="copy-content" id="cmd-meet-2" contenteditable="true">EMS To [DEPT/LAST]: Good copy</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Quick Meeting</span><button class="btn copy-btn" data-target="cmd-meet-3">📋</button></div><div class="copy-content" id="cmd-meet-3" contenteditable="true">EMS To [DEPT/LAST]: Can we have a quick meeting at your HQ?</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>ETA 5 Mins</span><button class="btn copy-btn" data-target="cmd-meet-4">📋</button></div><div class="copy-content" id="cmd-meet-4" contenteditable="true">EMS To [DEPT/LAST]: ETA to your HQ 5 minutes</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Permission to Land</span><button class="btn copy-btn" data-target="cmd-meet-5">📋</button></div><div class="copy-content" id="cmd-meet-5" contenteditable="true">EMS To [DEPT/LAST]: Can we have permission to land in your HQ?</div></div>
-                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-meetings')"><div class="add-command-icon">➕</div><div class="add-command-text">Add Command</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>How copy?</span><button class="btn copy-btn" data-target="cmd-meet-1"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-meet-1" contenteditable="true">EMS To [DEPT]: How copy?</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Good copy</span><button class="btn copy-btn" data-target="cmd-meet-2"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-meet-2" contenteditable="true">EMS To [DEPT/LAST]: Good copy</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Quick Meeting</span><button class="btn copy-btn" data-target="cmd-meet-3"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-meet-3" contenteditable="true">EMS To [DEPT/LAST]: Can we have a quick meeting at your HQ?</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>ETA 5 Mins</span><button class="btn copy-btn" data-target="cmd-meet-4"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-meet-4" contenteditable="true">EMS To [DEPT/LAST]: ETA to your HQ 5 minutes</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Permission to Land</span><button class="btn copy-btn" data-target="cmd-meet-5"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-meet-5" contenteditable="true">EMS To [DEPT/LAST]: Can we have permission to land in your HQ?</div></div>
+                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-meetings')"><div class="add-command-icon"><span class="material-symbols-outlined" style="font-size:1.8rem; color:#38bdf8;">add_circle</span></div><div class="add-command-text">Add Command</div></div>
                                 </div>
                             </div>
 
                             <!-- Medlabs Support -->
                             <div id="dept-tab-medlabs" class="dept-tab-content">
                                 <div class="copy-blocks-grid">
-                                    <div class="copy-block"><div class="copy-header"><span>Start Making Medicine</span><button class="btn copy-btn" data-target="cmd-med-1">📋</button></div><div class="copy-content" id="cmd-med-1" contenteditable="true">EMS To ALL: We Are Going Start Making Medicine Please Send Your Free Units To Medlabs!!</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>ETA to Medlabs</span><button class="btn copy-btn" data-target="cmd-med-2">📋</button></div><div class="copy-content" id="cmd-med-2" contenteditable="true">EMS To LSPD/FIB/SAHP/GOV/NG: ETA to Medlabs</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Thanks Assistance</span><button class="btn copy-btn" data-target="cmd-med-3">📋</button></div><div class="copy-content" id="cmd-med-3" contenteditable="true">EMS To [TO_DEPT]: Thanks for Your Assistance</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Thanks Assistance (ALL)</span><button class="btn copy-btn" data-target="cmd-med-4">📋</button></div><div class="copy-content" id="cmd-med-4" contenteditable="true">EMS To ALL: Thanks for Your Assistance</div></div>
-                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-medlabs')"><div class="add-command-icon">➕</div><div class="add-command-text">Add Command</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Start Making Medicine</span><button class="btn copy-btn" data-target="cmd-med-1"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-med-1" contenteditable="true">EMS To ALL: We Are Going Start Making Medicine Please Send Your Free Units To Medlabs!!</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>ETA to Medlabs</span><button class="btn copy-btn" data-target="cmd-med-2"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-med-2" contenteditable="true">EMS To LSPD/FIB/SAHP/GOV/NG: ETA to Medlabs</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Thanks Assistance</span><button class="btn copy-btn" data-target="cmd-med-3"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-med-3" contenteditable="true">EMS To [TO_DEPT]: Thanks for Your Assistance</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Thanks Assistance (ALL)</span><button class="btn copy-btn" data-target="cmd-med-4"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-med-4" contenteditable="true">EMS To ALL: Thanks for Your Assistance</div></div>
+                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-medlabs')"><div class="add-command-icon"><span class="material-symbols-outlined" style="font-size:1.8rem; color:#38bdf8;">add_circle</span></div><div class="add-command-text">Add Command</div></div>
                                 </div>
                             </div>
 
                             <!-- Spec Ops -->
                             <div id="dept-tab-specops" class="dept-tab-content">
                                 <div class="copy-blocks-grid">
-                                    <div class="copy-block"><div class="copy-header"><span>Medical Support</span><button class="btn copy-btn" data-target="cmd-specops-1">📋</button></div><div class="copy-content" id="cmd-specops-1" contenteditable="true">EMS To ALL: Please drop a 911 call for any medical support at the Spec Ops! Doctors are ready!</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>EMS Arrival</span><button class="btn copy-btn" data-target="cmd-specops-2">📋</button></div><div class="copy-content" id="cmd-specops-2" contenteditable="true">EMS To ALL: EMS is here! Please come near the EMS Vehicle to get medical attention.</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Watch Your Backs</span><button class="btn copy-btn" data-target="cmd-specops-3">📋</button></div><div class="copy-content" id="cmd-specops-3" contenteditable="true">EMS To ALL: Be safe and watch your backs at the Spec Ops! EMS out.</div></div>
-                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-specops')"><div class="add-command-icon">➕</div><div class="add-command-text">Add Command</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Medical Support</span><button class="btn copy-btn" data-target="cmd-specops-1"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-specops-1" contenteditable="true">EMS To ALL: Please drop a 911 call for any medical support at the Spec Ops! Doctors are ready!</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>EMS Arrival</span><button class="btn copy-btn" data-target="cmd-specops-2"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-specops-2" contenteditable="true">EMS To ALL: EMS is here! Please come near the EMS Vehicle to get medical attention.</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Watch Your Backs</span><button class="btn copy-btn" data-target="cmd-specops-3"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-specops-3" contenteditable="true">EMS To ALL: Be safe and watch your backs at the Spec Ops! EMS out.</div></div>
+                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-specops')"><div class="add-command-icon"><span class="material-symbols-outlined" style="font-size:1.8rem; color:#38bdf8;">add_circle</span></div><div class="add-command-text">Add Command</div></div>
                                 </div>
                             </div>
 
                             <!-- Data Breach -->
                             <div id="dept-tab-databreach" class="dept-tab-content">
                                 <div class="copy-blocks-grid">
-                                    <div class="copy-block"><div class="copy-header"><span>Medical Support</span><button class="btn copy-btn" data-target="cmd-databreach-1">📋</button></div><div class="copy-content" id="cmd-databreach-1" contenteditable="true">EMS To ALL: Please drop a 911 call for any medical support at the Data Breach! Doctors are ready!</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>EMS Arrival</span><button class="btn copy-btn" data-target="cmd-databreach-2">📋</button></div><div class="copy-content" id="cmd-databreach-2" contenteditable="true">EMS To ALL: EMS is here! Please come near the EMS Vehicle to get medical attention.</div></div>
-                                    <div class="copy-block"><div class="copy-header"><span>Watch Your Backs</span><button class="btn copy-btn" data-target="cmd-databreach-3">📋</button></div><div class="copy-content" id="cmd-databreach-3" contenteditable="true">EMS To ALL: Be safe and watch your backs at the Spec Ops! EMS out.</div></div>
-                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-databreach')"><div class="add-command-icon">➕</div><div class="add-command-text">Add Command</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Medical Support</span><button class="btn copy-btn" data-target="cmd-databreach-1"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-databreach-1" contenteditable="true">EMS To ALL: Please drop a 911 call for any medical support at the Data Breach! Doctors are ready!</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>EMS Arrival</span><button class="btn copy-btn" data-target="cmd-databreach-2"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-databreach-2" contenteditable="true">EMS To ALL: EMS is here! Please come near the EMS Vehicle to get medical attention.</div></div>
+                                    <div class="copy-block"><div class="copy-header"><span>Watch Your Backs</span><button class="btn copy-btn" data-target="cmd-databreach-3"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="cmd-databreach-3" contenteditable="true">EMS To ALL: Be safe and watch your backs at the Spec Ops! EMS out.</div></div>
+                                    <div class="copy-block add-command-card" onclick="openAddCommandModal('dept-tab-databreach')"><div class="add-command-icon"><span class="material-symbols-outlined" style="font-size:1.8rem; color:#38bdf8;">add_circle</span></div><div class="add-command-text">Add Command</div></div>
                                 </div>
                             </div>
                         </div>
@@ -793,40 +804,40 @@
 
             <!-- MODAL: LABTECH & MED LOGS -->
             <div class="modal-content" id="modal-discord">
-                <button class="close-btn" onclick="closeModals()">✕</button>
-                <div class="modal-header">🔬 Labtech &amp; Med Logs</div>
+                <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-purple" style="font-size:1.4rem; margin-right:6px;">science</span> Labtech &amp; Med Logs</div>
 
                 <div class="discord-grid">
                     <div class="discord-card">
                         <div class="channel-name">#MAKING-MEDICAL-SUPPLIES</div>
                         <div class="desc">Medlabs: Before &amp; after finishing captchas.</div>
-                        <button class="btn btn-primary" onclick="openSubModal('sub-supplies')">Generate &amp; Open</button>
+                        <button class="btn btn-primary" onclick="openSubModal('sub-supplies')"><span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> Generate &amp; Open</button>
                     </div>
 
                     <div class="discord-card">
                         <div class="channel-name">#LABTECH-ROTA</div>
                         <div class="desc">Daily summary log. Fill once a day, edit if updating.</div>
-                        <button class="btn btn-primary" onclick="openSubModal('sub-rota')">Generate &amp; Open</button>
+                        <button class="btn btn-primary" onclick="openSubModal('sub-rota')"><span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> Generate &amp; Open</button>
                     </div>
 
                     <div class="discord-card">
                         <div class="channel-name">#PROOF-OF-CAPTCHA</div>
                         <div class="desc">Upload screenshot proof of completed captcha.</div>
-                        <button class="btn btn-primary" onclick="executeDiscordAction('captcha', true)">Open Discord Channel</button>
+                        <button class="btn btn-primary" onclick="executeDiscordAction('captcha', true)"><span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> Open Discord Channel</button>
                     </div>
 
                     <div class="discord-card">
                         <div class="channel-name">#MEDICAL-DELIVERIES</div>
                         <div class="desc">Log medical deliveries to hospital and other factions.</div>
-                        <button class="btn btn-primary" onclick="executeDiscordAction('deliveries', true)">Open Discord Channel</button>
+                        <button class="btn btn-primary" onclick="executeDiscordAction('deliveries', true)"><span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> Open Discord Channel</button>
                     </div>
                 </div>
             </div>
 
             <!-- SUB-MODAL: SUPPLIES -->
             <div class="modal-content sub-modal" id="sub-supplies">
-                <button class="close-btn" onclick="closeSubModal()">✕</button>
-                <div class="modal-header">🧪 Medical Supplies Log</div>
+                <button class="close-btn" onclick="closeSubModal()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-purple" style="font-size:1.4rem; margin-right:6px;">inventory_2</span> Medical Supplies Log</div>
                 <div class="input-group">
                     <label>Status</label>
                     <input type="hidden" id="ms-status" value="before">
@@ -847,14 +858,14 @@
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
                     <label class="discord-toggle-label"><input type="checkbox" class="discord-toggle-checkbox" id="cb-supplies" checked><span class="toggle-slider"></span></label>
-                    <button class="btn btn-success" style="flex:1; padding:0.8rem;" onclick="generateDiscordAction('supplies', 'cb-supplies')">Generate, Copy &amp; Open</button>
+                    <button class="btn btn-success" style="flex:1; padding:0.8rem;" onclick="generateDiscordAction('supplies', 'cb-supplies')"><span class="material-symbols-outlined" style="font-size:1.1rem; margin-right:4px;">send</span> Generate, Copy &amp; Open</button>
                 </div>
             </div>
 
             <!-- SUB-MODAL: LABTECH ROTA -->
             <div class="modal-content sub-modal" id="sub-rota">
-                <button class="close-btn" onclick="closeSubModal()">✕</button>
-                <div class="modal-header">🔬 Labtech Rota &amp; Bonus Calculator</div>
+                <button class="close-btn" onclick="closeSubModal()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-emerald" style="font-size:1.4rem; margin-right:6px;">calculate</span> Labtech Rota &amp; Bonus Calculator</div>
                 <div class="input-group">
                     <label>Date</label>
                     <div id="lr-live-date" style="font-size: 0.95rem; color: #38bdf8; background: rgba(0,0,0,0.3); padding: 0.6rem; border-radius: 8px; text-align: center; font-family: monospace; font-weight: bold; border: 1px solid var(--card-border);">--/--/---- (IC) | --/--/---- (Local)</div>
@@ -882,18 +893,18 @@
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
                     <label class="discord-toggle-label"><input type="checkbox" class="discord-toggle-checkbox" id="cb-rota" checked><span class="toggle-slider"></span></label>
-                    <button class="btn btn-success" style="flex:1; padding:0.8rem;" onclick="generateDiscordAction('rota', 'cb-rota')">Generate, Copy &amp; Open</button>
+                    <button class="btn btn-success" style="flex:1; padding:0.8rem;" onclick="generateDiscordAction('rota', 'cb-rota')"><span class="material-symbols-outlined" style="font-size:1.1rem; margin-right:4px;">send</span> Generate, Copy &amp; Open</button>
                 </div>
             </div>
 
             <!-- MODAL: HOSPITAL SERVICES (HS) -->
             <div class="modal-content" id="modal-hs">
-                <button class="close-btn" onclick="closeModals()">✕</button>
-                <div class="modal-header">🏥 Hospital Services (HS) Guide</div>
+                <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-emerald" style="font-size:1.4rem; margin-right:6px;">local_hospital</span> Hospital Services (HS) Guide</div>
 
                 <div class="hs-grid-wrapper">
                     <div class="glass-section">
-                        <div class="section-title">👗 Coming On Duty (Dress Code)</div>
+                        <div class="section-title"><span class="material-symbols-outlined icon-gradient-purple" style="font-size:1.15rem; margin-right:4px; vertical-align:middle;">styler</span> Coming On Duty (Dress Code)</div>
                         <div class="section-body" style="font-size: 0.85rem; line-height: 1.5;">
                             <strong>Male:</strong><br>
                             Outwear: 1, Color: 2 | Pants: 2, Color: 2<br>
@@ -906,28 +917,28 @@
                     </div>
 
                     <div class="glass-section">
-                        <div class="section-title">🎥 Bodycam Protocols</div>
+                        <div class="section-title"><span class="material-symbols-outlined icon-gradient-rose" style="font-size:1.15rem; margin-right:4px; vertical-align:middle;">videocam</span> Bodycam Protocols</div>
                         <div class="section-body">
                             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem;">Perform step-by-step On Duty, Refresh, Save, and Off Duty bodycam sequences with active timers.</p>
-                            <button class="btn btn-primary" style="width: 100%; padding: 0.75rem; font-weight: 600;" onclick="openModal('modal-bodycam')">📹 Open Bodycam Dialog</button>
+                            <button class="btn btn-primary" style="width: 100%; padding: 0.75rem; font-weight: 600;" onclick="openModal('modal-bodycam')"><span class="material-symbols-outlined" style="font-size:1.1rem; margin-right:4px;">videocam</span> Open Bodycam Dialog</button>
                         </div>
                     </div>
 
                     <div class="glass-section">
-                        <div class="section-title">📡 Key Radio Codes</div>
+                        <div class="section-title"><span class="material-symbols-outlined icon-gradient-blue" style="font-size:1.15rem; margin-right:4px; vertical-align:middle;">podcasts</span> Key Radio Codes</div>
                         <div class="section-body">
-                            <div class="copy-block"><div class="copy-header"><span>10-8 (Available)</span><button class="btn copy-btn" data-target="hs-rc-108">📋</button></div><div class="copy-content" id="hs-rc-108" contenteditable="true">10-8 where am I needed?</div></div>
-                            <div class="copy-block"><div class="copy-header"><span>10-5 (On Duty / Replacing)</span><button class="btn copy-btn" data-target="hs-rc-105">📋</button></div><div class="copy-content" id="hs-rc-105" contenteditable="true">10-5 {LOC} replacing {REP}</div></div>
-                            <div class="copy-block"><div class="copy-header"><span>10-7 (10 Min Request)</span><button class="btn copy-btn" data-target="hs-rc-107a">📋</button></div><div class="copy-content" id="hs-rc-107a" contenteditable="true">10-7 {LOC} need replacement in 10 minutes</div></div>
-                            <div class="copy-block"><div class="copy-header"><span>10-7 (Off Duty)</span><button class="btn copy-btn" data-target="hs-rc-107b">📋</button></div><div class="copy-content" id="hs-rc-107b" contenteditable="true">10-7 {LOC} replaced by {REP}</div></div>
-                            <div class="copy-block"><div class="copy-header"><span>10-7 (Empty Protocol)</span><button class="btn copy-btn" data-target="hs-rc-empty">📋</button></div><div class="copy-content" id="hs-rc-empty" contenteditable="true">10-7 {LOC} no replacement found after 30 minutes, lobby is now empty</div></div>
-                            <div class="copy-block"><div class="copy-header"><span>10-9 (Break)</span><button class="btn copy-btn" data-target="hs-rc-109">📋</button></div><div class="copy-content" id="hs-rc-109" contenteditable="true">Need 10-9 {LOC} for 10 minutes</div></div>
-                            <div class="copy-block"><div class="copy-header"><span>Code A (Crash)</span><button class="btn copy-btn" data-target="hs-rc-codea">📋</button></div><div class="copy-content" id="hs-rc-codea" contenteditable="true">Code A at {LOC} flying back/cannot fly back @Employee @High Command</div></div>
+                            <div class="copy-block"><div class="copy-header"><span>10-8 (Available)</span><button class="btn copy-btn" data-target="hs-rc-108"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="hs-rc-108" contenteditable="true">10-8 where am I needed?</div></div>
+                            <div class="copy-block"><div class="copy-header"><span>10-5 (On Duty / Replacing)</span><button class="btn copy-btn" data-target="hs-rc-105"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="hs-rc-105" contenteditable="true">10-5 {LOC} replacing {REP}</div></div>
+                            <div class="copy-block"><div class="copy-header"><span>10-7 (10 Min Request)</span><button class="btn copy-btn" data-target="hs-rc-107a"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="hs-rc-107a" contenteditable="true">10-7 {LOC} need replacement in 10 minutes</div></div>
+                            <div class="copy-block"><div class="copy-header"><span>10-7 (Off Duty)</span><button class="btn copy-btn" data-target="hs-rc-107b"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="hs-rc-107b" contenteditable="true">10-7 {LOC} replaced by {REP}</div></div>
+                            <div class="copy-block"><div class="copy-header"><span>10-7 (Empty Protocol)</span><button class="btn copy-btn" data-target="hs-rc-empty"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="hs-rc-empty" contenteditable="true">10-7 {LOC} no replacement found after 30 minutes, lobby is now empty</div></div>
+                            <div class="copy-block"><div class="copy-header"><span>10-9 (Break)</span><button class="btn copy-btn" data-target="hs-rc-109"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="hs-rc-109" contenteditable="true">Need 10-9 {LOC} for 10 minutes</div></div>
+                            <div class="copy-block"><div class="copy-header"><span>Code A (Crash)</span><button class="btn copy-btn" data-target="hs-rc-codea"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" id="hs-rc-codea" contenteditable="true">Code A at {LOC} flying back/cannot fly back @Employee @High Command</div></div>
                         </div>
                     </div>
 
                     <div class="glass-section">
-                        <div class="section-title">📝 Lobby Tasks &amp; Functions</div>
+                        <div class="section-title"><span class="material-symbols-outlined icon-gradient-emerald" style="font-size:1.15rem; margin-right:4px; vertical-align:middle;">assignment</span> Lobby Tasks &amp; Functions</div>
                         <div class="section-body">
                             <ul style="font-size: 0.85rem; padding-left: 1.2rem; color: var(--text-muted); line-height: 1.6;">
                                 <li><strong>Selling Medkits:</strong> Flex 'G' muscle -&gt; Organization -&gt; Sell A Medkit. (Max 50 at a time)</li>
@@ -945,23 +956,23 @@
 
             <!-- MODAL: GROUND SERVICES (GS) -->
             <div class="modal-content" id="modal-gs">
-                <button class="close-btn" onclick="closeModals()">✕</button>
-                <div class="modal-header">🚑 Ground Services (GS) Guide</div>
+                <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.4rem; margin-right:6px;">medical_services</span> Ground Services (GS) Guide</div>
 
                 <div class="gs-grid-wrapper">
                     <div class="glass-section">
-                        <div class="section-title">👗 Coming On Duty (Vest)</div>
+                        <div class="section-title"><span class="material-symbols-outlined icon-gradient-amber" style="font-size:1.15rem; margin-right:4px; vertical-align:middle;">shield</span> Coming On Duty (Vest)</div>
                         <div class="section-body" style="font-size: 0.85rem;">
                             <p style="margin-bottom: 0.5rem;">GS Calls require a vest before you leave the hospital.</p>
                             <div class="copy-block">
-                                <div class="copy-header"><span>Ask for Vest</span><button class="btn copy-btn" data-target="gs-rc-vest">📋</button></div>
+                                <div class="copy-header"><span>Ask for Vest</span><button class="btn copy-btn" data-target="gs-rc-vest"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                 <div class="copy-content" id="gs-rc-vest" contenteditable="true">Any HC available, I need a vest for GS Calls?</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="glass-section">
-                        <div class="section-title">🚑 Active GS Calls Protocols</div>
+                        <div class="section-title"><span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.15rem; margin-right:4px; vertical-align:middle;">emergency</span> Active GS Calls Protocols</div>
                         <div class="section-body">
                             <ul style="font-size: 0.85rem; padding-left: 1.2rem; color: var(--text-muted); line-height: 1.6;">
                                 <li>Flex <strong>J</strong> to accept incoming dispatch calls.</li>
@@ -971,14 +982,14 @@
                                 <li><span style="color: var(--primary);">NEVER reject or delete a call (verbal warning offense).</span></li>
                             </ul>
                             <div class="copy-block" style="margin-top: 0.8rem;">
-                                <div class="copy-header"><span>RP Arrival Script</span><button class="btn copy-btn" data-target="gs-rp-arr">📋</button></div>
+                                <div class="copy-header"><span>RP Arrival Script</span><button class="btn copy-btn" data-target="gs-rp-arr"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                 <div class="copy-content" id="gs-rp-arr" contenteditable="true">Hello sir! I am from EMS, I am going to patch you up. Don't worry you will be fine.</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="glass-section">
-                        <div class="section-title">⚠️ Special Situations Guide</div>
+                        <div class="section-title"><span class="material-symbols-outlined icon-gradient-amber" style="font-size:1.15rem; margin-right:4px; vertical-align:middle;">warning</span> Special Situations Guide</div>
                         <div class="section-body" style="font-size: 0.85rem; line-height: 1.5;">
                             <div style="margin-bottom: 0.5rem;"><strong>Stuck Under Car:</strong> Ram with ambulance max 3 times to dislodge. If unsuccessful, open admin ticket (Code B).</div>
                             <div style="margin-bottom: 0.5rem;"><strong>Patient Underwater:</strong> Swim down to confirm, take screenshot, open admin ticket to teleport to shore.</div>
@@ -992,8 +1003,8 @@
 
             <!-- MODAL: ARO SERVICES -->
             <div class="modal-content" id="modal-aro">
-                <button class="close-btn" onclick="closeModals()">✕</button>
-                <div class="modal-header">🚁 Air Rescue Operations (ARO)</div>
+                <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.4rem; margin-right:6px;">flight</span> Air Rescue Operations (ARO)</div>
                 <div class="glass-section">
                     <p style="font-size: 0.9rem; color: var(--text-muted);">ARO flight protocols and helicopter dispatch commands.</p>
                 </div>
@@ -1001,8 +1012,8 @@
 
             <!-- MODAL: ADD CUSTOM COMMAND -->
             <div class="modal-content sub-modal" id="modal-add-command" style="max-width: 480px;">
-                <button class="close-btn" onclick="closeAddCommandModal()">✕</button>
-                <div class="modal-header">➕ Add Custom Command</div>
+                <button class="close-btn" onclick="closeAddCommandModal()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-blue" style="font-size:1.4rem; margin-right:6px;">add_circle</span> Add Custom Command</div>
                 <div class="glass-section">
                     <div class="input-group">
                         <label>Target Section</label>
@@ -1033,12 +1044,12 @@
 
             <!-- MODAL: ADD DEPARTMENT CATEGORY -->
             <div class="modal-content sub-modal" id="modal-add-dept" style="max-width: 440px;">
-                <button class="close-btn" onclick="closeAddDeptModal()">✕</button>
-                <div class="modal-header">➕ Add Category</div>
+                <button class="close-btn" onclick="closeAddDeptModal()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-blue" style="font-size:1.4rem; margin-right:6px;">folder_open</span> Add Category</div>
                 <div class="glass-section">
                     <div class="input-group">
-                        <label>Icon / Emoji</label>
-                        <input type="text" id="new-dept-icon" placeholder="e.g. 🛡️" value="📁">
+                        <label>Icon Name (Material Symbol or Emoji)</label>
+                        <input type="text" id="new-dept-icon" placeholder="e.g. shield, badge, campaign" value="folder">
                     </div>
                     <div class="input-group">
                         <label>Category Name</label>
@@ -1063,7 +1074,13 @@
         </div>
 
         <!-- Floating Help Button -->
-        <button class="tutorial-fab" onclick="startTutorial()" title="Tutorial &amp; Help">❓</button>
+        <button class="tutorial-fab" onclick="startTutorial()" title="Tutorial &amp; Help"><span class="material-symbols-outlined" style="font-size:1.4rem;">help</span></button>
+
+        <!-- FLOATING FIXED SAVE SETTINGS BAR (Visible on changes) -->
+        <div id="floating-save-settings" class="floating-save-bar hidden">
+            <span class="save-bar-text">⚠️ Unsaved Settings Changes</span>
+            <button class="btn btn-success btn-save-fixed" onclick="saveSettings()"><span class="material-symbols-outlined" style="font-size:1.1rem; margin-right:4px;">save</span> Save Settings</button>
+        </div>
 
     </div> <!-- End of app-container -->
 

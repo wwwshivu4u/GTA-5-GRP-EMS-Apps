@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
 
 /* =====================================================
    1. DESIGN TOKENS & GLOBAL RESETS
@@ -16,6 +17,86 @@
     --surface: rgba(255, 255, 255, 0.05);
     --surface-hover: rgba(255, 255, 255, 0.12);
     --discord-brand: #5865F2;
+}
+
+/* Material Symbols Outlined Icon System */
+.material-symbols-outlined {
+    font-family: 'Material Symbols Outlined', sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    font-size: 1.25rem;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    vertical-align: middle;
+}
+.material-symbols-outlined.solid {
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Multi-colored Vibrant Gradient & Solid Outlined Icon Palette */
+.icon-gradient-emerald {
+    background: linear-gradient(135deg, #34d399, #059669);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 8px rgba(52, 211, 153, 0.45));
+}
+.icon-gradient-rose {
+    background: linear-gradient(135deg, #fb7185, #e11d48);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 8px rgba(251, 113, 133, 0.45));
+}
+.icon-gradient-blue {
+    background: linear-gradient(135deg, #60a5fa, #2563eb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.45));
+}
+.icon-gradient-purple {
+    background: linear-gradient(135deg, #c084fc, #9333ea);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 8px rgba(192, 132, 252, 0.45));
+}
+.icon-gradient-amber {
+    background: linear-gradient(135deg, #fbbf24, #d97706);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.45));
+}
+.icon-gradient-cyan {
+    background: linear-gradient(135deg, #22d3ee, #0284c7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.45));
+}
+.icon-gradient-slate {
+    background: linear-gradient(135deg, #cbd5e1, #64748b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 8px rgba(148, 163, 184, 0.35));
+}
+.icon-gradient-orange {
+    background: linear-gradient(135deg, #fb923c, #ea580c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 8px rgba(251, 146, 60, 0.45));
+}
+
+.chip-icon {
+    font-size: 1.1rem !important;
+    margin-right: 0.35rem;
+    vertical-align: middle;
 }
 
 * {
@@ -217,6 +298,10 @@ body {
     line-height: 1;
 }
 
+#main-icon span{
+    font-size: 2.8rem;
+}
+
 .nav-text {
     font-weight: 500;
     font-size: 1.5rem;
@@ -233,9 +318,9 @@ body {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid var(--card-border);
     color: white;
-    border-radius: 50%;
-    width: 28px;
+    border-radius: 12px;
     height: 28px;
+    padding: 0.2rem 0.9rem;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -528,6 +613,16 @@ body {
 .input-group input:focus, .input-group select:focus {
     border-color: var(--secondary);
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+.input-group input[readonly], .input-group select[readonly] {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: var(--text-muted) !important;
+    cursor: default !important;
+}
+.input-group input[readonly]:focus, .input-group select[readonly]:focus {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: none !important;
 }
 
 /* =====================================================
@@ -1003,18 +1098,73 @@ body.low-height-mode .discord-grid {
 }
 .glass-section.collapsible .section-title {
     cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
-.glass-section.collapsible .section-title::after {
+.glass-section.collapsible .section-title-text {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.glass-section.collapsible .section-title-text::after {
     content: '▼';
-    font-size: 0.8rem;
-    transition: transform 0.2s;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    transition: transform 0.2s ease;
+    display: inline-block;
 }
-.glass-section.collapsible.collapsed .section-title::after {
+.glass-section.collapsible.collapsed .section-title-text::after {
     transform: rotate(-90deg);
 }
-.glass-section.collapsible.collapsed .copy-block,
 .glass-section.collapsible.collapsed .section-body {
-    display: none;
+    display: none !important;
+}
+.edit-section-btn {
+    padding: 0.25rem 0.6rem !important;
+    font-size: 0.75rem !important;
+    line-height: 1.2 !important;
+}
+
+/* Floating Fixed Save Settings Bar */
+.floating-save-bar {
+    position: fixed;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid var(--success);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.8), 0 0 25px rgba(16, 185, 129, 0.35);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 0.7rem 1.3rem;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    z-index: 10000;
+    animation: slideUpFloat 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.floating-save-bar.hidden {
+    display: none !important;
+}
+.save-bar-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    white-space: nowrap;
+}
+.btn-save-fixed {
+    padding: 0.5rem 1.3rem !important;
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    border-radius: 30px !important;
+    white-space: nowrap;
+}
+
+@keyframes slideUpFloat {
+    0% { transform: translate(-50%, 40px); opacity: 0; }
+    100% { transform: translate(-50%, 0); opacity: 1; }
 }
 
 /* Tutorial Overlay */
