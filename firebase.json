@@ -5,7 +5,7 @@
   "hosting": [
     {
       "target": "companion",
-      "public": "Employee Companion",
+      "public": "Companion",
       "ignore": [
         "firebase.json",
         "**/.*",
