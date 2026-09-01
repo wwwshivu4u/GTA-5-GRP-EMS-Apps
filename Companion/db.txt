@@ -312,5 +312,6 @@
     "cb-generic-1": false,
     "cb-generic-2": true,
     "cb-bodycam": true
-  }
+  },
+  "quickNotes": ""
 }

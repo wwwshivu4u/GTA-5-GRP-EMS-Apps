@@ -123,7 +123,7 @@
                 <div class="nav-item" id="main-service-card">
                     <div class="nav-icon" id="main-icon"><span class="material-symbols-outlined icon-gradient-emerald">local_hospital</span></div>
                     <div class="nav-text" id="main-text">HOSPITAL<br>SERVICES</div>
-                    <button class="nav-dropdown-btn" onclick="toggleDropdown(event)" title="Select Department">Main Department <span class="material-symbols-outlined" style="font-size:1rem; vertical-align:middle;">expand_more</span></button>
+                    <button class="nav-dropdown-btn" onclick="toggleDropdown(event)" title="Select Department"><span class="main-department-name">Main Department</span><span class="material-symbols-outlined" style="font-size:1rem; vertical-align:middle;">expand_more</span></button>
                     <div class="nav-dropdown-menu" id="service-dropdown"></div>
                 </div>
                 <div class="nav-item-grid" id="secondary-grid"></div>
@@ -1059,6 +1059,38 @@
                 </div>
             </div>
 
+            <!-- MODAL: QUICK NOTEPAD -->
+            <div class="modal-content" id="modal-notes" style="max-width: 680px; width: 95%;">
+                <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                <div class="modal-header">
+                    <span class="material-symbols-outlined icon-gradient-amber" style="font-size:1.4rem; margin-right:6px;">edit_note</span>
+                    Quick Notepad
+                </div>
+
+                <div class="glass-section" style="padding: 0.8rem 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <button class="btn btn-secondary btn-sm" onclick="copyQuickNotes()" title="Copy all text to clipboard">
+                                <span class="material-symbols-outlined" style="font-size:0.95rem; margin-right:4px;">content_copy</span> Copy All
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="clearQuickNotes()" title="Clear note content" style="color: #ef4444;">
+                                <span class="material-symbols-outlined" style="font-size:0.95rem; margin-right:4px;">delete_sweep</span> Clear
+                            </button>
+                        </div>
+                        <div id="notes-auto-save-status" style="font-size: 0.8rem; color: #34d399; display: flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-outlined" style="font-size:0.95rem;">cloud_done</span> Auto-saved
+                        </div>
+                    </div>
+
+                    <textarea id="quick-notes-textarea" class="quick-notes-editor" placeholder="Write, paste, or draft your quick notes, RP logs, clipboard snippets, or duty checklists here... Everything is automatically saved and formatted." spellcheck="false"></textarea>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-muted);">
+                        <span id="notes-char-count">0 characters | 0 lines</span>
+                        <span style="color: #94a3b8; font-style: italic;">Preserves formatting &amp; line breaks</span>
+                    </div>
+                </div>
+            </div>
+
         </div> <!-- End of modalOverlay -->
 
         <!-- TUTORIAL OVERLAY -->
@@ -1072,6 +1104,9 @@
                 </div>
             </div>
         </div>
+
+        <!-- Floating Quick Notes Button -->
+        <button class="notes-fab" onclick="openModal('modal-notes')" title="Take a note / Quick Notepad"><span class="material-symbols-outlined icon-gradient-amber" style="font-size:1.4rem;">edit_note</span></button>
 
         <!-- Floating Help Button -->
         <button class="tutorial-fab" onclick="startTutorial()" title="Tutorial &amp; Help"><span class="material-symbols-outlined" style="font-size:1.4rem;">help</span></button>

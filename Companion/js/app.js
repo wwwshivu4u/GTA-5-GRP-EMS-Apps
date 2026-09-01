@@ -166,7 +166,8 @@
                 shiftRates: { ...DEFAULT_SHIFT_RATES },
                 showBootScreen: true,
                 bcStatus: 'Off duty',
-                discordToggles: {}
+                discordToggles: {},
+                quickNotes: ''
             };
         }
 
@@ -1368,6 +1369,9 @@
             window.closeAddDeptModal = () => this.closeAddDeptModal();
             window.saveNewDeptCategory = () => this.saveNewDeptCategory();
 
+            window.copyQuickNotes = () => this.copyQuickNotes();
+            window.clearQuickNotes = () => this.clearQuickNotes();
+
             window.toggleDropdown = (e) => {
                 e.stopPropagation();
                 document.getElementById('service-dropdown')?.classList.toggle('active');
@@ -1478,6 +1482,34 @@
                     }
                 });
             });
+
+            // Quick Notes auto-save and stats
+            const notesArea = document.getElementById('quick-notes-textarea');
+            if (notesArea) {
+                notesArea.value = stateManager.get('quickNotes') || '';
+                this.updateNotesStats();
+                notesArea.addEventListener('input', (e) => {
+                    stateManager.set('quickNotes', e.target.value);
+                    this.updateNotesStats();
+                    const badge = document.getElementById('notes-auto-save-status');
+                    if (badge) {
+                        badge.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.95rem;">cloud_done</span> Auto-saved';
+                        badge.style.color = '#34d399';
+                    }
+                });
+                // Allow Tab key in textarea for indentation
+                notesArea.addEventListener('keydown', (e) => {
+                    if (e.key === 'Tab') {
+                        e.preventDefault();
+                        const start = notesArea.selectionStart;
+                        const end = notesArea.selectionEnd;
+                        notesArea.value = notesArea.value.substring(0, start) + '\t' + notesArea.value.substring(end);
+                        notesArea.selectionStart = notesArea.selectionEnd = start + 1;
+                        stateManager.set('quickNotes', notesArea.value);
+                        this.updateNotesStats();
+                    }
+                });
+            }
 
             document.addEventListener('click', () => {
                 document.getElementById('service-dropdown')?.classList.remove('active');
@@ -1888,6 +1920,12 @@
             this.checkDutyState();
             this.saveRotaState();
 
+            const notesArea = document.getElementById('quick-notes-textarea');
+            if (notesArea && stateManager.get('quickNotes') !== undefined) {
+                notesArea.value = stateManager.get('quickNotes') || '';
+                this.updateNotesStats();
+            }
+
             if (stateManager.get('dutyStartTime')) {
                 document.getElementById('tb-default-view')?.classList.add('hidden');
                 document.getElementById('tb-setup-view')?.classList.add('hidden');
@@ -2099,6 +2137,58 @@
                 if (modalManager.overlay) modalManager.overlay.classList.add('active');
             }
             DeptCommandsService.switchDeptTab(tabId);
+        }
+
+        updateNotesStats() {
+            const notesArea = document.getElementById('quick-notes-textarea');
+            const countEl = document.getElementById('notes-char-count');
+            if (notesArea && countEl) {
+                const val = notesArea.value || '';
+                const chars = val.length;
+                const lines = val ? val.split('\n').length : 0;
+                countEl.innerText = `${chars.toLocaleString()} character${chars === 1 ? '' : 's'} | ${lines} line${lines === 1 ? '' : 's'}`;
+            }
+        }
+
+        copyQuickNotes() {
+            const notesArea = document.getElementById('quick-notes-textarea');
+            if (!notesArea || !notesArea.value) {
+                sound.playDutyChime();
+                return;
+            }
+            navigator.clipboard.writeText(notesArea.value).then(() => {
+                sound.playDutyChime();
+                const badge = document.getElementById('notes-auto-save-status');
+                if (badge) {
+                    badge.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.95rem;">check_circle</span> Copied to Clipboard!';
+                    badge.style.color = '#38bdf8';
+                    setTimeout(() => {
+                        badge.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.95rem;">cloud_done</span> Auto-saved';
+                        badge.style.color = '#34d399';
+                    }, 2000);
+                }
+            }).catch(err => {
+                console.error('Failed to copy note:', err);
+            });
+        }
+
+        clearQuickNotes() {
+            const notesArea = document.getElementById('quick-notes-textarea');
+            if (!notesArea || !notesArea.value) return;
+            if (confirm('Are you sure you want to clear everything in your Quick Notepad?')) {
+                notesArea.value = '';
+                stateManager.set('quickNotes', '');
+                this.updateNotesStats();
+                const badge = document.getElementById('notes-auto-save-status');
+                if (badge) {
+                    badge.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.95rem; color:#ef4444;">delete</span> Cleared';
+                    badge.style.color = '#ef4444';
+                    setTimeout(() => {
+                        badge.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.95rem;">cloud_done</span> Auto-saved';
+                        badge.style.color = '#34d399';
+                    }, 1500);
+                }
+            }
         }
     }
 

@@ -513,6 +513,7 @@ body {
 }
 @media (max-width: 600px) {
     .grid-layout { grid-template-columns: 1fr; }
+
 }
 
 .settings-grid-wrapper {
@@ -570,6 +571,12 @@ body {
 }
 @media (max-width: 600px) {
     .discord-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 1070px){
+    .main-department-name{
+        font-size: 0.6rem;
+    }
 }
 
 .discord-card {
@@ -1196,9 +1203,34 @@ body.low-height-mode .discord-grid {
 .tutorial-text { font-size: 0.9rem; line-height: 1.4; margin-bottom: 1rem; }
 .tutorial-actions { display: flex; justify-content: space-between; }
 
+.notes-fab {
+    position: fixed;
+    top: 84px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid var(--card-border);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 90;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    transition: all 0.2s ease;
+}
+.notes-fab:hover {
+    background: rgba(30, 41, 59, 1);
+    transform: scale(1.1);
+    border-color: #f59e0b;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+}
+
 .tutorial-fab {
     position: fixed;
-    bottom: 20px;
+    top: 144px;
     right: 20px;
     width: 44px;
     height: 44px;
@@ -1219,6 +1251,30 @@ body.low-height-mode .discord-grid {
     background: rgba(30, 41, 59, 1);
     transform: scale(1.1);
     border-color: var(--secondary);
+}
+
+.quick-notes-editor {
+    width: 100%;
+    min-height: 380px;
+    max-height: 60vh;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    color: var(--text-main);
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    padding: 1rem;
+    outline: none;
+    resize: vertical;
+    white-space: pre-wrap;
+    tab-size: 4;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.quick-notes-editor:focus {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
 }
 
 .hidden { display: none !important; }
