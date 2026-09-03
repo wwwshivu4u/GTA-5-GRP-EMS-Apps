@@ -1187,6 +1187,13 @@
         <!-- Floating Help Button -->
         <button class="tutorial-fab" onclick="startTutorial()" title="Tutorial &amp; Help"><span class="material-symbols-outlined" style="font-size:1.4rem;">help</span></button>
 
+        <!-- Floating Special About Team Button (Bottom Right) -->
+        <button id="about-team-fab" class="about-team-fab" onclick="openAboutTeam()" title="About The Team" aria-label="About The Team">
+            <span class="team-fab-pulse"></span>
+            <img src="EMS-LOGO.png" alt="EMS Logo" class="team-fab-img" />
+            <span class="team-fab-tooltip">About The Team</span>
+        </button>
+
         <!-- FLOATING FIXED SAVE SETTINGS BAR (Visible on changes) -->
         <div id="floating-save-settings" class="floating-save-bar hidden">
             <span class="save-bar-text">⚠️ Unsaved Settings Changes</span>
@@ -1194,6 +1201,39 @@
         </div>
 
     </div> <!-- End of app-container -->
+
+    <!-- FULL PAGE: ABOUT THE TEAM SECTION -->
+    <div id="about-team-page" class="about-team-page hidden" role="dialog" aria-modal="true" aria-labelledby="about-team-title">
+        <!-- 1 Close Button -->
+        <button class="about-team-close-btn" id="about-team-close-btn" onclick="closeAboutTeam()" aria-label="Close About The Team" title="Close">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+
+        <div class="about-team-scroll-area">
+            <div class="about-team-wrapper">
+                <!-- Header -->
+                <header class="about-team-header">
+                    <div class="about-team-badge">
+                        <span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.1rem;">groups</span>
+                        <span>EMS COMPANION</span>
+                    </div>
+                    <h1 id="about-team-title" class="about-team-title">About The Team</h1>
+                    <p class="about-team-subtitle">Meet the team behind the EMS Companion system.</p>
+                </header>
+
+                <!-- Team Content Area (Ready for user-provided content) -->
+                <main class="about-team-content" id="about-team-content">
+                    <div class="about-team-placeholder-card">
+                        <div class="placeholder-icon-wrap">
+                            <span class="material-symbols-outlined icon-gradient-cyan" style="font-size:2.4rem;">badge</span>
+                        </div>
+                        <h3>Team Section Ready</h3>
+                        <p>Content will be placed here. Ready for team members, roles, credits, and acknowledgements.</p>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
 
     <script src="js/app.js"></script>
 </body>

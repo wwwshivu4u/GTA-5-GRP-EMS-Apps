@@ -1312,10 +1312,16 @@
                 }
             }, { passive: false });
 
-            // Prevent keyboard zoom shortcuts (Ctrl/Cmd + +, -, =, 0)
+            // Prevent keyboard zoom shortcuts (Ctrl/Cmd + +, -, =, 0) and allow Escape for About Team
             document.addEventListener('keydown', (e) => {
                 if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0')) {
                     e.preventDefault();
+                }
+                if (e.key === 'Escape') {
+                    const teamPage = document.getElementById('about-team-page');
+                    if (teamPage && teamPage.classList.contains('active')) {
+                        window.closeAboutTeam?.();
+                    }
                 }
             });
         }
@@ -1594,6 +1600,27 @@
 
             window.copyQuickNotes = () => this.copyQuickNotes();
             window.clearQuickNotes = () => this.clearQuickNotes();
+
+            window.openAboutTeam = () => {
+                const page = document.getElementById('about-team-page');
+                if (!page) return;
+                page.classList.remove('hidden', 'closing');
+                void page.offsetWidth;
+                page.classList.add('active');
+                document.body.classList.add('about-team-open');
+            };
+
+            window.closeAboutTeam = () => {
+                const page = document.getElementById('about-team-page');
+                if (!page) return;
+                page.classList.add('closing');
+                page.classList.remove('active');
+                document.body.classList.remove('about-team-open');
+                setTimeout(() => {
+                    page.classList.remove('closing');
+                    page.classList.add('hidden');
+                }, 280);
+            };
 
             window.toggleDropdown = (e) => {
                 e.stopPropagation();
