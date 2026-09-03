@@ -123,13 +123,19 @@ export class TimerEngine {
         const compactView = document.getElementById('tb-compact-view');
         const confirmView = document.getElementById('tb-confirm-view');
 
-        if (defaultView) defaultView.classList.add('hidden');
         if (compactView) compactView.classList.add('hidden');
         if (confirmView) confirmView.classList.add('hidden');
-        if (setupView) setupView.classList.remove('hidden');
 
-        const startBtn = document.getElementById('btn-rota-start');
-        if (startBtn) startBtn.disabled = false;
+        const isOnDuty = stateManager.get('bcStatus') === 'On duty';
+        if (isOnDuty) {
+            if (defaultView) defaultView.classList.add('hidden');
+            if (setupView) setupView.classList.remove('hidden');
+            const startBtn = document.getElementById('btn-rota-start');
+            if (startBtn) startBtn.disabled = false;
+        } else {
+            if (setupView) setupView.classList.add('hidden');
+            if (defaultView) defaultView.classList.remove('hidden');
+        }
 
         const outlineRect = document.getElementById('progress-outline-rect');
         if (outlineRect) outlineRect.style.strokeDashoffset = 1000;

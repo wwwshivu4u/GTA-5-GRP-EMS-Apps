@@ -541,19 +541,28 @@
             const compactView = document.getElementById('tb-compact-view');
             const confirmView = document.getElementById('tb-confirm-view');
 
-            if (defaultView) defaultView.classList.add('hidden');
             if (compactView) compactView.classList.add('hidden');
             if (confirmView) confirmView.classList.add('hidden');
-            if (setupView) setupView.classList.remove('hidden');
 
-            const startBtn = document.getElementById('btn-rota-start');
-            if (startBtn) startBtn.disabled = false;
+            const isOnDuty = stateManager.get('bcStatus') === 'On duty';
+            if (isOnDuty) {
+                if (defaultView) defaultView.classList.add('hidden');
+                if (setupView) setupView.classList.remove('hidden');
+                const startBtn = document.getElementById('btn-rota-start');
+                if (startBtn) startBtn.disabled = false;
+            } else {
+                if (setupView) setupView.classList.add('hidden');
+                if (defaultView) defaultView.classList.remove('hidden');
+            }
 
             const outlineRect = document.getElementById('progress-outline-rect');
             if (outlineRect) outlineRect.style.strokeDashoffset = 1000;
 
             const display = document.getElementById('compact-main-timer');
             if (display) display.textContent = '0 hr 00:00';
+
+            const bonusValEl = document.getElementById('compact-bonus-val');
+            if (bonusValEl) bonusValEl.textContent = '$0';
 
             this.checkNightShiftUI();
         }
@@ -1960,6 +1969,9 @@
                         this.updateDutyStatusUI(true);
                     } else if (targetId === 'off4') {
                         stateManager.state.bcStatus = 'Off duty';
+                        stateManager.set('dutyStartTime', null);
+                        stateManager.set('rotaCap', 0);
+                        stateManager.set('rotaDel', 0);
                         stateManager.save();
                         timerEngine.resetRotaTimer();
                         this.updateDutyStatusUI(false);
@@ -1974,12 +1986,14 @@
                         this.showHelpToast('Bodycam log copied, just paste it in Mails and upload bodyshot with it');
 
                         modalManager.closeAll();
-                        const focusLocation = () => {
-                            const rotaLoc = document.getElementById('rota-location');
-                            if (rotaLoc) rotaLoc.focus();
-                        };
-                        focusLocation();
-                        setTimeout(focusLocation, 250);
+                        if (targetId === 'od4') {
+                            const focusLocation = () => {
+                                const rotaLoc = document.getElementById('rota-location');
+                                if (rotaLoc) rotaLoc.focus();
+                            };
+                            focusLocation();
+                            setTimeout(focusLocation, 250);
+                        }
                     }
 
                     const discordKey = btn.getAttribute('data-discord-key');
@@ -2175,26 +2189,31 @@
                     if (steps[prev] || isOnDuty) {
                         btn.disabled = false;
                         btn.classList.remove('disabled');
+                    } else {
+                        btn.disabled = true;
+                        btn.classList.add('disabled');
                     }
                 }
             });
 
-            // Step 4 unlock (card highlight) – always available when on duty
+            // Step 4 Generator Unlock & Highlight
             const cardOd4 = document.getElementById('card-od4');
             const btnOd4  = document.getElementById('btn-od4');
             const cardOff4 = document.getElementById('card-off4');
             const btnOff4  = document.getElementById('btn-off4');
 
-            if (isOnDuty) {
+            if (steps.od3 || isOnDuty) {
                 if (cardOd4) cardOd4.classList.add('unlocked');
                 if (btnOd4)  { btnOd4.disabled = false; btnOd4.classList.remove('disabled'); }
-                if (steps.off3) {
-                    if (cardOff4) cardOff4.classList.add('unlocked');
-                    if (btnOff4)  { btnOff4.disabled = false; btnOff4.classList.remove('disabled'); }
-                }
             } else {
                 if (cardOd4) cardOd4.classList.remove('unlocked');
                 if (btnOd4)  { btnOd4.disabled = true; btnOd4.classList.add('disabled'); }
+            }
+
+            if (steps.off3) {
+                if (cardOff4) cardOff4.classList.add('unlocked');
+                if (btnOff4)  { btnOff4.disabled = false; btnOff4.classList.remove('disabled'); }
+            } else {
                 if (cardOff4) cardOff4.classList.remove('unlocked');
                 if (btnOff4)  { btnOff4.disabled = true; btnOff4.classList.add('disabled'); }
             }
@@ -2217,11 +2236,20 @@
                 }
             } else {
                 this.updateDutyStatusUI(false);
+                const defV = document.getElementById('tb-default-view');
+                const setV = document.getElementById('tb-setup-view');
+                const comV = document.getElementById('tb-compact-view');
+                const conV = document.getElementById('tb-confirm-view');
+                if (setV) setV.classList.add('hidden');
+                if (comV) comV.classList.add('hidden');
+                if (conV) conV.classList.add('hidden');
+                if (defV) defV.classList.remove('hidden');
             }
 
             if (offDutyDone) {
                 stateManager.state.bcStatus = 'Off duty';
                 ALL_DUTY_STEPS.forEach(step => { steps[step] = false; });
+                stateManager.set('dutyStartTime', null);
                 stateManager.set('rotaCap', 0);
                 stateManager.set('rotaDel', 0);
                 stateManager.save();
@@ -2247,6 +2275,15 @@
                 if (btnOd4)  { btnOd4.disabled = true; btnOd4.classList.add('disabled'); }
                 if (cardOff4) cardOff4.classList.remove('unlocked');
                 if (btnOff4)  { btnOff4.disabled = true; btnOff4.classList.add('disabled'); }
+
+                const defV = document.getElementById('tb-default-view');
+                const setV = document.getElementById('tb-setup-view');
+                const comV = document.getElementById('tb-compact-view');
+                const conV = document.getElementById('tb-confirm-view');
+                if (setV) setV.classList.add('hidden');
+                if (comV) comV.classList.add('hidden');
+                if (conV) conV.classList.add('hidden');
+                if (defV) defV.classList.remove('hidden');
 
                 this.updateDutyStatusUI(false);
                 document.getElementById('btn-tab-onduty')?.click();
