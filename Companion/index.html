@@ -908,7 +908,7 @@
                 <div class="modal-header"><span class="material-symbols-outlined icon-gradient-purple" style="font-size:1.4rem; margin-right:6px;">inventory_2</span> Medical Supplies Log
                     <button class="close-btn" onclick="closeSubModal()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
                 </div>
-                <div class="input-group">
+                <div class="input-group" style=" margin:2rem 2rem 1rem;">
                     <label>Status</label>
                     <input type="hidden" id="ms-status" value="before">
                     <button type="button" class="btn btn-secondary" style="width: 100%; padding: 1rem; font-size: 1.2rem; font-weight: bold;" onclick="
@@ -926,7 +926,7 @@
                         }
                     ">Before</button>
                 </div>
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin: 0 2rem 2rem;">
                     <label class="discord-toggle-label"><input type="checkbox" class="discord-toggle-checkbox" id="cb-supplies" checked><span class="toggle-slider"></span></label>
                     <button class="btn btn-success" style="flex:1; padding:0.8rem;" onclick="generateDiscordAction('supplies', 'cb-supplies')"><span class="material-symbols-outlined" style="font-size:1.1rem; margin-right:4px;">send</span> Generate, Copy &amp; Open</button>
                 </div>
@@ -937,11 +937,11 @@
                 <div class="modal-header"><span class="material-symbols-outlined icon-gradient-emerald" style="font-size:1.4rem; margin-right:6px;">calculate</span> Labtech Rota &amp; Bonus Calculator
                     <button class="close-btn" onclick="closeSubModal()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
                 </div>
-                <div class="input-group">
+                <div class="input-group" style="margin: 2rem 2rem 0;">
                     <label>Date</label>
                     <div id="lr-live-date" style="font-size: 0.95rem; color: #38bdf8; background: rgba(0,0,0,0.3); padding: 0.6rem; border-radius: 8px; text-align: center; font-family: monospace; font-weight: bold; border: 1px solid var(--card-border);">--/--/---- (IC) | --/--/---- (Local)</div>
                 </div>
-                <div class="grid-layout">
+                <div class="grid-layout" style="margin: 0 2rem;">
                     <div class="input-group">
                         <label>Captchas Completed</label>
                         <div style="display: flex; align-items: center; gap: 0.4rem;">
@@ -959,10 +959,10 @@
                         </div>
                     </div>
                 </div>
-                <div id="lr-bonus-display" style="margin-top: 1rem; padding: 0.8rem; background: rgba(16, 185, 129, 0.15); border-radius: 8px; text-align: center; color: #34d399; font-weight: bold; font-size: 1.1rem; border: 1px solid rgba(16, 185, 129, 0.3);">
+                <div id="lr-bonus-display" style="margin: 1rem; padding: 0.8rem; background: rgba(16, 185, 129, 0.15); border-radius: 8px; text-align: center; color: #34d399; font-weight: bold; font-size: 1.1rem; border: 1px solid rgba(16, 185, 129, 0.3);">
                     Bonus Earned: $0
                 </div>
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin: 1rem 3rem;">
                     <label class="discord-toggle-label"><input type="checkbox" class="discord-toggle-checkbox" id="cb-rota" checked><span class="toggle-slider"></span></label>
                     <button class="btn btn-success" style="flex:1; padding:0.8rem;" onclick="generateDiscordAction('rota', 'cb-rota')"><span class="material-symbols-outlined" style="font-size:1.1rem; margin-right:4px;">send</span> Generate, Copy &amp; Open</button>
                 </div>
