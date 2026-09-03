@@ -6,6 +6,8 @@ export class ModalManager {
     constructor() {
         this.overlay = null;
         this.activeModal = null;
+        this.modalBehindNotes = null;
+        this.closeTimeout = null;
         this.init();
     }
 
@@ -47,15 +49,53 @@ export class ModalManager {
                 if (targetContent) targetContent.classList.add('active');
             });
         });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.overlay && this.overlay.classList.contains('active')) {
+                this.closeAll();
+            }
+        });
     }
 
     open(modalId) {
-        this.closeAll();
+        if (this.closeTimeout) {
+            clearTimeout(this.closeTimeout);
+            this.closeTimeout = null;
+        }
+
         if (!this.overlay) this.overlay = document.getElementById('modalOverlay');
-        if (this.overlay) this.overlay.classList.add('active');
+        if (this.overlay) {
+            this.overlay.classList.remove('closing');
+            this.overlay.classList.add('active');
+        }
+
+        if (modalId === 'modal-notes') {
+            const currentActive = (this.activeModal && this.activeModal.id !== 'modal-notes')
+                ? this.activeModal
+                : document.querySelector('.modal-content.active:not(#modal-notes)');
+            if (currentActive) {
+                this.modalBehindNotes = currentActive;
+                currentActive.classList.add('in-background');
+            }
+            document.querySelectorAll('.modal-content').forEach(m => {
+                if (m.id !== modalId && m !== this.modalBehindNotes) {
+                    m.classList.remove('active', 'closing', 'in-background');
+                }
+            });
+        } else {
+            if (this.modalBehindNotes) {
+                this.modalBehindNotes.classList.remove('in-background');
+                this.modalBehindNotes = null;
+            }
+            document.querySelectorAll('.modal-content').forEach(m => {
+                if (m.id !== modalId) {
+                    m.classList.remove('active', 'closing', 'in-background');
+                }
+            });
+        }
 
         const modal = document.getElementById(modalId);
         if (modal) {
+            modal.classList.remove('closing', 'in-background');
             modal.classList.add('active');
             this.activeModal = modal;
         }
@@ -69,21 +109,68 @@ export class ModalManager {
     }
 
     openSubModal(subModalId) {
-        document.querySelectorAll('.modal-content:not(.sub-modal)').forEach(m => m.classList.remove('active'));
+        document.querySelectorAll('.modal-content:not(.sub-modal)').forEach(m => m.classList.remove('active', 'closing'));
         const sm = document.getElementById(subModalId);
-        if (sm) sm.classList.add('active');
+        if (sm) {
+            sm.classList.remove('closing');
+            sm.classList.add('active');
+        }
     }
 
     closeSubModal() {
-        document.querySelectorAll('.sub-modal').forEach(sm => sm.classList.remove('active'));
-        const dm = document.getElementById('modal-discord');
-        if (dm) dm.classList.add('active');
+        const activeSubs = document.querySelectorAll('.sub-modal.active');
+        activeSubs.forEach(sm => sm.classList.add('closing'));
+
+        setTimeout(() => {
+            activeSubs.forEach(sm => sm.classList.remove('active', 'closing'));
+            const dm = document.getElementById('modal-discord');
+            if (dm) {
+                dm.classList.remove('closing');
+                dm.classList.add('active');
+            }
+        }, 220);
     }
 
     closeAll() {
-        if (this.overlay) this.overlay.classList.remove('active');
-        document.querySelectorAll('.modal-content').forEach(m => m.classList.remove('active'));
-        this.activeModal = null;
+        if (!this.overlay) this.overlay = document.getElementById('modalOverlay');
+        if (!this.overlay || !this.overlay.classList.contains('active')) return;
+
+        // If Quick Notes is open above a background modal, close only Quick Notes and restore background modal
+        const notesModal = document.getElementById('modal-notes');
+        if (notesModal && notesModal.classList.contains('active') && this.modalBehindNotes) {
+            notesModal.classList.add('closing');
+            const bgModal = this.modalBehindNotes;
+            this.modalBehindNotes = null;
+
+            setTimeout(() => {
+                notesModal.classList.remove('active', 'closing');
+                if (bgModal) {
+                    bgModal.classList.remove('in-background');
+                    this.activeModal = bgModal;
+                }
+            }, 200);
+            return;
+        }
+
+        const activeModals = document.querySelectorAll('.modal-content.active, .sub-modal.active');
+        if (activeModals.length === 0) {
+            this.overlay.classList.remove('active', 'closing');
+            return;
+        }
+
+        this.overlay.classList.add('closing');
+        activeModals.forEach(m => m.classList.add('closing'));
+
+        if (this.closeTimeout) clearTimeout(this.closeTimeout);
+        this.closeTimeout = setTimeout(() => {
+            if (this.overlay) {
+                this.overlay.classList.remove('active', 'closing');
+            }
+            activeModals.forEach(m => m.classList.remove('active', 'closing', 'in-background'));
+            this.activeModal = null;
+            this.modalBehindNotes = null;
+            this.closeTimeout = null;
+        }, 230);
     }
 
     switchRadioTab(tabId) {

@@ -28,20 +28,20 @@ export const DEFAULT_SHIFT_RATES = {
 };
 
 export const ALL_DUTY_STEPS = [
-    'od1', 'od2', 'od3',
+    'od1', 'od2', 'od3', 'od4',
     'ref1', 'ref2',
     'sav1', 'sav2',
-    'off1', 'off2', 'off3',
+    'off1', 'off2', 'off3', 'off4',
     'sw1_1', 'sw1_2', 'sw1_3', 'sw1_4', 'sw1_5',
     'sw2_1', 'sw2_2', 'sw2_3', 'sw2_4', 'sw2_5',
     'sw3_1', 'sw3_2', 'sw3_3', 'sw3_4', 'sw3_5'
 ];
 
 export const STEP_DEPENDENCIES = [
-    ['od1', 'od2'], ['od2', 'od3'],
+    ['od1', 'od2'], ['od2', 'od3'], ['od3', 'od4'],
     ['ref1', 'ref2'],
     ['sav1', 'sav2'],
-    ['off1', 'off2'], ['off2', 'off3'],
+    ['off1', 'off2'], ['off2', 'off3'], ['off3', 'off4'],
     ['sw1_1', 'sw1_2'], ['sw1_2', 'sw1_3'], ['sw1_3', 'sw1_4'], ['sw1_4', 'sw1_5'],
     ['sw2_1', 'sw2_2'], ['sw2_2', 'sw2_3'], ['sw2_3', 'sw2_4'], ['sw2_4', 'sw2_5'],
     ['sw3_1', 'sw3_2'], ['sw3_2', 'sw3_3'], ['sw3_3', 'sw3_4'], ['sw3_4', 'sw3_5']

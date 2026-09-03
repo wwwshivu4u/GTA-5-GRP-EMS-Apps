@@ -52,6 +52,21 @@ export class TimerEngine {
                 bcLiveTimeEl.textContent = `${edinH}:${edinM} (IC) | ${userH}:${userM} (Local)`;
             }
 
+            // Step 4 Live Times (Bodycam On & Off Duty)
+            const od4ClockEl = document.getElementById('od4-clock-time');
+            if (od4ClockEl) od4ClockEl.textContent = `${edinH}:${edinM}`;
+            const off4ClockEl = document.getElementById('off4-clock-time');
+            if (off4ClockEl) off4ClockEl.textContent = `${edinH}:${edinM}`;
+
+            const od4Content = document.getElementById('od4');
+            if (od4Content && !od4Content.dataset.customEdited && document.activeElement !== od4Content) {
+                od4Content.innerText = `On duty : ${edinH}:${edinM}`;
+            }
+            const off4Content = document.getElementById('off4');
+            if (off4Content && !off4Content.dataset.customEdited && document.activeElement !== off4Content) {
+                off4Content.innerText = `Off duty : ${edinH}:${edinM}`;
+            }
+
             // Labtech Rota Live Date
             const lrLiveDateEl = document.getElementById('lr-live-date');
             if (lrLiveDateEl) {

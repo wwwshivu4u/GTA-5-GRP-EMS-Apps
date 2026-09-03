@@ -11,7 +11,7 @@
   gtag('config', 'G-Q1E9TR8BSE');
 </script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
     <title>EMS Companion</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -331,6 +331,29 @@
                                 <div class="copy-header"><span>Step 3</span><button class="btn copy-btn bc-btn" data-target="od3" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                 <div class="copy-content" id="od3" contenteditable="true">/do It is recording, and its ballistic, water proof</div>
                             </div>
+                            <div class="copy-block generator-step-card" id="card-od4">
+                                <div class="copy-header" style="background: rgba(16, 185, 129, 0.08); border-bottom: 1px solid rgba(16, 185, 129, 0.2);">
+                                    <span style="display:flex; align-items:center; gap:5px; color:#34d399;">
+                                        <span class="material-symbols-outlined" style="font-size:1rem;">badge</span> Step 4: Discord Log
+                                    </span>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <label class="discord-toggle-label" title="Open Discord Mails on Copy">
+                                            <input type="checkbox" class="discord-toggle-checkbox" id="cb-od4" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="copy-content" id="od4" contenteditable="true">On duty : --:--</div>
+                                <!-- <div class="step-help-text" id="od4-help-text">
+                                    <span class="material-symbols-outlined" style="font-size:0.85rem; vertical-align:middle; color:#34d399;">info</span> Bodycam log copied, just paste it in Mails and upload bodyshot with it
+                                </div> -->
+                                <div class="step-generator-footer">
+                                    <span class="step-live-clock"><span class="material-symbols-outlined" style="font-size:0.85rem; vertical-align:middle; margin-right:2px;">schedule</span> IC: <strong id="od4-clock-time">--:--</strong></span>
+                                    <button class="btn copy-btn bc-btn btn-success btn-xs" id="btn-od4" data-target="od4" data-discord-key="bodycam" disabled style="padding: 0.35rem 0.75rem;">
+                                        <span class="material-symbols-outlined" style="font-size:0.95rem; margin-right:3px;">mail</span> <span class="btn-label">Copy &amp; Open Mails</span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -376,6 +399,29 @@
                             <div class="copy-block">
                                 <div class="copy-header"><span>Step 3</span><button class="btn copy-btn bc-btn" data-target="off3" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
                                 <div class="copy-content" id="off3" contenteditable="true">/me Uploads the bodycam footage to the EMS Cloud Server</div>
+                            </div>
+                            <div class="copy-block generator-step-card" id="card-off4">
+                                <div class="copy-header" style="background: rgba(239, 68, 68, 0.08); border-bottom: 1px solid rgba(239, 68, 68, 0.2);">
+                                    <span style="display:flex; align-items:center; gap:5px; color:#f87171;">
+                                        <span class="material-symbols-outlined" style="font-size:1rem;">badge</span> Step 4: Discord Log
+                                    </span>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <label class="discord-toggle-label" title="Open Discord Mails on Copy">
+                                            <input type="checkbox" class="discord-toggle-checkbox" id="cb-off4" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="copy-content" id="off4" contenteditable="true">Off duty : --:--</div>
+                                <!-- <div class="step-help-text" id="off4-help-text">
+                                    <span class="material-symbols-outlined" style="font-size:0.85rem; vertical-align:middle; color:#f87171;">info</span> Bodycam log copied, just paste it in Mails and upload bodyshot with it
+                                </div> -->
+                                <div class="step-generator-footer">
+                                    <span class="step-live-clock"><span class="material-symbols-outlined" style="font-size:0.85rem; vertical-align:middle; margin-right:2px;">schedule</span> IC: <strong id="off4-clock-time">--:--</strong></span>
+                                    <button class="btn copy-btn bc-btn btn-danger btn-xs" id="btn-off4" data-target="off4" data-discord-key="bodycam" disabled style="padding: 0.35rem 0.75rem;">
+                                        <span class="material-symbols-outlined" style="font-size:0.95rem; margin-right:3px;">mail</span> <span class="btn-label">Copy &amp; Open Mails</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

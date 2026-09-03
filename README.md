@@ -1,135 +1,160 @@
 # 🚑 GTA V GRP EMS Assist
 
 ![Project Header](https://img.shields.io/badge/Project-GTA_V_GRP_EMS_Assist-blue)
-![Version](https://img.shields.io/badge/Version-1.0-green)
+![Version](https://img.shields.io/badge/Version-2.0-green)
+![Hosting](https://img.shields.io/badge/Firebase-Hosting-orange)
+![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20Mobile%20%7C%20Android%20Auto-brightgreen)
 
-Welcome to the **GTA V GRP EMS Assist** repository! This project is a comprehensive suite of front-end applications built for the Grand RP (GRP) EMS faction. It provides a cohesive ecosystem of tools for everyday duties, HR management, and shift tracking.
+Welcome to the **GTA V GRP EMS Assist** repository! This project is an all-in-one frontend software suite built for the Grand RP (GRP) Emergency Medical Services (EMS) faction. It streamlines daily field operations, bodycam logs, shift timing, departmental comms, and high-command HR/payroll management.
 
 ---
 
 ## 🏗️ Project Ecosystem
 
-The ecosystem consists of three interconnected web-based applications:
-
-1. **Employee Companion** 🩺
-2. **HRMS (Human Resources Management System)** 📊
-3. **Shift Guide** ⏱️
-
-### Ecosystem Architecture
+The repository contains three specialized applications deployed via Firebase Hosting:
 
 ```mermaid
 graph TD;
-    Discord[Discord Logs] -->|Copied Manually| HRMS[HRMS Portal]
-    HRMS -->|Calculates payouts, tracks hours| Leaderboard[Bonus & Payout Leaderboard]
-    
-    Duty[EMS On Duty] --> ShiftGuide[Shift Guide Timer]
-    Duty --> EmployeeCompanion[Employee Companion Dashboard]
-    
-    ShiftGuide -->|Shift Tracking| Duty
-    EmployeeCompanion -->|In-Game Tasks| Duty
+    Field[EMS Field Duties] -->|Logs, Codes & Shift Timing| Companion[EMS Companion App]
+    Field -->|Shift Reference & Quotas| ShiftGuide[Shift Guide]
+    Companion -->|Generates Formatted Logs| Discord[Discord Channels]
+    Discord -->|Ingested & Parsed| HRMS[HRMS Portal]
+    HRMS -->|Calculates Payouts & Bonuses| Leaderboard[Payroll & Leaderboards]
 ```
+
+1. **[EMS Companion App](Companion/)** 🩺 — In-game dashboard with Dynamic Island shift timer, quick logs, radio codes, and an Android Auto-style split layout for secondary screens and car displays.
+2. **[HRMS Portal](HRMS/)** 📊 — High Command administration suite for parsing Discord logs, tracking roster hours, calculating bonuses, and exporting payroll.
+3. **[Shift Guide](Shift%20Guide/)** ⏱️ — Dedicated shift tracker and reference guide for duty quotas and medical procedures.
 
 ---
 
-## 1. 🩺 Employee Companion
+## 1. 🩺 EMS Companion App
 
-The **Employee Companion** is a lightweight dashboard designed for on-the-go or secondary-monitor use by an EMS employee. It tracks ongoing medical procedures, task progress, and other real-time details required on duty.
+The **EMS Companion App** is an interactive, glassmorphism-styled field dashboard optimized for dual-monitor setups, mobile devices, in-game browser overlays, and car dash displays.
 
-### ✨ Features
-- **Visual Progress Tracker**: Provides an aesthetic progress bar tracking ongoing tasks and duty milestones.
-- **Glassmorphism UI**: Uses a blurred overlay for a sleek, modern UI.
-- **Top Status Bar**: At-a-glance status metrics for the current shift.
+### ✨ Key Features
 
-### 🖼️ Wireframe
+- **Dynamic Island Shift & Rota Timer**:
+  - Live **IC Time** and **Local Time** clocks.
+  - One-click shift start/stop with customizable locations (Pillbox Front/Back, Sandy Shores, Calls, Labs, Training, Custom).
+  - Night shift bonus tracker with active earnings indicator.
+  - Animated progress outline SVG surrounding the widget.
+- **Android Auto 30/70 Split Layout**:
+  - Automatically activates on low height, compact screens, or automotive displays (e.g. 800x480, 960x540, mobile landscape).
+  - **Left 30% Panel**: Dedicated Rota Shift widget (clocks, glowing neon cyan timer, night shift bonus, and touch controls).
+  - **Right 70% Panel**: Dashboard navigation cards arranged in a clean 2-row grid.
+- **Bottom-Sheet Modal Animations**:
+  - Smooth bottom slide-in when opening (`translateY(100%)` to `0`) and slide-out to bottom when closing (`0` to `translateY(100%)`).
+  - Native `Escape` key dismiss and backdrop tap close.
+- **Zoom-Locked Interface**:
+  - Prevents accidental zooming on touchscreens, car displays, and mobile WebViews via viewport scaling locks, CSS `touch-action`, multi-touch pinch prevention, and keyboard shortcut blocks.
+- **De-Jittered High-Performance UI**:
+  - GPU-accelerated transforms (`translate3d`) with targeted property transitions to prevent subpixel font blur and redraw jitter.
+- **Operational Modules**:
+  - 📹 **Bodycam**: Automated log generator for On-Duty/Off-Duty transitions and copy-to-clipboard workflows.
+  - 📻 **Comms & Logs**: 10-codes reference, department commands, and customizable user categories.
+  - 🏥 **Hospital Services**: Quick switcher between Pillbox Hill, Sandy Shores, Ground Services, Labtech, Settings, and Log Gen.
+  - 📝 **Quick Notepad**: Floating notes drawer with auto-save and one-click copy.
+
+### 🖼️ Wireframe & Layout Modes
 
 ```mermaid
 block-beta
-    columns 1
-    space
-    block:TopBar
-        columns 3
-        Status["[Duty Status]"]
-        Time["[Current Time]"]
-        User["[User Profile]"]
+    columns 2
+    block:LeftPanel["30% Rota Widget"]:1
+        Clock["Live IC & Local Clock"]
+        Timer["Shift Timer (00:00:00)"]
+        Bonus["Night Shift Bonus"]
+        Controls["[Start / End Shift]"]
     end
-    space
-    block:MainContent
-        columns 1
-        Title("Active Tasks & Progress")
-        ProgressBar["[================>    ] 75%"]
-        Details["Task Details / Current Assignment"]
+    block:RightPanel["70% Dashboard Cards"]:1
+        columns 2
+        Bodycam["📹 BODYCAM"]
+        Comms["📻 COMMS & LOGS"]
+        Hospital["🏥 HOSPITAL SERVICES\n(Dept Switcher)"]
+        SubGrid["4x Quick Services\n(Ground / Lab / Settings / Log)"]
     end
-    space
-    Footer["EMS Employee Dashboard - Active"]
 ```
 
 ---
 
 ## 2. 📊 HRMS (Human Resources Management System)
 
-The **HRMS Portal** is the administrative powerhouse of the EMS faction. Designed for High Command and management, it ingests shift logs, calculates base wages, applies complex bonus structures, and maintains a roster of employees.
+The **HRMS Portal** is the administrative command center for EMS High Command to process attendance, calculate wages, and manage the faction roster.
 
 ### ✨ Features
-- **Discord Log Ingestion**: Parses raw Discord "On/Off Duty" logs using fuzzy-matching and regex.
-- **Automated Payout Calculations**: Factors in day/night shifts, specific locations (PH front, SH, Labs, Calls), and base wages ($1,300/hr).
-- **Timezone Normalization**: Automatically converts IST log timestamps to BST for accurate night shift bonuses.
-- **Data Persistence**: Uses encrypted Browser `LocalStorage` via CryptoJS.
-
-### 🖼️ Wireframe
-
-```mermaid
-block-beta
-    columns 4
-    Nav["Sidebar Navigation\n- Dashboard\n- Roster\n- Logs\n- Payouts"]:1
-    block:MainArea:3
-        columns 1
-        Header("HRMS Dashboard (Admin Portal)")
-        block:Stats
-            columns 3
-            TLogs["Total Logs"]
-            THours["Total Hours"]
-            TPayouts["Total Payouts"]
-        end
-        LogInput["[Text Area for Discord Logs]\n[Submit Button]"]
-        DataTable["Data Table (Name, Rank, Hours, Bonus)"]
-    end
-```
+- **Discord Log Parser**: Parses raw Discord duty channel logs using regex and fuzzy string matching.
+- **Automated Payroll Engine**:
+  - Base wages calculation ($1,300/hour base).
+  - Day vs. Night shift bonus differential multipliers.
+  - Location-specific bonuses (PH Front, Sandy Shores, Labs, Calls).
+- **Timezone Normalization**: Converts Indian Standard Time (IST) timestamps to British Summer Time (BST) for in-game server night shift alignment.
+- **Encrypted Local Storage**: Secures employee records and sensitive payroll data in the browser via CryptoJS encryption.
+- **Roster & Promotions**: Track promotions, active members, weekly quotas, and leaderboard payouts.
 
 ---
 
 ## 3. ⏱️ Shift Guide
 
-The **Shift Guide** focuses strictly on time management for individual shifts. It acts as a dedicated overlay or companion app that ensures employees meet their hourly quotas and avoid accidental short-shifting.
+The **Shift Guide** is a focused reference and time-tracking utility for individual medical personnel.
 
 ### ✨ Features
-- **Shift Duration Timer**: Counts down or up depending on duty status.
-- **Quota Tracking**: Visual indicators if minimum required time is met.
-- **Modern Styling**: Styled identically to the Employee Companion for a unified aesthetic.
-
-### 🖼️ Wireframe
-
-```mermaid
-block-beta
-    columns 1
-    Header("Shift Guide")
-    space
-    block:Timer
-        columns 1
-        Label("Current Shift Duration")
-        TimeDisplay("02:45:30")
-    end
-    space
-    block:Controls
-        columns 2
-        Btn1("Start Shift")
-        Btn2("End Shift")
-    end
-```
+- **Shift Duration Counter**: Real-time counter to verify minimum shift requirements.
+- **Quota Tracking**: Visual progress indicators for daily/weekly quota compliance.
+- **Medical SOP Reference**: Quick lookups for patient treatments, triage levels, and medication protocols.
+- **Consistent Glass Aesthetic**: Matches the visual design system of the Companion App.
 
 ---
 
 ## 🛠️ Technology Stack
-- **HTML5 & CSS3**: Core layout and styling (Glassmorphism aesthetics).
-- **Vanilla JavaScript**: All business logic, parsers, and timers.
-- **Tailwind CSS**: Rapid UI development (used extensively in the HRMS).
-- **CryptoJS**: LocalStorage encryption for HRMS data security.
+
+| Component | Technologies Used |
+| :--- | :--- |
+| **Architecture** | Pure Vanilla Web Stack (HTML5, CSS3, ES6+ JavaScript) |
+| **Design System** | Glassmorphism, CSS Grid, Flexbox, JetBrains Mono, Inter, Google Material Symbols |
+| **Animations** | Hardware-accelerated CSS `translate3d`, Cubic-Bezier timing curves |
+| **Security** | CryptoJS for LocalStorage encryption |
+| **Styling (HRMS)** | Tailwind CSS |
+| **Hosting & Deploy** | Firebase Hosting multi-target deployment |
+
+---
+
+## 🚀 Deployment & Local Setup
+
+### Running Locally
+To run any of the apps locally, you can serve the directory using any static web server (e.g. Python, Node, or VSCode Live Server):
+
+```bash
+# Serve the Companion App
+python -m http.server 8080 --directory Companion
+
+# Serve the HRMS
+python -m http.server 8081 --directory HRMS
+
+# Serve the Shift Guide
+python -m http.server 8082 --directory "Shift Guide"
+```
+
+Open your browser at `http://localhost:8080`.
+
+### Firebase Deployment
+The repository is pre-configured with multi-target hosting in [`firebase.json`](firebase.json):
+
+```bash
+# Deploy all targets
+firebase deploy
+
+# Deploy only the Companion app
+firebase deploy --only hosting:companion
+
+# Deploy only HRMS
+firebase deploy --only hosting:hrms
+
+# Deploy only Shift Guide
+firebase deploy --only hosting:shift
+```
+
+---
+
+## 📄 License
+Maintained for the Grand RP EMS Community. Designed and engineered for high-performance roleplay operations.

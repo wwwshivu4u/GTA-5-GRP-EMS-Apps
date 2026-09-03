@@ -35,20 +35,20 @@
     };
 
     const ALL_DUTY_STEPS = [
-        'od1', 'od2', 'od3',
+        'od1', 'od2', 'od3', 'od4',
         'ref1', 'ref2',
         'sav1', 'sav2',
-        'off1', 'off2', 'off3',
+        'off1', 'off2', 'off3', 'off4',
         'sw1_1', 'sw1_2', 'sw1_3', 'sw1_4', 'sw1_5',
         'sw2_1', 'sw2_2', 'sw2_3', 'sw2_4', 'sw2_5',
         'sw3_1', 'sw3_2', 'sw3_3', 'sw3_4', 'sw3_5'
     ];
 
     const STEP_DEPENDENCIES = [
-        ['od1', 'od2'], ['od2', 'od3'],
+        ['od1', 'od2'], ['od2', 'od3'], ['od3', 'od4'],
         ['ref1', 'ref2'],
         ['sav1', 'sav2'],
-        ['off1', 'off2'], ['off2', 'off3'],
+        ['off1', 'off2'], ['off2', 'off3'], ['off3', 'off4'],
         ['sw1_1', 'sw1_2'], ['sw1_2', 'sw1_3'], ['sw1_3', 'sw1_4'], ['sw1_4', 'sw1_5'],
         ['sw2_1', 'sw2_2'], ['sw2_2', 'sw2_3'], ['sw2_3', 'sw2_4'], ['sw2_4', 'sw2_5'],
         ['sw3_1', 'sw3_2'], ['sw3_2', 'sw3_3'], ['sw3_3', 'sw3_4'], ['sw3_4', 'sw3_5']
@@ -470,6 +470,21 @@
                     bcLiveTimeEl.textContent = `${edinH}:${edinM} (IC) | ${userH}:${userM} (Local)`;
                 }
 
+                // Step 4 Live Times (Bodycam On & Off Duty)
+                const od4ClockEl = document.getElementById('od4-clock-time');
+                if (od4ClockEl) od4ClockEl.textContent = `${edinH}:${edinM}`;
+                const off4ClockEl = document.getElementById('off4-clock-time');
+                if (off4ClockEl) off4ClockEl.textContent = `${edinH}:${edinM}`;
+
+                const od4Content = document.getElementById('od4');
+                if (od4Content && !od4Content.dataset.customEdited && document.activeElement !== od4Content) {
+                    od4Content.innerText = `On duty : ${edinH}:${edinM}`;
+                }
+                const off4Content = document.getElementById('off4');
+                if (off4Content && !off4Content.dataset.customEdited && document.activeElement !== off4Content) {
+                    off4Content.innerText = `Off duty : ${edinH}:${edinM}`;
+                }
+
                 const lrLiveDateEl = document.getElementById('lr-live-date');
                 if (lrLiveDateEl) {
                     lrLiveDateEl.textContent = `${edinD}/${edinMo}/${edinY} (IC) | ${userD}/${userMo}/${userY} (Local)`;
@@ -796,6 +811,9 @@
     class ModalManager {
         constructor() {
             this.overlay = null;
+            this.activeModal = null;
+            this.modalBehindNotes = null;
+            this.closeTimeout = null;
         }
 
         init() {
@@ -809,6 +827,12 @@
             document.addEventListener('contextmenu', (e) => {
                 if (this.overlay && this.overlay.classList.contains('active')) {
                     e.preventDefault();
+                    this.closeAll();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && this.overlay && this.overlay.classList.contains('active')) {
                     this.closeAll();
                 }
             });
@@ -836,12 +860,48 @@
         }
 
         open(modalId) {
-            this.closeAll();
+            if (this.closeTimeout) {
+                clearTimeout(this.closeTimeout);
+                this.closeTimeout = null;
+            }
+
             if (!this.overlay) this.overlay = document.getElementById('modalOverlay');
-            if (this.overlay) this.overlay.classList.add('active');
+            if (this.overlay) {
+                this.overlay.classList.remove('closing');
+                this.overlay.classList.add('active');
+            }
+
+            if (modalId === 'modal-notes') {
+                const currentActive = (this.activeModal && this.activeModal.id !== 'modal-notes')
+                    ? this.activeModal
+                    : document.querySelector('.modal-content.active:not(#modal-notes)');
+                if (currentActive) {
+                    this.modalBehindNotes = currentActive;
+                    currentActive.classList.add('in-background');
+                }
+                document.querySelectorAll('.modal-content').forEach(m => {
+                    if (m.id !== modalId && m !== this.modalBehindNotes) {
+                        m.classList.remove('active', 'closing', 'in-background');
+                    }
+                });
+            } else {
+                if (this.modalBehindNotes) {
+                    this.modalBehindNotes.classList.remove('in-background');
+                    this.modalBehindNotes = null;
+                }
+                document.querySelectorAll('.modal-content').forEach(m => {
+                    if (m.id !== modalId) {
+                        m.classList.remove('active', 'closing', 'in-background');
+                    }
+                });
+            }
 
             const modal = document.getElementById(modalId);
-            if (modal) modal.classList.add('active');
+            if (modal) {
+                modal.classList.remove('closing', 'in-background');
+                modal.classList.add('active');
+                this.activeModal = modal;
+            }
 
             if (modalId === 'modal-discord-bodycam') {
                 const bcStatus = document.getElementById('bc-status');
@@ -850,20 +910,68 @@
         }
 
         openSubModal(subModalId) {
-            document.querySelectorAll('.modal-content:not(.sub-modal)').forEach(m => m.classList.remove('active'));
+            document.querySelectorAll('.modal-content:not(.sub-modal)').forEach(m => m.classList.remove('active', 'closing'));
             const sm = document.getElementById(subModalId);
-            if (sm) sm.classList.add('active');
+            if (sm) {
+                sm.classList.remove('closing');
+                sm.classList.add('active');
+            }
         }
 
         closeSubModal() {
-            document.querySelectorAll('.sub-modal').forEach(sm => sm.classList.remove('active'));
-            const dm = document.getElementById('modal-discord');
-            if (dm) dm.classList.add('active');
+            const activeSubs = document.querySelectorAll('.sub-modal.active');
+            activeSubs.forEach(sm => sm.classList.add('closing'));
+
+            setTimeout(() => {
+                activeSubs.forEach(sm => sm.classList.remove('active', 'closing'));
+                const dm = document.getElementById('modal-discord');
+                if (dm) {
+                    dm.classList.remove('closing');
+                    dm.classList.add('active');
+                }
+            }, 220);
         }
 
         closeAll() {
-            if (this.overlay) this.overlay.classList.remove('active');
-            document.querySelectorAll('.modal-content').forEach(m => m.classList.remove('active'));
+            if (!this.overlay) this.overlay = document.getElementById('modalOverlay');
+            if (!this.overlay || !this.overlay.classList.contains('active')) return;
+
+            // If Quick Notes is open above a background modal, close only Quick Notes and restore background modal
+            const notesModal = document.getElementById('modal-notes');
+            if (notesModal && notesModal.classList.contains('active') && this.modalBehindNotes) {
+                notesModal.classList.add('closing');
+                const bgModal = this.modalBehindNotes;
+                this.modalBehindNotes = null;
+
+                setTimeout(() => {
+                    notesModal.classList.remove('active', 'closing');
+                    if (bgModal) {
+                        bgModal.classList.remove('in-background');
+                        this.activeModal = bgModal;
+                    }
+                }, 200);
+                return;
+            }
+
+            const activeModals = document.querySelectorAll('.modal-content.active, .sub-modal.active');
+            if (activeModals.length === 0) {
+                this.overlay.classList.remove('active', 'closing');
+                return;
+            }
+
+            this.overlay.classList.add('closing');
+            activeModals.forEach(m => m.classList.add('closing'));
+
+            if (this.closeTimeout) clearTimeout(this.closeTimeout);
+            this.closeTimeout = setTimeout(() => {
+                if (this.overlay) {
+                    this.overlay.classList.remove('active', 'closing');
+                }
+                activeModals.forEach(m => m.classList.remove('active', 'closing', 'in-background'));
+                this.activeModal = null;
+                this.modalBehindNotes = null;
+                this.closeTimeout = null;
+            }, 230);
         }
 
         switchRadioTab(tabId) {
@@ -1091,6 +1199,7 @@
 
         init() {
             stateManager.load();
+            this.disableZoom();
             this.initLowHeightMode();
             this.initSplashScreen();
             this.bindGlobalHooks();
@@ -1106,16 +1215,56 @@
             }
         }
 
+        disableZoom() {
+            // Prevent pinch gesture zoom (iOS / WebKit)
+            document.addEventListener('gesturestart', (e) => e.preventDefault(), { passive: false });
+            document.addEventListener('gesturechange', (e) => e.preventDefault(), { passive: false });
+            document.addEventListener('gestureend', (e) => e.preventDefault(), { passive: false });
+
+            // Prevent multi-touch pinch zoom
+            document.addEventListener('touchmove', (e) => {
+                if (e.touches && e.touches.length > 1) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
+            // Prevent double-tap zooming on mobile/touch screens
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', (e) => {
+                const now = Date.now();
+                if (now - lastTouchEnd <= 300) {
+                    e.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, { passive: false });
+
+            // Prevent Ctrl + MouseWheel / trackpad pinch zoom
+            document.addEventListener('wheel', (e) => {
+                if (e.ctrlKey) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
+            // Prevent keyboard zoom shortcuts (Ctrl/Cmd + +, -, =, 0)
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0')) {
+                    e.preventDefault();
+                }
+            });
+        }
+
         initLowHeightMode() {
             const checkMode = () => {
                 const h = window.innerHeight;
                 const w = window.innerWidth;
-                const isLowHeight = h < 650 || (w / h >= 1.3 && h < 750);
+                const isAutoLayout = (h <= 650 && w >= 450) || (w / h >= 1.2 && h <= 750) || (w <= 1024 && h <= 650);
 
-                if (isLowHeight) {
+                if (isAutoLayout) {
                     document.body.classList.add('low-height-mode');
+                    document.body.classList.add('android-auto-layout');
                 } else {
                     document.body.classList.remove('low-height-mode');
+                    document.body.classList.remove('android-auto-layout');
                 }
             };
 
@@ -1206,6 +1355,12 @@
             window.testDiscordChannel = (key) => DiscordService.testChannel(key);
             window.executeDiscordAction = (key, skipCopy, text, skipRedirect) => DiscordService.executeAction(key, text, skipRedirect);
             window.generateDiscordAction = (type, cbId) => DiscordService.generateAction(type, cbId);
+            window.triggerStep4 = (mode) => {
+                const btn = document.getElementById(mode === 'on' ? 'btn-od4' : 'btn-off4');
+                if (btn && !btn.disabled) {
+                    btn.click();
+                }
+            };
 
             window.copySimple = (text) => {
                 navigator.clipboard.writeText(text).then(() => {
@@ -1618,7 +1773,67 @@
                 }
             });
 
+            this.initStep4Toggles();
             stateManager.save();
+        }
+
+        initStep4Toggles() {
+            const setupToggle = (cbId, btnId) => {
+                const cb = document.getElementById(cbId);
+                const btn = document.getElementById(btnId);
+                if (!cb || !btn) return;
+
+                const updateLabel = () => {
+                    if (btn.classList.contains('success')) return;
+                    const isMails = cb.checked;
+                    const icon = isMails ? 'mail' : 'content_copy';
+                    const text = isMails ? 'Copy & Open Mails' : 'Copy';
+                    btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:0.95rem; margin-right:3px;">${icon}</span> <span class="btn-label">${text}</span>`;
+                };
+
+                cb.addEventListener('change', updateLabel);
+                updateLabel();
+            };
+
+            setupToggle('cb-od4', 'btn-od4');
+            setupToggle('cb-off4', 'btn-off4');
+        }
+
+        showHelpToast(msg) {
+            const existing = document.querySelector('.duty-help-toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = 'duty-help-toast';
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 85px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(15, 23, 42, 0.95);
+                color: #f8fafc;
+                border: 1px solid #10b981;
+                padding: 0.65rem 1.25rem;
+                border-radius: 30px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                z-index: 10005;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(16, 185, 129, 0.35);
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                animation: slideUpFloat 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+                pointer-events: none;
+                white-space: nowrap;
+            `;
+            toast.innerHTML = `<span class="material-symbols-outlined" style="font-size:1.1rem; color:#10b981;">info</span> ${msg}`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                toast.style.opacity = '0';
+                toast.style.transform = 'translate(-50%, 10px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4500);
         }
 
         attachCopyEvent(btn) {
@@ -1626,6 +1841,16 @@
                 const targetId = btn.getAttribute('data-target');
                 const targetEl = document.getElementById(targetId);
                 if (!targetEl) return;
+
+                // For od4 and off4: if not custom edited, ensure current IC time is updated before copying
+                if ((targetId === 'od4' || targetId === 'off4') && !targetEl.dataset.customEdited) {
+                    const now = new Date();
+                    const icStr = timerEngine.dtFormatter.format(now);
+                    const [_, timePart] = icStr.split(', ');
+                    let [h, m] = timePart.split(':');
+                    if (h === '24') h = '00';
+                    targetEl.innerText = `${targetId === 'od4' ? 'On duty' : 'Off duty'} : ${h}:${m}`;
+                }
 
                 const textToCopy = targetEl.innerText;
                 const newTemplate = stateManager.extractTemplate(textToCopy);
@@ -1638,30 +1863,68 @@
                     await navigator.clipboard.writeText(textToCopy);
                     sound.playCopySound();
 
+                    const isStep4 = (targetId === 'od4' || targetId === 'off4');
+                    const cb = isStep4 ? document.getElementById(targetId === 'od4' ? 'cb-od4' : 'cb-off4') : null;
+                    const isMails = cb ? cb.checked : false;
+
                     const originalHTML = btn.innerHTML;
-                    btn.innerHTML = '✅';
+                    if (isStep4) {
+                        btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:0.95rem; margin-right:3px;">check</span> <span class="btn-label">${isMails ? 'Copied & Opened!' : 'Copied!'}</span>`;
+                    } else {
+                        btn.innerHTML = `${originalHTML} copied!`;
+                    }
                     btn.classList.add('success');
                     setTimeout(() => {
-                        btn.innerHTML = originalHTML;
+                        if (isStep4) {
+                            const icon = cb && cb.checked ? 'mail' : 'content_copy';
+                            const text = cb && cb.checked ? 'Copy & Open Mails' : 'Copy';
+                            btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:0.95rem; margin-right:3px;">${icon}</span> <span class="btn-label">${text}</span>`;
+                        } else {
+                            btn.innerHTML = originalHTML;
+                        }
                         btn.classList.remove('success');
                     }, 1500);
 
-                    if (targetId === 'od3') {
+                    if (targetId === 'od4') {
                         timerEngine.startDutyTimer();
-                        setTimeout(() => {
-                            modalManager.open('modal-discord-bodycam');
-                        }, 400);
-                    } else if (targetId === 'off3') {
+                    } else if (targetId === 'off4') {
                         timerEngine.stopDutyTimer();
-                        setTimeout(() => {
-                            modalManager.open('modal-discord-bodycam');
-                        }, 400);
                     }
 
-                    if (stateManager.state.dutySteps?.hasOwnProperty(targetId)) {
-                        stateManager.state.dutySteps[targetId] = true;
-                        stateManager.save();
-                        this.checkDutyState();
+                    if (isStep4) {
+                        const helpEl = document.getElementById(`${targetId}-help-text`);
+                        if (helpEl) {
+                            helpEl.classList.add('active-copied');
+                            setTimeout(() => helpEl.classList.remove('active-copied'), 3500);
+                        }
+                        this.showHelpToast('Bodycam log copied, just paste it in Mails and upload bodyshot with it');
+                    }
+
+                    const discordKey = btn.getAttribute('data-discord-key');
+                    if (discordKey) {
+                        const block = btn.closest('.copy-block') || btn.parentElement;
+                        const cbToggle = block.querySelector('input[type="checkbox"]') || (isStep4 ? cb : null);
+                        const shouldOpen = cbToggle ? cbToggle.checked : true;
+                        if (shouldOpen) {
+                            DiscordService.openChannel(stateManager.state.discordServerId, stateManager.state.discordChannels[discordKey]);
+                        }
+                    }
+
+                    if (targetId === 'off4') {
+                        // Delay step completion briefly so user sees the green checkmark before duty reset
+                        setTimeout(() => {
+                            if (stateManager.state.dutySteps?.hasOwnProperty(targetId)) {
+                                stateManager.state.dutySteps[targetId] = true;
+                                stateManager.save();
+                                this.checkDutyState();
+                            }
+                        }, 700);
+                    } else {
+                        if (stateManager.state.dutySteps?.hasOwnProperty(targetId)) {
+                            stateManager.state.dutySteps[targetId] = true;
+                            stateManager.save();
+                            this.checkDutyState();
+                        }
                     }
 
                     if (targetId === 'rc107b') {
@@ -1670,16 +1933,6 @@
                             document.getElementById('btn-tab-offduty')?.click();
                         }, 400);
                     }
-
-                    const discordKey = btn.getAttribute('data-discord-key');
-                    if (discordKey) {
-                        const block = btn.closest('.copy-block') || btn.parentElement;
-                        const cb = block.querySelector('input[type="checkbox"]');
-                        const shouldOpen = cb ? cb.checked : true;
-                        if (shouldOpen) {
-                            DiscordService.openChannel(stateManager.state.discordServerId, stateManager.state.discordChannels[discordKey]);
-                        }
-                    }
                 } catch (err) {
                     console.warn('Copy failed:', err);
                 }
@@ -1687,8 +1940,16 @@
         }
 
         attachBlurEvent(el) {
+            el.addEventListener('input', () => {
+                if (el.id === 'od4' || el.id === 'off4') {
+                    el.dataset.customEdited = 'true';
+                }
+            });
             el.addEventListener('blur', () => {
                 const targetId = el.id;
+                if (targetId === 'od4' || targetId === 'off4') {
+                    el.dataset.customEdited = 'true';
+                }
                 const newTemplate = stateManager.extractTemplate(el.innerText);
                 stateManager.state.customCommands[targetId] = newTemplate;
                 el.dataset.template = newTemplate;
@@ -1755,8 +2016,41 @@
                 }
             });
 
-            const onDutyDone = steps.od1 && steps.od2 && steps.od3;
-            const offDutyDone = steps.off1 && steps.off2 && steps.off3;
+            const onDutyDone = steps.od1 && steps.od2 && steps.od3 && steps.od4;
+            const offDutyDone = steps.off1 && steps.off2 && steps.off3 && steps.off4;
+
+            // Step 4 Generator Unlock & Highlight
+            const cardOd4 = document.getElementById('card-od4');
+            const btnOd4 = document.getElementById('btn-od4');
+            if (steps.od3) {
+                if (cardOd4) cardOd4.classList.add('unlocked');
+                if (btnOd4) {
+                    btnOd4.disabled = false;
+                    btnOd4.classList.remove('disabled');
+                }
+            } else {
+                if (cardOd4) cardOd4.classList.remove('unlocked');
+                if (btnOd4) {
+                    btnOd4.disabled = true;
+                    btnOd4.classList.add('disabled');
+                }
+            }
+
+            const cardOff4 = document.getElementById('card-off4');
+            const btnOff4 = document.getElementById('btn-off4');
+            if (steps.off3) {
+                if (cardOff4) cardOff4.classList.add('unlocked');
+                if (btnOff4) {
+                    btnOff4.disabled = false;
+                    btnOff4.classList.remove('disabled');
+                }
+            } else {
+                if (cardOff4) cardOff4.classList.remove('unlocked');
+                if (btnOff4) {
+                    btnOff4.disabled = true;
+                    btnOff4.classList.add('disabled');
+                }
+            }
 
             const btnRefresh = document.getElementById('btn-tab-refresh');
             const btnSave = document.getElementById('btn-tab-save');
@@ -1771,9 +2065,6 @@
                 if (!offDutyDone && btnOnDuty) {
                     btnOnDuty.disabled = true;
                     btnOnDuty.classList.add('disabled');
-                    if (btnOnDuty.classList.contains('active')) {
-                        btnOffDuty?.click();
-                    }
                 }
             }
 
@@ -1797,6 +2088,11 @@
                     const b = document.querySelector(`[data-target="${next}"]`);
                     if (b) { b.disabled = true; b.classList.add('disabled'); }
                 });
+
+                if (cardOd4) cardOd4.classList.remove('unlocked');
+                if (btnOd4) { btnOd4.disabled = true; btnOd4.classList.add('disabled'); }
+                if (cardOff4) cardOff4.classList.remove('unlocked');
+                if (btnOff4) { btnOff4.disabled = true; btnOff4.classList.add('disabled'); }
 
                 btnOnDuty?.click();
             }
