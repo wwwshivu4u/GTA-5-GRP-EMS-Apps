@@ -84,13 +84,20 @@
 
             <!-- Compact Active Timer View -->
             <div class="di-view hidden" id="tb-compact-view">
-                <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
                     <button class="btn btn-danger di-btn" id="btn-rota-end" onclick="showConfirmRotaEnd()" style="padding: 0.5rem 0.9rem;">
                         <span class="material-symbols-outlined" style="font-size:1.1rem;">stop</span><span>End</span>
                     </button>
                     <div id="compact-main-timer">0 hr 00:00</div>
-                    <div id="night-shift-indicator" class="hidden" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border-radius: 10px; padding: 0.3rem 0.6rem; min-width: 60px;">
-                    </div>
+                    <span class="compact-loc-pill">
+                        <span class="material-symbols-outlined" style="font-size:0.8rem;">location_on</span>
+                        <span id="compact-loc-val">—</span>
+                    </span>
+                    <span class="compact-bonus-pill" id="compact-bonus-pill" title="Shift Bonus">
+                        <span class="material-symbols-outlined" style="font-size:0.8rem;">payments</span>
+                        <span class="material-symbols-outlined night-icon hidden" id="compact-night-icon" style="font-size:0.85rem; color:#f1c40f;" title="Night Shift Active">dark_mode</span>
+                        <span id="compact-bonus-val">$0</span>
+                    </span>
                 </div>
             </div>
 
@@ -146,8 +153,9 @@
 
             <!-- MODAL: SETTINGS -->
             <div class="modal-content" id="modal-settings">
-                <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
-                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-slate" style="font-size:1.4rem; margin-right:6px;">settings</span> Settings &amp; Configuration</div>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-slate" style="font-size:1.4rem; margin-right:6px;">settings</span> Settings &amp; Configuration
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
 
                 <div class="settings-grid-wrapper">
                     <div class="settings-col">
@@ -305,8 +313,11 @@
 
             <!-- MODAL: BODYCAM LOGS -->
             <div class="modal-content" id="modal-bodycam">
-                <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
-                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-rose" style="font-size:1.4rem; margin-right:6px;">videocam</span> Bodycam Logs</div>
+                <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between;">
+                    <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-rose" style="font-size:1.4rem; margin-right:6px;">videocam</span> Bodycam Logs</span>
+                    <span class="duty-pill off-duty" id="modal-duty-status-pill"><span class="pulse-dot"></span> <span class="duty-pill-text">OFF DUTY</span></span>
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
 
                 <div class="tabs-header">
                     <button class="tab-btn active" data-tab="tab-onduty" id="btn-tab-onduty">On Duty</button>
@@ -430,8 +441,9 @@
 
             <!-- MODAL: DISCORD BODYCAM LOG GENERATOR -->
             <div class="modal-content" id="modal-discord-bodycam">
-                <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
-                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-rose" style="font-size:1.4rem; margin-right:6px;">badge</span> Discord Generator (Bodycam Logs)</div>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-rose" style="font-size:1.4rem; margin-right:6px;">badge</span> Discord Generator (Bodycam Logs)
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
 
                 <div class="glass-section">
                     <div class="grid-layout" style="align-items: end;">
@@ -461,8 +473,9 @@
 
             <!-- MODAL: COMMS & LOGS -->
             <div class="modal-content" id="modal-radio">
-                <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
-                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-blue" style="font-size:1.4rem; margin-right:6px;">podcasts</span> Comms &amp; Radio Codes</div>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-blue" style="font-size:1.4rem; margin-right:6px;">podcasts</span> Comms &amp; Radio Codes
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
 
                 <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem; text-align: center;">Quick Codes (Instant Clipboard Copy)</div>
                 <div class="quick-codes-grid">
@@ -474,7 +487,7 @@
                 </div>
 
                 <!-- Channel Tabs Select -->
-                <div class="input-group" style="margin-bottom: 0.8rem;">
+                <div class="input-group" style="margin: 0.8rem;">
                     <select id="radio-tabs-select" onchange="switchRadioTab(this.value)">
                         <option value="tab-rc-general">#RADIO-CODES</option>
                         <option value="tab-rc-break">#BREAK-ROOM</option>
@@ -859,8 +872,9 @@
 
             <!-- MODAL: LABTECH & MED LOGS -->
             <div class="modal-content" id="modal-discord">
-                <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
-                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-purple" style="font-size:1.4rem; margin-right:6px;">science</span> Labtech &amp; Med Logs</div>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-purple" style="font-size:1.4rem; margin-right:6px;">science</span> Labtech &amp; Med Logs
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
 
                 <div class="discord-grid">
                     <div class="discord-card">
@@ -891,8 +905,9 @@
 
             <!-- SUB-MODAL: SUPPLIES -->
             <div class="modal-content sub-modal" id="sub-supplies">
-                <button class="close-btn" onclick="closeSubModal()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
-                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-purple" style="font-size:1.4rem; margin-right:6px;">inventory_2</span> Medical Supplies Log</div>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-purple" style="font-size:1.4rem; margin-right:6px;">inventory_2</span> Medical Supplies Log
+                    <button class="close-btn" onclick="closeSubModal()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
                 <div class="input-group">
                     <label>Status</label>
                     <input type="hidden" id="ms-status" value="before">
@@ -919,8 +934,9 @@
 
             <!-- SUB-MODAL: LABTECH ROTA -->
             <div class="modal-content sub-modal" id="sub-rota">
-                <button class="close-btn" onclick="closeSubModal()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
-                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-emerald" style="font-size:1.4rem; margin-right:6px;">calculate</span> Labtech Rota &amp; Bonus Calculator</div>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-emerald" style="font-size:1.4rem; margin-right:6px;">calculate</span> Labtech Rota &amp; Bonus Calculator
+                    <button class="close-btn" onclick="closeSubModal()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
                 <div class="input-group">
                     <label>Date</label>
                     <div id="lr-live-date" style="font-size: 0.95rem; color: #38bdf8; background: rgba(0,0,0,0.3); padding: 0.6rem; border-radius: 8px; text-align: center; font-family: monospace; font-weight: bold; border: 1px solid var(--card-border);">--/--/---- (IC) | --/--/---- (Local)</div>
@@ -954,8 +970,9 @@
 
             <!-- MODAL: HOSPITAL SERVICES (HS) -->
             <div class="modal-content" id="modal-hs">
-                <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
-                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-emerald" style="font-size:1.4rem; margin-right:6px;">local_hospital</span> Hospital Services (HS) Guide</div>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-emerald" style="font-size:1.4rem; margin-right:6px;">local_hospital</span> Hospital Services (HS) Guide
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
 
                 <div class="hs-grid-wrapper">
                     <div class="glass-section">
@@ -1011,8 +1028,9 @@
 
             <!-- MODAL: GROUND SERVICES (GS) -->
             <div class="modal-content" id="modal-gs">
-                <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
-                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.4rem; margin-right:6px;">medical_services</span> Ground Services (GS) Guide</div>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.4rem; margin-right:6px;">medical_services</span> Ground Services (GS) Guide
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
 
                 <div class="gs-grid-wrapper">
                     <div class="glass-section">
@@ -1058,8 +1076,9 @@
 
             <!-- MODAL: ARO SERVICES -->
             <div class="modal-content" id="modal-aro">
-                <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
-                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.4rem; margin-right:6px;">flight</span> Air Rescue Operations (ARO)</div>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.4rem; margin-right:6px;">flight</span> Air Rescue Operations (ARO)
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
                 <div class="glass-section">
                     <p style="font-size: 0.9rem; color: var(--text-muted);">ARO flight protocols and helicopter dispatch commands.</p>
                 </div>
@@ -1067,8 +1086,9 @@
 
             <!-- MODAL: ADD CUSTOM COMMAND -->
             <div class="modal-content sub-modal" id="modal-add-command" style="max-width: 480px;">
-                <button class="close-btn" onclick="closeAddCommandModal()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
-                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-blue" style="font-size:1.4rem; margin-right:6px;">add_circle</span> Add Custom Command</div>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-blue" style="font-size:1.4rem; margin-right:6px;">add_circle</span> Add Custom Command
+                    <button class="close-btn" onclick="closeAddCommandModal()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
                 <div class="glass-section">
                     <div class="input-group">
                         <label>Target Section</label>
@@ -1099,8 +1119,9 @@
 
             <!-- MODAL: ADD DEPARTMENT CATEGORY -->
             <div class="modal-content sub-modal" id="modal-add-dept" style="max-width: 440px;">
-                <button class="close-btn" onclick="closeAddDeptModal()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
-                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-blue" style="font-size:1.4rem; margin-right:6px;">folder_open</span> Add Category</div>
+                <div class="modal-header"><span class="material-symbols-outlined icon-gradient-blue" style="font-size:1.4rem; margin-right:6px;">folder_open</span> Add Category
+                    <button class="close-btn" onclick="closeAddDeptModal()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
                 <div class="glass-section">
                     <div class="input-group">
                         <label>Icon Name (Material Symbol or Emoji)</label>
@@ -1116,10 +1137,10 @@
 
             <!-- MODAL: QUICK NOTEPAD -->
             <div class="modal-content" id="modal-notes" style="max-width: 680px; width: 95%;">
-                <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
                 <div class="modal-header">
                     <span class="material-symbols-outlined icon-gradient-amber" style="font-size:1.4rem; margin-right:6px;">edit_note</span>
                     Quick Notepad
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
                 </div>
 
                 <div class="glass-section" style="padding: 0.8rem 1rem;">
@@ -1161,7 +1182,7 @@
         </div>
 
         <!-- Floating Quick Notes Button -->
-        <button class="notes-fab" onclick="openModal('modal-notes')" title="Take a note / Quick Notepad"><span class="material-symbols-outlined icon-gradient-amber" style="font-size:1.4rem;">edit_note</span></button>
+        <button class="notes-fab" onclick="openModal('modal-notes')" title="Take a note / Quick Notepad"><span class="material-symbols-outlined icon-gradient-amber">edit_note</span></button>
 
         <!-- Floating Help Button -->
         <button class="tutorial-fab" onclick="startTutorial()" title="Tutorial &amp; Help"><span class="material-symbols-outlined" style="font-size:1.4rem;">help</span></button>

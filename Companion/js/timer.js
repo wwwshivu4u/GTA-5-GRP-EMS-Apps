@@ -113,10 +113,44 @@ export class TimerEngine {
         if (outlineRect) outlineRect.style.strokeDashoffset = 1000;
     }
 
+    resetRotaTimer() {
+        if (this.rotaTimerInterval) clearInterval(this.rotaTimerInterval);
+        stateManager.set('dutyStartTime', null);
+        stateManager.save();
+
+        const defaultView = document.getElementById('tb-default-view');
+        const setupView = document.getElementById('tb-setup-view');
+        const compactView = document.getElementById('tb-compact-view');
+        const confirmView = document.getElementById('tb-confirm-view');
+
+        if (defaultView) defaultView.classList.add('hidden');
+        if (compactView) compactView.classList.add('hidden');
+        if (confirmView) confirmView.classList.add('hidden');
+        if (setupView) setupView.classList.remove('hidden');
+
+        const startBtn = document.getElementById('btn-rota-start');
+        if (startBtn) startBtn.disabled = false;
+
+        const outlineRect = document.getElementById('progress-outline-rect');
+        if (outlineRect) outlineRect.style.strokeDashoffset = 1000;
+
+        const display = document.getElementById('compact-main-timer');
+        if (display) display.textContent = '0 hr 00:00';
+
+        const bonusValEl = document.getElementById('compact-bonus-val');
+        if (bonusValEl) bonusValEl.textContent = '$0';
+
+        this.checkNightShiftUI();
+    }
+
     startShift(location) {
         const state = stateManager.state;
         state.dutyStartTime = Date.now();
         state.rotaLocation = location;
+        state.bcStatus = 'On duty';
+        ['od1', 'od2', 'od3', 'od4'].forEach(step => {
+            state.dutySteps[step] = true;
+        });
         stateManager.save();
 
         const setupView = document.getElementById('tb-setup-view');
@@ -124,11 +158,18 @@ export class TimerEngine {
         if (setupView) setupView.classList.add('hidden');
         if (compactView) compactView.classList.remove('hidden');
 
+        const locValEl = document.getElementById('compact-loc-val');
+        if (locValEl) locValEl.textContent = location;
+
         this.startRotaTimer();
+        window.app?.updateDutyStatusUI?.(true);
+        window.app?.checkDutyState?.();
     }
 
     startRotaTimer() {
         const display = document.getElementById('compact-main-timer');
+        const locValEl = document.getElementById('compact-loc-val');
+        const bonusValEl = document.getElementById('compact-bonus-val');
         const outlineRect = document.getElementById('progress-outline-rect');
         if (!display) return;
 
@@ -146,6 +187,21 @@ export class TimerEngine {
             const ss = String(s).padStart(2, '0');
 
             display.textContent = `${h} hr ${mm}:${ss}`;
+
+            const loc = stateManager.get('rotaLocation') || 'PH Front';
+            if (locValEl) locValEl.textContent = loc;
+
+            let bonus = 0;
+            if (loc === 'Labs') {
+                const capRate = stateManager.get('shiftRates')?.labCaptcha || 5000;
+                const delRate = stateManager.get('shiftRates')?.labMedicine || 10000;
+                bonus = (stateManager.get('rotaCap') || 0) * capRate + (stateManager.get('rotaDel') || 0) * delRate;
+            } else {
+                const startHour = new Date(new Date(dutyStartTime).toLocaleString('en-US', { timeZone: 'Europe/London' })).getHours();
+                const rate = this.getShiftRate(loc, startHour);
+                bonus = rate * h;
+            }
+            if (bonusValEl) bonusValEl.textContent = `$${bonus.toLocaleString()}`;
 
             if (outlineRect) {
                 const currentHourSeconds = timerSeconds % 3600;
@@ -196,17 +252,25 @@ export class TimerEngine {
     }
 
     checkNightShiftUI() {
-        const nsIndicatorEl = document.getElementById('night-shift-indicator');
+        const bonusPill = document.getElementById('compact-bonus-pill');
+        const bonusValEl = document.getElementById('compact-bonus-val');
+        const nightIconEl = document.getElementById('compact-night-icon');
         const nsTimerEl = document.getElementById('compact-main-timer');
         const state = stateManager.state;
 
         const now = new Date();
         const edinHour = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/London' })).getHours();
-        const isNightShift = edinHour >= 0 && edinHour < 6;
+        const currentIsNight = edinHour >= 0 && edinHour < 6;
+        let isNightShift = currentIsNight;
+        if (state.dutyStartTime) {
+            const startHour = new Date(new Date(state.dutyStartTime).toLocaleString('en-US', { timeZone: 'Europe/London' })).getHours();
+            if (startHour >= 0 && startHour < 6) isNightShift = true;
+        }
 
         let bonus = 0;
         if (state.dutyStartTime) {
-            if (state.rotaLocation === 'Labs') {
+            const loc = state.rotaLocation || 'PH Front';
+            if (loc === 'Labs') {
                 const capRate = state.shiftRates?.labCaptcha || 5000;
                 const delRate = state.shiftRates?.labMedicine || 10000;
                 bonus = (state.rotaCap || 0) * capRate + (state.rotaDel || 0) * delRate;
@@ -214,38 +278,31 @@ export class TimerEngine {
                 const timerSeconds = Math.floor((now.getTime() - state.dutyStartTime) / 1000);
                 const hours = Math.floor(timerSeconds / 3600);
                 const startHour = new Date(new Date(state.dutyStartTime).toLocaleString('en-US', { timeZone: 'Europe/London' })).getHours();
-                const rate = this.getShiftRate(state.rotaLocation || 'PH Front', startHour);
+                const rate = this.getShiftRate(loc, startHour);
                 bonus = rate * hours;
             }
         }
 
-        if (nsIndicatorEl) {
+        if (bonusValEl) {
+            bonusValEl.textContent = `$${bonus.toLocaleString()}`;
+        }
+
+        if (nightIconEl) {
+            nightIconEl.classList.toggle('hidden', !isNightShift);
+        }
+
+        if (bonusPill) {
+            bonusPill.classList.toggle('night-shift', isNightShift);
+            bonusPill.title = isNightShift ? 'Night Shift Active (00:00 - 06:00 IC)' : 'Day Shift Bonus';
+        }
+
+        if (nsTimerEl) {
             if (isNightShift) {
-                nsIndicatorEl.classList.remove('hidden');
-                nsIndicatorEl.style.color = '#f1c40f';
-                nsIndicatorEl.innerHTML = `
-                    <div style="font-size: 1.3rem; line-height: 1; margin-bottom: 2px;">🌙</div>
-                    <div style="font-size: 0.85rem; font-weight: bold;">$${bonus.toLocaleString()}</div>
-                `;
-                if (nsTimerEl) {
-                    nsTimerEl.style.color = '#f1c40f';
-                    nsTimerEl.style.textShadow = '0 0 10px rgba(241,196,15,0.4)';
-                }
+                nsTimerEl.style.color = '#f1c40f';
+                nsTimerEl.style.textShadow = '0 0 10px rgba(241,196,15,0.4)';
             } else {
-                if (bonus > 0 && state.dutyStartTime) {
-                    nsIndicatorEl.classList.remove('hidden');
-                    nsIndicatorEl.style.color = '#10b981';
-                    nsIndicatorEl.innerHTML = `
-                        <div style="font-size: 1.3rem; line-height: 1; margin-bottom: 2px;">☀️</div>
-                        <div style="font-size: 0.85rem; font-weight: bold;">$${bonus.toLocaleString()}</div>
-                    `;
-                } else {
-                    nsIndicatorEl.classList.add('hidden');
-                }
-                if (nsTimerEl) {
-                    nsTimerEl.style.color = '#f8fafc';
-                    nsTimerEl.style.textShadow = '';
-                }
+                nsTimerEl.style.color = '#f8fafc';
+                nsTimerEl.style.textShadow = '';
             }
         }
     }
@@ -331,12 +388,7 @@ export class TimerEngine {
         state.dutyStartTime = null;
         stateManager.save();
 
-        setTimeout(() => {
-            const setupView = document.getElementById('tb-setup-view');
-            const confirmView = document.getElementById('tb-confirm-view');
-            if (confirmView) confirmView.classList.add('hidden');
-            if (setupView) setupView.classList.remove('hidden');
-        }, 3500);
+        document.getElementById('tb-confirm-view')?.classList.add('hidden');
     }
 
     showShiftEndModal(template, durationStr, bonusStr) {
@@ -378,10 +430,27 @@ export class TimerEngine {
             <button class="btn btn-success" style="width: 100%; padding: 0.8rem; font-size: 1rem; font-weight: bold;">Close</button>
         `;
 
-        modal.querySelector('button').onclick = () => overlay.remove();
-        overlay.onclick = (e) => {
-            if (e.target === overlay) overlay.remove();
+        const handleClose = () => {
+            overlay.remove();
+            document.removeEventListener('keydown', handleKeyDown);
+            this.resetRotaTimer();
+            setTimeout(() => {
+                const locSelect = document.getElementById('rota-location');
+                if (locSelect) locSelect.focus();
+            }, 50);
         };
+
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                handleClose();
+            }
+        };
+
+        modal.querySelector('button').onclick = handleClose;
+        overlay.onclick = (e) => {
+            if (e.target === overlay) handleClose();
+        };
+        document.addEventListener('keydown', handleKeyDown);
 
         overlay.appendChild(modal);
         document.body.appendChild(overlay);

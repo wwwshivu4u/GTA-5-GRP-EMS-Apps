@@ -153,6 +153,7 @@
                 dutySteps,
                 dutyStartTime: null,
                 rotaLocation: 'PH Front',
+                customRotaLocation: '',
                 rotaCap: 0,
                 rotaDel: 0,
                 customCommands: {},
@@ -227,7 +228,7 @@
 
             let loc = rotaLocSelect ? rotaLocSelect.value : (this.state.rotaLocation || 'PH Front');
             if (loc === 'Other...' || loc === 'Custom') {
-                loc = locInputCustom?.value?.trim() || '[Location]';
+                loc = locInputCustom?.value?.trim() || this.state.customRotaLocation || '[Location]';
             }
             if (!loc) loc = '[Location]';
 
@@ -530,10 +531,41 @@
             if (outlineRect) outlineRect.style.strokeDashoffset = 1000;
         }
 
+        resetRotaTimer() {
+            if (this.rotaTimerInterval) clearInterval(this.rotaTimerInterval);
+            stateManager.set('dutyStartTime', null);
+            stateManager.save();
+
+            const defaultView = document.getElementById('tb-default-view');
+            const setupView = document.getElementById('tb-setup-view');
+            const compactView = document.getElementById('tb-compact-view');
+            const confirmView = document.getElementById('tb-confirm-view');
+
+            if (defaultView) defaultView.classList.add('hidden');
+            if (compactView) compactView.classList.add('hidden');
+            if (confirmView) confirmView.classList.add('hidden');
+            if (setupView) setupView.classList.remove('hidden');
+
+            const startBtn = document.getElementById('btn-rota-start');
+            if (startBtn) startBtn.disabled = false;
+
+            const outlineRect = document.getElementById('progress-outline-rect');
+            if (outlineRect) outlineRect.style.strokeDashoffset = 1000;
+
+            const display = document.getElementById('compact-main-timer');
+            if (display) display.textContent = '0 hr 00:00';
+
+            this.checkNightShiftUI();
+        }
+
         startShift(location) {
             const state = stateManager.state;
             state.dutyStartTime = Date.now();
             state.rotaLocation = location;
+            state.bcStatus = 'On duty';
+            ['od1', 'od2', 'od3', 'od4'].forEach(step => {
+                state.dutySteps[step] = true;
+            });
             stateManager.save();
 
             const setupView = document.getElementById('tb-setup-view');
@@ -541,11 +573,18 @@
             if (setupView) setupView.classList.add('hidden');
             if (compactView) compactView.classList.remove('hidden');
 
+            const locValEl = document.getElementById('compact-loc-val');
+            if (locValEl) locValEl.textContent = location;
+
             this.startRotaTimer();
+            window.app?.updateDutyStatusUI?.(true);
+            window.app?.checkDutyState?.();
         }
 
         startRotaTimer() {
             const display = document.getElementById('compact-main-timer');
+            const locValEl = document.getElementById('compact-loc-val');
+            const bonusValEl = document.getElementById('compact-bonus-val');
             const outlineRect = document.getElementById('progress-outline-rect');
             if (!display) return;
 
@@ -563,6 +602,21 @@
                 const ss = String(s).padStart(2, '0');
 
                 display.textContent = `${h} hr ${mm}:${ss}`;
+
+                const loc = stateManager.get('rotaLocation') || 'PH Front';
+                if (locValEl) locValEl.textContent = loc;
+
+                let bonus = 0;
+                if (loc === 'Labs') {
+                    const capRate = stateManager.get('shiftRates')?.labCaptcha || 5000;
+                    const delRate = stateManager.get('shiftRates')?.labMedicine || 10000;
+                    bonus = (stateManager.get('rotaCap') || 0) * capRate + (stateManager.get('rotaDel') || 0) * delRate;
+                } else {
+                    const startHour = new Date(new Date(dutyStartTime).toLocaleString('en-US', { timeZone: 'Europe/London' })).getHours();
+                    const rate = this.getShiftRate(loc, startHour);
+                    bonus = rate * h;
+                }
+                if (bonusValEl) bonusValEl.textContent = `$${bonus.toLocaleString()}`;
 
                 if (outlineRect) {
                     const currentHourSeconds = timerSeconds % 3600;
@@ -612,17 +666,25 @@
         }
 
         checkNightShiftUI() {
-            const nsIndicatorEl = document.getElementById('night-shift-indicator');
+            const bonusPill = document.getElementById('compact-bonus-pill');
+            const bonusValEl = document.getElementById('compact-bonus-val');
+            const nightIconEl = document.getElementById('compact-night-icon');
             const nsTimerEl = document.getElementById('compact-main-timer');
             const state = stateManager.state;
 
             const now = new Date();
             const edinHour = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/London' })).getHours();
-            const isNightShift = edinHour >= 0 && edinHour < 6;
+            const currentIsNight = edinHour >= 0 && edinHour < 6;
+            let isNightShift = currentIsNight;
+            if (state.dutyStartTime) {
+                const startHour = new Date(new Date(state.dutyStartTime).toLocaleString('en-US', { timeZone: 'Europe/London' })).getHours();
+                if (startHour >= 0 && startHour < 6) isNightShift = true;
+            }
 
             let bonus = 0;
             if (state.dutyStartTime) {
-                if (state.rotaLocation === 'Labs') {
+                const loc = state.rotaLocation || 'PH Front';
+                if (loc === 'Labs') {
                     const capRate = state.shiftRates?.labCaptcha || 5000;
                     const delRate = state.shiftRates?.labMedicine || 10000;
                     bonus = (state.rotaCap || 0) * capRate + (state.rotaDel || 0) * delRate;
@@ -630,38 +692,31 @@
                     const timerSeconds = Math.floor((now.getTime() - state.dutyStartTime) / 1000);
                     const hours = Math.floor(timerSeconds / 3600);
                     const startHour = new Date(new Date(state.dutyStartTime).toLocaleString('en-US', { timeZone: 'Europe/London' })).getHours();
-                    const rate = this.getShiftRate(state.rotaLocation || 'PH Front', startHour);
+                    const rate = this.getShiftRate(loc, startHour);
                     bonus = rate * hours;
                 }
             }
 
-            if (nsIndicatorEl) {
+            if (bonusValEl) {
+                bonusValEl.textContent = `$${bonus.toLocaleString()}`;
+            }
+
+            if (nightIconEl) {
+                nightIconEl.classList.toggle('hidden', !isNightShift);
+            }
+
+            if (bonusPill) {
+                bonusPill.classList.toggle('night-shift', isNightShift);
+                bonusPill.title = isNightShift ? 'Night Shift Active (00:00 - 06:00 IC)' : 'Day Shift Bonus';
+            }
+
+            if (nsTimerEl) {
                 if (isNightShift) {
-                    nsIndicatorEl.classList.remove('hidden');
-                    nsIndicatorEl.style.color = '#f1c40f';
-                    nsIndicatorEl.innerHTML = `
-                        <div style="line-height: 1; margin-bottom: 2px;"><span class="material-symbols-outlined icon-gradient-amber" style="font-size:1.3rem;">dark_mode</span></div>
-                        <div style="font-size: 0.85rem; font-weight: bold;">$${bonus.toLocaleString()}</div>
-                    `;
-                    if (nsTimerEl) {
-                        nsTimerEl.style.color = '#f1c40f';
-                        nsTimerEl.style.textShadow = '0 0 10px rgba(241,196,15,0.4)';
-                    }
+                    nsTimerEl.style.color = '#f1c40f';
+                    nsTimerEl.style.textShadow = '0 0 10px rgba(241,196,15,0.4)';
                 } else {
-                    if (bonus > 0 && state.dutyStartTime) {
-                        nsIndicatorEl.classList.remove('hidden');
-                        nsIndicatorEl.style.color = '#10b981';
-                        nsIndicatorEl.innerHTML = `
-                            <div style="line-height: 1; margin-bottom: 2px;"><span class="material-symbols-outlined icon-gradient-emerald" style="font-size:1.3rem;">light_mode</span></div>
-                            <div style="font-size: 0.85rem; font-weight: bold;">$${bonus.toLocaleString()}</div>
-                        `;
-                    } else {
-                        nsIndicatorEl.classList.add('hidden');
-                    }
-                    if (nsTimerEl) {
-                        nsTimerEl.style.color = '#f8fafc';
-                        nsTimerEl.style.textShadow = '';
-                    }
+                    nsTimerEl.style.color = '#f8fafc';
+                    nsTimerEl.style.textShadow = '';
                 }
             }
         }
@@ -746,12 +801,7 @@
             state.dutyStartTime = null;
             stateManager.save();
 
-            setTimeout(() => {
-                const setupView = document.getElementById('tb-setup-view');
-                const confirmView = document.getElementById('tb-confirm-view');
-                if (confirmView) confirmView.classList.add('hidden');
-                if (setupView) setupView.classList.remove('hidden');
-            }, 3500);
+            document.getElementById('tb-confirm-view')?.classList.add('hidden');
         }
 
         showShiftEndModal(template, durationStr, bonusStr) {
@@ -793,10 +843,27 @@
                 <button class="btn btn-success" style="width: 100%; padding: 0.8rem; font-size: 1rem; font-weight: bold;">Close</button>
             `;
 
-            modal.querySelector('button').onclick = () => overlay.remove();
-            overlay.onclick = (e) => {
-                if (e.target === overlay) overlay.remove();
+            const handleClose = () => {
+                overlay.remove();
+                document.removeEventListener('keydown', handleKeyDown);
+                this.resetRotaTimer();
+                setTimeout(() => {
+                    const locSelect = document.getElementById('rota-location');
+                    if (locSelect) locSelect.focus();
+                }, 50);
             };
+
+            const handleKeyDown = (e) => {
+                if (e.key === 'Escape') {
+                    handleClose();
+                }
+            };
+
+            modal.querySelector('button').onclick = handleClose;
+            overlay.onclick = (e) => {
+                if (e.target === overlay) handleClose();
+            };
+            document.addEventListener('keydown', handleKeyDown);
 
             overlay.appendChild(modal);
             document.body.appendChild(overlay);
@@ -820,20 +887,10 @@
             this.overlay = document.getElementById('modalOverlay');
             if (!this.overlay) return;
 
-            this.overlay.addEventListener('click', (e) => {
-                if (e.target === this.overlay) this.closeAll();
-            });
-
+            // Clicking the backdrop does NOT close the modal — use the X button.
             document.addEventListener('contextmenu', (e) => {
                 if (this.overlay && this.overlay.classList.contains('active')) {
                     e.preventDefault();
-                    this.closeAll();
-                }
-            });
-
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && this.overlay && this.overlay.classList.contains('active')) {
-                    this.closeAll();
                 }
             });
 
@@ -1194,6 +1251,7 @@
     // -----------------------------------------------------
     class App {
         constructor() {
+            window.app = this;
             this.init();
         }
 
@@ -1351,6 +1409,7 @@
 
             window.startDutyTimer = () => timerEngine.startDutyTimer();
             window.stopDutyTimer = () => timerEngine.stopDutyTimer();
+            window.resetRotaTimer = () => timerEngine.resetRotaTimer();
 
             window.testDiscordChannel = (key) => DiscordService.testChannel(key);
             window.executeDiscordAction = (key, skipCopy, text, skipRedirect) => DiscordService.executeAction(key, text, skipRedirect);
@@ -1593,7 +1652,16 @@
             const repInput = document.getElementById('repInput');
 
             if (rotaLocSelect) {
-                rotaLocSelect.value = stateManager.get('rotaLocation') || 'PH Front';
+                const savedLoc = stateManager.get('rotaLocation') || 'PH Front';
+                rotaLocSelect.value = savedLoc;
+                if (locInputCustom) {
+                    locInputCustom.value = stateManager.get('customRotaLocation') || '';
+                    locInputCustom.style.display = (savedLoc === 'Other...' || savedLoc === 'Custom') ? 'block' : 'none';
+                    locInputCustom.addEventListener('input', () => {
+                        stateManager.set('customRotaLocation', locInputCustom.value);
+                        this.updatePreviews();
+                    });
+                }
                 rotaLocSelect.addEventListener('change', () => {
                     stateManager.set('rotaLocation', rotaLocSelect.value);
                     if (locInputCustom) {
@@ -1886,9 +1954,15 @@
                     }, 1500);
 
                     if (targetId === 'od4') {
+                        stateManager.state.bcStatus = 'On duty';
+                        stateManager.save();
                         timerEngine.startDutyTimer();
+                        this.updateDutyStatusUI(true);
                     } else if (targetId === 'off4') {
-                        timerEngine.stopDutyTimer();
+                        stateManager.state.bcStatus = 'Off duty';
+                        stateManager.save();
+                        timerEngine.resetRotaTimer();
+                        this.updateDutyStatusUI(false);
                     }
 
                     if (isStep4) {
@@ -1898,6 +1972,14 @@
                             setTimeout(() => helpEl.classList.remove('active-copied'), 3500);
                         }
                         this.showHelpToast('Bodycam log copied, just paste it in Mails and upload bodyshot with it');
+
+                        modalManager.closeAll();
+                        const focusLocation = () => {
+                            const rotaLoc = document.getElementById('rota-location');
+                            if (rotaLoc) rotaLoc.focus();
+                        };
+                        focusLocation();
+                        setTimeout(focusLocation, 250);
                     }
 
                     const discordKey = btn.getAttribute('data-discord-key');
@@ -2005,70 +2087,140 @@
             btn.addEventListener('touchcancel', cancelDelete);
         }
 
+        updateDutyStatusUI(isOnDuty) {
+            const statusText = isOnDuty ? 'ON DUTY' : 'OFF DUTY';
+            const modalPill = document.getElementById('modal-duty-status-pill');
+            const navPill = document.getElementById('nav-duty-status-pill');
+            const dashPill = document.getElementById('dash-duty-status-pill');
+            const bcSelect = document.getElementById('bc-status');
+
+            [modalPill, navPill, dashPill].forEach(pill => {
+                if (!pill) return;
+                pill.classList.toggle('on-duty', isOnDuty);
+                pill.classList.toggle('off-duty', !isOnDuty);
+                const txt = pill.querySelector('.duty-pill-text, .nav-duty-text');
+                if (txt) txt.textContent = statusText;
+            });
+
+            if (bcSelect) {
+                bcSelect.value = isOnDuty ? 'On duty' : 'Off duty';
+            }
+
+            this.updateTabsForDutyStatus(isOnDuty);
+        }
+
+        updateTabsForDutyStatus(isOnDuty) {
+            const btnOnDuty  = document.getElementById('btn-tab-onduty');
+            const btnRefresh = document.getElementById('btn-tab-refresh');
+            const btnSave    = document.getElementById('btn-tab-save');
+            const btnOffDuty = document.getElementById('btn-tab-offduty');
+
+            const enable  = (btn) => { if (btn) { btn.disabled = false; btn.classList.remove('disabled'); } };
+            const disable = (btn) => { if (btn) { btn.disabled = true;  btn.classList.add('disabled');    } };
+
+            if (isOnDuty) {
+                // On Duty: all tabs accessible
+                enable(btnOnDuty);
+                enable(btnRefresh);
+                enable(btnSave);
+                enable(btnOffDuty);
+            } else {
+                // Off Duty: only On Duty tab usable
+                enable(btnOnDuty);
+                disable(btnRefresh);
+                disable(btnSave);
+                disable(btnOffDuty);
+                // Switch to On Duty tab if another tab is currently active
+                const activeTab = document.querySelector('.tab-content.active:not(#tab-onduty)');
+                if (activeTab) {
+                    btnOnDuty?.click();
+                }
+            }
+        }
+
         checkDutyState() {
             const steps = stateManager.state.dutySteps || {};
 
-            STEP_DEPENDENCIES.forEach(([prev, next]) => {
-                const btn = document.querySelector(`[data-target="${next}"]`);
-                if (steps[prev] && btn) {
-                    btn.disabled = false;
-                    btn.classList.remove('disabled');
+            // Determine status from bcStatus + dutyStartTime + steps
+            const isOnDuty = !!stateManager.get('dutyStartTime') ||
+                stateManager.get('bcStatus') === 'On duty' ||
+                (steps.od1 && steps.od2 && steps.od3 && steps.od4);
+            const offDutyDone = steps.off1 && steps.off2 && steps.off3 && steps.off4;
+
+            // Visually reflect step completion on copy buttons & blocks
+            ALL_DUTY_STEPS.forEach(step => {
+                const btn = document.querySelector(`.copy-btn[data-target="${step}"]`);
+                const block = btn?.closest('.copy-block');
+                if (steps[step]) {
+                    if (block) block.classList.add('step-done');
+                    if (btn) {
+                        btn.classList.add('step-done');
+                        const icon = btn.querySelector('.material-symbols-outlined');
+                        if (icon && !btn.classList.contains('bc-btn')) icon.textContent = 'check';
+                    }
+                } else {
+                    if (block) block.classList.remove('step-done');
+                    if (btn) {
+                        btn.classList.remove('step-done');
+                        const icon = btn.querySelector('.material-symbols-outlined');
+                        if (icon && !btn.classList.contains('bc-btn')) icon.textContent = 'content_copy';
+                    }
                 }
             });
 
-            const onDutyDone = steps.od1 && steps.od2 && steps.od3 && steps.od4;
-            const offDutyDone = steps.off1 && steps.off2 && steps.off3 && steps.off4;
+            // Within-tab step dependencies (e.g. od1 → od2 → od3 → od4)
+            STEP_DEPENDENCIES.forEach(([prev, next]) => {
+                const btn = document.querySelector(`[data-target="${next}"]`);
+                if (btn) {
+                    if (steps[prev] || isOnDuty) {
+                        btn.disabled = false;
+                        btn.classList.remove('disabled');
+                    }
+                }
+            });
 
-            // Step 4 Generator Unlock & Highlight
+            // Step 4 unlock (card highlight) – always available when on duty
             const cardOd4 = document.getElementById('card-od4');
-            const btnOd4 = document.getElementById('btn-od4');
-            if (steps.od3) {
+            const btnOd4  = document.getElementById('btn-od4');
+            const cardOff4 = document.getElementById('card-off4');
+            const btnOff4  = document.getElementById('btn-off4');
+
+            if (isOnDuty) {
                 if (cardOd4) cardOd4.classList.add('unlocked');
-                if (btnOd4) {
-                    btnOd4.disabled = false;
-                    btnOd4.classList.remove('disabled');
+                if (btnOd4)  { btnOd4.disabled = false; btnOd4.classList.remove('disabled'); }
+                if (steps.off3) {
+                    if (cardOff4) cardOff4.classList.add('unlocked');
+                    if (btnOff4)  { btnOff4.disabled = false; btnOff4.classList.remove('disabled'); }
                 }
             } else {
                 if (cardOd4) cardOd4.classList.remove('unlocked');
-                if (btnOd4) {
-                    btnOd4.disabled = true;
-                    btnOd4.classList.add('disabled');
-                }
+                if (btnOd4)  { btnOd4.disabled = true; btnOd4.classList.add('disabled'); }
+                if (cardOff4) cardOff4.classList.remove('unlocked');
+                if (btnOff4)  { btnOff4.disabled = true; btnOff4.classList.add('disabled'); }
             }
 
-            const cardOff4 = document.getElementById('card-off4');
-            const btnOff4 = document.getElementById('btn-off4');
-            if (steps.off3) {
-                if (cardOff4) cardOff4.classList.add('unlocked');
-                if (btnOff4) {
-                    btnOff4.disabled = false;
-                    btnOff4.classList.remove('disabled');
+            if (isOnDuty) {
+                stateManager.state.bcStatus = 'On duty';
+                ['od1', 'od2', 'od3', 'od4'].forEach(s => { steps[s] = true; });
+                stateManager.save();
+
+                this.updateDutyStatusUI(true);
+
+                // If rota timer not running, ensure setup view is shown instead of default view
+                if (!stateManager.get('dutyStartTime')) {
+                    const defV = document.getElementById('tb-default-view');
+                    const setV = document.getElementById('tb-setup-view');
+                    if (defV) defV.classList.add('hidden');
+                    if (setV) setV.classList.remove('hidden');
+                    const startBtn = document.getElementById('btn-rota-start');
+                    if (startBtn) startBtn.disabled = false;
                 }
             } else {
-                if (cardOff4) cardOff4.classList.remove('unlocked');
-                if (btnOff4) {
-                    btnOff4.disabled = true;
-                    btnOff4.classList.add('disabled');
-                }
-            }
-
-            const btnRefresh = document.getElementById('btn-tab-refresh');
-            const btnSave = document.getElementById('btn-tab-save');
-            const btnOffDuty = document.getElementById('btn-tab-offduty');
-            const btnOnDuty = document.getElementById('btn-tab-onduty');
-
-            if (onDutyDone) {
-                if (btnRefresh) { btnRefresh.disabled = false; btnRefresh.classList.remove('disabled'); }
-                if (btnSave) { btnSave.disabled = false; btnSave.classList.remove('disabled'); }
-                if (btnOffDuty) { btnOffDuty.disabled = false; btnOffDuty.classList.remove('disabled'); }
-
-                if (!offDutyDone && btnOnDuty) {
-                    btnOnDuty.disabled = true;
-                    btnOnDuty.classList.add('disabled');
-                }
+                this.updateDutyStatusUI(false);
             }
 
             if (offDutyDone) {
+                stateManager.state.bcStatus = 'Off duty';
                 ALL_DUTY_STEPS.forEach(step => { steps[step] = false; });
                 stateManager.set('rotaCap', 0);
                 stateManager.set('rotaDel', 0);
@@ -2079,22 +2231,25 @@
                 if (lrCap) lrCap.value = 0;
                 if (lrDel) lrDel.value = 0;
 
-                if (btnOnDuty) { btnOnDuty.disabled = false; btnOnDuty.classList.remove('disabled'); }
-                if (btnRefresh) { btnRefresh.disabled = true; btnRefresh.classList.add('disabled'); }
-                if (btnSave) { btnSave.disabled = true; btnSave.classList.add('disabled'); }
-                if (btnOffDuty) { btnOffDuty.disabled = true; btnOffDuty.classList.add('disabled'); }
-
-                STEP_DEPENDENCIES.forEach(([_, next]) => {
-                    const b = document.querySelector(`[data-target="${next}"]`);
-                    if (b) { b.disabled = true; b.classList.add('disabled'); }
+                // Clear all step-done visual styling
+                ALL_DUTY_STEPS.forEach(step => {
+                    const btn = document.querySelector(`.copy-btn[data-target="${step}"]`);
+                    const block = btn?.closest('.copy-block');
+                    if (block) block.classList.remove('step-done');
+                    if (btn) {
+                        btn.classList.remove('step-done');
+                        const icon = btn.querySelector('.material-symbols-outlined');
+                        if (icon && !btn.classList.contains('bc-btn')) icon.textContent = 'content_copy';
+                    }
                 });
 
                 if (cardOd4) cardOd4.classList.remove('unlocked');
-                if (btnOd4) { btnOd4.disabled = true; btnOd4.classList.add('disabled'); }
+                if (btnOd4)  { btnOd4.disabled = true; btnOd4.classList.add('disabled'); }
                 if (cardOff4) cardOff4.classList.remove('unlocked');
-                if (btnOff4) { btnOff4.disabled = true; btnOff4.classList.add('disabled'); }
+                if (btnOff4)  { btnOff4.disabled = true; btnOff4.classList.add('disabled'); }
 
-                btnOnDuty?.click();
+                this.updateDutyStatusUI(false);
+                document.getElementById('btn-tab-onduty')?.click();
             }
         }
 
@@ -2222,11 +2377,33 @@
                 this.updateNotesStats();
             }
 
-            if (stateManager.get('dutyStartTime')) {
+            const isTimerRunning = !!stateManager.get('dutyStartTime');
+            const isOnDuty = isTimerRunning || stateManager.get('bcStatus') === 'On duty' || (
+                stateManager.state.dutySteps?.od1 &&
+                stateManager.state.dutySteps?.od2 &&
+                stateManager.state.dutySteps?.od3 &&
+                stateManager.state.dutySteps?.od4
+            );
+
+            this.updateDutyStatusUI(isOnDuty);
+
+            if (isTimerRunning) {
                 document.getElementById('tb-default-view')?.classList.add('hidden');
                 document.getElementById('tb-setup-view')?.classList.add('hidden');
                 document.getElementById('tb-compact-view')?.classList.remove('hidden');
+                const locValEl = document.getElementById('compact-loc-val');
+                if (locValEl) locValEl.textContent = stateManager.get('rotaLocation') || 'PH Front';
                 timerEngine.startRotaTimer();
+            } else if (isOnDuty) {
+                document.getElementById('tb-default-view')?.classList.add('hidden');
+                document.getElementById('tb-compact-view')?.classList.add('hidden');
+                document.getElementById('tb-setup-view')?.classList.remove('hidden');
+                const startBtn = document.getElementById('btn-rota-start');
+                if (startBtn) startBtn.disabled = false;
+            } else {
+                document.getElementById('tb-setup-view')?.classList.add('hidden');
+                document.getElementById('tb-compact-view')?.classList.add('hidden');
+                document.getElementById('tb-default-view')?.classList.remove('hidden');
             }
         }
 

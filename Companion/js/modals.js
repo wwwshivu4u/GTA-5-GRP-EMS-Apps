@@ -15,16 +15,11 @@ export class ModalManager {
         this.overlay = document.getElementById('modalOverlay');
         if (!this.overlay) return;
 
-        this.overlay.addEventListener('click', (e) => {
-            if (e.target === this.overlay) {
-                this.closeAll();
-            }
-        });
-
+        // Clicking the backdrop does NOT close the modal — use the X button.
+        // Context-menu on overlay still suppressed to avoid confusion.
         document.addEventListener('contextmenu', (e) => {
             if (this.overlay && this.overlay.classList.contains('active')) {
                 e.preventDefault();
-                this.closeAll();
             }
         });
 
@@ -48,11 +43,6 @@ export class ModalManager {
                 const targetContent = document.getElementById(tabId);
                 if (targetContent) targetContent.classList.add('active');
             });
-        });
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.overlay && this.overlay.classList.contains('active')) {
-                this.closeAll();
-            }
         });
     }
 
