@@ -972,6 +972,15 @@
             if (modalId === 'modal-discord-bodycam') {
                 const bcStatus = document.getElementById('bc-status');
                 if (bcStatus) bcStatus.value = stateManager.state.bcStatus || 'On duty';
+            } else if (modalId === 'modal-bodycam') {
+                if (window.app && window.app.updateTabsForDutyStatus) {
+                    const steps = stateManager.state.dutySteps || {};
+                    const isOnDuty = !!stateManager.get('dutyStartTime') ||
+                        stateManager.get('bcStatus') === 'On duty' ||
+                        (steps.od1 && steps.od2 && steps.od3 && steps.od4);
+                    
+                    window.app.updateTabsForDutyStatus(isOnDuty);
+                }
             }
         }
 
@@ -2158,22 +2167,30 @@
 
             const enable  = (btn) => { if (btn) { btn.disabled = false; btn.classList.remove('disabled'); } };
             const disable = (btn) => { if (btn) { btn.disabled = true;  btn.classList.add('disabled');    } };
+            const show = (btn) => { if (btn) { btn.style.display = ''; } };
+            const hide = (btn) => { if (btn) { btn.style.display = 'none'; } };
 
             if (isOnDuty) {
-                // On Duty: all tabs accessible
-                enable(btnOnDuty);
+                // On Duty: all tabs accessible except On Duty
+                disable(btnOnDuty);
                 enable(btnRefresh);
                 enable(btnSave);
                 enable(btnOffDuty);
+                
+                // If on duty tab is currently selected, switch to refresh
+                if (btnOnDuty && btnOnDuty.classList.contains('active')) {
+                    btnRefresh?.click();
+                }
             } else {
                 // Off Duty: only On Duty tab usable
+                show(btnOnDuty);
                 enable(btnOnDuty);
                 disable(btnRefresh);
                 disable(btnSave);
                 disable(btnOffDuty);
                 // Switch to On Duty tab if another tab is currently active
                 const activeTab = document.querySelector('.tab-content.active:not(#tab-onduty)');
-                if (activeTab) {
+                if (activeTab || (btnOnDuty && !btnOnDuty.classList.contains('active'))) {
                     btnOnDuty?.click();
                 }
             }
