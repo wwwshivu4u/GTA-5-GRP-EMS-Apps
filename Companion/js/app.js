@@ -479,11 +479,11 @@
 
                 const od4Content = document.getElementById('od4');
                 if (od4Content && !od4Content.dataset.customEdited && document.activeElement !== od4Content) {
-                    od4Content.innerText = `On duty : ${edinH}:${edinM}`;
+                    od4Content.textContent = `On duty : ${edinH}:${edinM}`;
                 }
                 const off4Content = document.getElementById('off4');
                 if (off4Content && !off4Content.dataset.customEdited && document.activeElement !== off4Content) {
-                    off4Content.innerText = `Off duty : ${edinH}:${edinM}`;
+                    off4Content.textContent = `Off duty : ${edinH}:${edinM}`;
                 }
 
                 const lrLiveDateEl = document.getElementById('lr-live-date');
@@ -819,8 +819,7 @@
                 position: fixed;
                 inset: 0;
                 z-index: 99998;
-                background: rgba(0,0,0,0.6);
-                backdrop-filter: blur(8px);
+                background: rgba(0,0,0,0.85);
                 display: flex;
                 align-items: center;
                 justify-content: center;
