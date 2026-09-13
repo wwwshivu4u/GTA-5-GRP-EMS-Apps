@@ -372,7 +372,7 @@ export class TimerEngine {
         const onM = String(onTime.getMinutes()).padStart(2, '0');
 
         const loc = state.rotaLocation || 'PH Front';
-        const template = `On duty ${loc} : ${onH}:${onM}\nOff duty ${loc} : ${offH}:${offM}`;
+        const template = `On duty ${loc}: ${onH}:${onM}\nOff duty ${loc}: ${offH}:${offM}`;
 
         const timerSeconds = Math.floor((now.getTime() - state.dutyStartTime) / 1000);
         const hoursCompleted = Math.floor(timerSeconds / 3600);
