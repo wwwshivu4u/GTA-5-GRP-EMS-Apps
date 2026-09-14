@@ -11,13 +11,13 @@
     "radiocodes": "1035903894552850452",
     "replacementlogs": "1035903893772710037"
   },
-  "name": "Thakur Sergey",
+  "name": "Mavi Gokyuzu",
   "id": "177919",
   "dutySteps": {
-    "od1": true,
-    "od2": true,
-    "od3": true,
-    "od4": true,
+    "od1": false,
+    "od2": false,
+    "od3": false,
+    "od4": false,
     "ref1": false,
     "ref2": false,
     "sav1": false,
@@ -51,7 +51,7 @@
   "rotaDel": 0,
   "customCommands": {
     "off1": "/me Switches off the bodycam and checks for the Green Light\n",
-    "rc107a": "10-7 {LOC} need replacement in 10 minute",
+    "rc107a": "10-7 {LOC} need replacement in 10 mins",
     "rc107b": "10-7 {LOC} replaced by [Replacement Name]",
     "hs-bc-on": "/me Takes out Bodycam and attaches Bodycam to chest and checks its ballistic, water proof\n\n/me Makes sure it is recording and checks for the red light\n\n/do It is recording, and its ballistic, water proof ",
     "sg-end-rc-timer": "10-7 [Location] need replacement in 10 minute",
@@ -75,7 +75,6 @@
     "cmd-bank-1": "EMS To ALL: Doctors are loading adrenaline and preparing for the Bank! See you there!",
     "cmd-bank-2": "EMS To ALL: Doctors have arrived at the situation. Come to the EMS vehicle for adrenaline shots!!",
     "cmd-bank-3": "EMS To ALL: Good luck at the BANK! Stay safe and watch your backs. EMS out!",
-    "cmd-bank-4": "...",
     "cmd-subs-1": "EMS To ALL: Doctors are loading adrenaline and preparing for the SUBS! See you there!",
     "cmd-subs-2": "EMS To ALL: Doctors have arrived at the situation. Come to the EMS vehicle for adrenaline shots!!",
     "cmd-subs-3": "EMS To ALL: Good luck at the SUBS! Stay safe and watch your backs! EMS out!",
@@ -105,7 +104,7 @@
     "hs-rc-105": "10-5 {LOC} replacing [Replacement Name]",
     "hs-rc-107a": "10-7 {LOC} need replacement in 10 minute",
     "hs-rc-107b": "10-7 {LOC} replaced by [Replacement Name]",
-    "hs-rc-109": "Thanks for the quick response! EMP on TOP!",
+    "hs-rc-109": "Thanks for the quick response! EMS on TOP!",
     "gs-rc-vest": "Any HC available, I need a vest for GS Calls?",
     "gs-rp-arr": "Hello sir! I am from EMS, I am going to patch you up. Don't worry you will be fine.",
     "hs-rc-codea": "Code A at {LOC} flying back/cannot fly back @Employee @HighCommand",
@@ -121,7 +120,7 @@
     "sav2": "/do It is recording, and its ballistic, water proof",
     "rc109": "Need 10-9 {LOC} for 10 minutes",
     "rc108b": "10-8 {LOC} back from 10-9",
-    "rc105": "10-5 {LOC} replacing {REP}",
+    "rc105": "10-5 {LOC} replacing [Replacement Name]",
     "sw2_1": "Dear Citizens of Los Santos, this is Kuro Vukovic Chief of EMS",
     "sw2_2": "We are still live with open EMS recruitment and time is ticking",
     "sw2_3": "If you have the will to help and a heart that beats for others then come to PH Front now",
@@ -143,8 +142,10 @@
     "cmd-databreach-2": "EMS To ALL: EMS is here! Please come near the EMS Vehicle to get medical attention.",
     "cmd-databreach-3": "EMS To ALL: Be safe and watch your backs at the Spec Ops! EMS out.",
     "hs-rc-empty": "10-7 {LOC} no replacement found after 30 minutes, lobby is now empty",
-    "od4": "On duty : 15:57",
-    "off4": "Off duty : 13:40"
+    "od4": "On duty : 01:24",
+    "off4": "Off duty : 03:07",
+    "custom-cmd-1789289640616": "EMS To ALL: Doctors have arrived at the situation. Come to the EMS vehicle for adrenaline shots!!",
+    "cmd-bank-4": "EMS To ALL: Wishing you all the best in securing and safeguarding the Bank! Stay safe out there."
   },
   "userAddedCommands": [
     {
@@ -192,6 +193,12 @@
       "id": "custom-cmd-1786990553529854",
       "template": "EMS to FIB: Please drop a 911 call for Spec Ops!",
       "title": "Spec Ops"
+    },
+    {
+      "secIndex": "dept-tab-broadcasts",
+      "id": "custom-cmd-1789289640616",
+      "title": "Custom Command",
+      "template": "EMS To ALL: Doctors have arrived at the situation. Come to the EMS vehicle for adrenaline shots!!"
     }
   ],
   "userDefaults": {
@@ -220,7 +227,6 @@
     "cmd-bank-1": "EMS To ALL: Doctors are loading adrenaline and preparing for the Bank! See you there!",
     "cmd-bank-2": "EMS To ALL: Doctors have arrived at the situation. Come to the EMS vehicle for adrenaline shots!!",
     "cmd-bank-3": "EMS To ALL: Good luck at the BANK! Stay safe and watch your backs. EMS out!",
-    "cmd-bank-4": "...",
     "cmd-subs-1": "EMS To ALL: Doctors are loading adrenaline and preparing for the SUBS! See you there!",
     "cmd-subs-2": "EMS To ALL: Doctors have arrived at the situation. Come to the EMS vehicle for adrenaline shots!!",
     "cmd-subs-3": "EMS To ALL: Good luck at the SUBS! Stay safe and watch your backs! EMS out!",
@@ -288,8 +294,9 @@
     "cmd-databreach-2": "EMS To ALL: EMS is here! Please come near the EMS Vehicle to get medical attention.",
     "cmd-databreach-3": "EMS To ALL: Be safe and watch your backs at the Spec Ops! EMS out.",
     "hs-rc-empty": "10-7 {LOC} no replacement found after 30 minutes, lobby is now empty",
-    "od4": "On duty : 15:57",
-    "off4": "Off duty : 13:40"
+    "od4": "On duty : 22:06",
+    "off4": "Off duty : 21:58",
+    "custom-cmd-1789289640616": "EMS To ALL: Doctors have arrived at the situation. Come to the EMS vehicle for adrenaline shots!!"
   },
   "deletedCommands": [
     "cmd-bank-4"
@@ -324,7 +331,9 @@
     "cmd-emergency-3": "Hostage",
     "cmd-emergency-2": "Gun Store",
     "cmd-emergency-1": "Store",
-    "hs-rc-109": "Thanks for quick response"
+    "hs-rc-109": "Thanks for quick response",
+    "rc1020": "10-20 (Specify Location)",
+    "custom-cmd-1789289640616": "After arriving\n"
   },
   "lastProfileVerifyDate": null,
   "selectedSubDept": "HS",
@@ -340,16 +349,17 @@
     "labMedicine": 10000
   },
   "showBootScreen": false,
-  "bcStatus": "On duty",
+  "bcStatus": "Off duty",
   "discordToggles": {
     "cb-generic-1": false,
-    "cb-generic-2": true,
+    "cb-generic-2": false,
     "cb-bodycam": false,
     "cb-generic-3": true,
-    "cb-od4": false,
-    "cb-off4": false
+    "cb-od4": true,
+    "cb-off4": false,
+    "cb-generic-7": true
   },
-  "quickNotes": "// Short Radios\nyou are healthy\ncan you repeat?\nI am covering temporarily\n\n// Long Radios\nAny inactive units including high commands will be demoted or fired!\nPlease be active, cover lobbies, go on calls, go to Labs, take replacements proactively!\nWhen in city, Be on duty for one hour at least and always respond to radio calls by HC.\nThank you for the quickest response! EMS on TOP!\n\nbuying mikachu hoodie for men in yellow\n\nPrince Fardin\n+Professionalism, +Proactiveness, +Resourceful ()\n\nNauman Scar\n+Professionalism, +Proactiveness, +\n\nAhmed Montana\n+Professionalism, +Proactiveness, +\n\n",
+  "quickNotes": "selling 12 grand pro bodycams 3k each\nselling 12 grand pro bodycams at 4k each\nselling 5 grand tickets for 2.1M\n- beach 5% 2.1M\n- otherwise 10% 2.2M\n\n\n\n// Short Radios\nyou are healthy\ncan you repeat?\nI am covering temporarily\n\n// Long Radios\nAny inactive units including high commands will be demoted or fired!\nPlease be active, cover lobbies, go on calls, go to Labs, take replacements proactively!\nWhen in city, Be on duty for one hour at least and always respond to radio calls by HC.\nThank you for the quickest response! EMS on TOP!\n\n\nlos santos map\n\n--Praise--\n14/09/2026\n\nNames:\nIntern Rasik 161240\n\nReason:\nGood activity\nalways available for duty when in city\n\n\n--leader meetings notes--\n1. punctuality issue from all orgs\n2. LSPD flow is sus\n3. not equals treatment by LSPD\n4. \n\n",
   "tasks": [],
   "taskStates": {},
   "enableDailyTasks": true,

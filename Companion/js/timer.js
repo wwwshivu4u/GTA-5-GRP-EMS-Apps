@@ -60,11 +60,11 @@ export class TimerEngine {
 
             const od4Content = document.getElementById('od4');
             if (od4Content && !od4Content.dataset.customEdited && document.activeElement !== od4Content) {
-                od4Content.innerText = `On duty : ${edinH}:${edinM}`;
+                od4Content.innerText = `On duty: ${edinH}:${edinM}`;
             }
             const off4Content = document.getElementById('off4');
             if (off4Content && !off4Content.dataset.customEdited && document.activeElement !== off4Content) {
-                off4Content.innerText = `Off duty : ${edinH}:${edinM}`;
+                off4Content.innerText = `Off duty: ${edinH}:${edinM}`;
             }
 
             // Labtech Rota Live Date
@@ -371,8 +371,9 @@ export class TimerEngine {
         const onH = String(onTime.getHours()).padStart(2, '0');
         const onM = String(onTime.getMinutes()).padStart(2, '0');
 
-        const loc = state.rotaLocation || 'PH Front';
-        const template = `On duty ${loc}: ${onH}:${onM}\nOff duty ${loc}: ${offH}:${offM}`;
+        const loc = (state.rotaLocation || 'PH Front').trim();
+        const locStr = loc ? ` ${loc}` : '';
+        const template = `On duty${locStr}: ${onH}:${onM}\nOff duty${locStr}: ${offH}:${offM}`;
 
         const timerSeconds = Math.floor((now.getTime() - state.dutyStartTime) / 1000);
         const hoursCompleted = Math.floor(timerSeconds / 3600);

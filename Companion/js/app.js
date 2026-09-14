@@ -259,17 +259,46 @@
             return result;
         }
 
-        exportDb() {
-            const dataStr = JSON.stringify(this.state, null, 2);
+        exportDb(customFileName = '') {
+            const now = new Date();
+            const dateStr = now.toISOString().slice(0, 10);
+            const rawName = (this.state.employeeName || this.state.name || '').trim();
+            const cleanName = rawName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
+            
+            let finalFileName = '';
+            if (customFileName && customFileName.trim()) {
+                finalFileName = customFileName.trim().replace(/[^a-zA-Z0-9_\-\.]/g, '_');
+                if (!finalFileName.toLowerCase().endsWith('.txt')) {
+                    finalFileName += '.txt';
+                }
+            } else {
+                finalFileName = cleanName ? `EMS_Config_${cleanName}_${dateStr}.txt` : `EMS_Companion_Config_${dateStr}.txt`;
+            }
+
+            const customCount = Object.keys(this.state.customCommands || {}).length;
+            const payload = {
+                _exportMeta: {
+                    appName: 'EMS Companion',
+                    version: '2.1',
+                    exportedAt: now.toISOString(),
+                    authorName: rawName || 'Anonymous',
+                    authorId: (this.state.employeeId || this.state.id || ''),
+                    customCommandsCount: customCount
+                },
+                ...this.state
+            };
+
+            const dataStr = JSON.stringify(payload, null, 2);
             const blob = new Blob([dataStr], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `EMS_Companion_Backup_${new Date().toISOString().slice(0, 10)}.txt`;
+            a.download = finalFileName;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            return finalFileName;
         }
 
         importDb(file, onSuccess, onError) {
@@ -277,6 +306,15 @@
             reader.onload = (e) => {
                 try {
                     const imported = JSON.parse(e.target.result);
+                    if (!imported || typeof imported !== 'object') {
+                        throw new Error('Invalid JSON structure');
+                    }
+
+                    const hasCommands = imported.customCommands || imported.deptCommands || imported._exportMeta || imported.discordChannels;
+                    if (!hasCommands) {
+                        throw new Error('File does not appear to be an EMS Companion config or backup file.');
+                    }
+
                     this.state = {
                         ...this.getDefaultState(),
                         ...imported,
@@ -289,8 +327,9 @@
                             ...(imported.shiftRates || {})
                         }
                     };
+                    delete this.state._exportMeta;
                     this.save();
-                    if (onSuccess) onSuccess();
+                    if (onSuccess) onSuccess(imported);
                 } catch (err) {
                     console.error('Import error:', err);
                     if (onError) onError(err);
@@ -299,7 +338,7 @@
             reader.readAsText(file);
         }
 
-        resetDefaults() {
+        resetToFactoryDefaults() {
             this.state.customCommands = {};
             this.state.userAddedCommands = [];
             this.state.userDefaults = {};
@@ -308,9 +347,19 @@
             this.save();
         }
 
-        saveCurrentAsDefault() {
-            this.state.userDefaults = { ...this.state.customCommands };
+        resetToSavedDefaults() {
+            if (!this.state.userDefaults || Object.keys(this.state.userDefaults).length === 0) {
+                return false;
+            }
+            this.state.customCommands = { ...this.state.userDefaults };
             this.save();
+            return true;
+        }
+
+        saveCurrentAsDefault() {
+            this.state.userDefaults = { ...(this.state.customCommands || {}) };
+            this.save();
+            return Object.keys(this.state.userDefaults).length;
         }
     }
 
@@ -320,7 +369,7 @@
     // 4. DISCORD SERVICE
     // -----------------------------------------------------
     class DiscordService {
-        static openChannel(serverId, channelId) {
+        static openChannel(serverId, channelId, target = 'app') {
             if (!serverId || !channelId) {
                 alert('Discord Server ID or Channel ID is missing in Settings!');
                 return;
@@ -329,15 +378,12 @@
             const appUrl = `discord://-/channels/${serverId}/${channelId}`;
             const webUrl = `https://discord.com/channels/${serverId}/${channelId}`;
 
-            const startTime = Date.now();
-            window.location.href = appUrl;
-
-            setTimeout(() => {
-                const endTime = Date.now();
-                if (!document.hidden && endTime - startTime < 700) {
-                    window.open(webUrl, '_blank');
-                }
-            }, 500);
+            if (target === 'browser') {
+                window.open(webUrl, '_blank');
+            } else {
+                // Open exclusively in Discord Desktop client
+                window.location.href = appUrl;
+            }
         }
 
         static testChannel(channelKey) {
@@ -350,7 +396,7 @@
                 return;
             }
 
-            this.openChannel(serverId, channelId);
+            this.openChannel(serverId, channelId, 'app');
         }
 
         static async executeAction(key, textToCopy = '', skipRedirect = false) {
@@ -373,7 +419,7 @@
             }
 
             if (!skipRedirect) {
-                this.openChannel(serverId, channelId);
+                this.openChannel(serverId, channelId, 'app');
             }
         }
 
@@ -391,7 +437,7 @@
 
             if (type === 'bodycam') {
                 const status = document.getElementById('bc-status')?.value || state.bcStatus || 'On duty';
-                text = `${status} : ${edinH}:${edinM}`;
+                text = `${status}: ${edinH}:${edinM}`;
             } else if (type === 'codea') {
                 const loc = document.getElementById('ca-loc')?.value || '[Location]';
                 const status = document.getElementById('ca-status')?.value || 'flying back';
@@ -479,11 +525,11 @@
 
                 const od4Content = document.getElementById('od4');
                 if (od4Content && !od4Content.dataset.customEdited && document.activeElement !== od4Content) {
-                    od4Content.textContent = `On duty : ${edinH}:${edinM}`;
+                    od4Content.textContent = `On duty: ${edinH}:${edinM}`;
                 }
                 const off4Content = document.getElementById('off4');
                 if (off4Content && !off4Content.dataset.customEdited && document.activeElement !== off4Content) {
-                    off4Content.textContent = `Off duty : ${edinH}:${edinM}`;
+                    off4Content.textContent = `Off duty: ${edinH}:${edinM}`;
                 }
 
                 const lrLiveDateEl = document.getElementById('lr-live-date');
@@ -787,8 +833,9 @@
             const onH = String(onTime.getHours()).padStart(2, '0');
             const onM = String(onTime.getMinutes()).padStart(2, '0');
 
-            const loc = state.rotaLocation || 'PH Front';
-            const template = `On duty ${loc} : ${onH}:${onM}\nOff duty ${loc} : ${offH}:${offM}`;
+            const loc = (state.rotaLocation || 'PH Front').trim();
+            const locStr = loc ? ` ${loc}` : '';
+            const template = `On duty${locStr}: ${onH}:${onM}\nOff duty${locStr}: ${offH}:${offM}`;
 
             const timerSeconds = Math.floor((now.getTime() - state.dutyStartTime) / 1000);
             const hoursCompleted = Math.floor(timerSeconds / 3600);
@@ -1556,21 +1603,43 @@
                 alert('Settings Saved Successfully!');
             };
 
-            window.exportDb = () => stateManager.exportDb();
+            window.exportDb = () => {
+                const input = document.getElementById('export-filename-input');
+                const customName = input?.value?.trim() || '';
+                const savedFile = stateManager.exportDb(customName);
+                sound.playSuccessSound?.() || sound.playCopySound();
+                this.showHelpToast?.(`Exported configuration as ${savedFile}`) || alert(`Exported configuration as ${savedFile}`);
+            };
 
-            window.resetToDefaultCommands = () => {
-                if (confirm('Are you sure you want to reset all commands to defaults?')) {
-                    stateManager.resetDefaults();
+            window.saveCurrentAsDefault = () => {
+                const count = stateManager.saveCurrentAsDefault();
+                this.updateConfigUI();
+                sound.playSuccessSound?.() || sound.playCopySound();
+                alert(`Saved! Current configuration with ${count} command templates is now set as your personal default baseline.`);
+            };
+
+            window.resetToSavedDefaults = () => {
+                const count = Object.keys(stateManager.state.userDefaults || {}).length;
+                if (count === 0) {
+                    alert('No saved baseline found. Click "Save Current as My Default Baseline" first to create one.');
+                    return;
+                }
+                if (confirm(`Restore all commands to your saved default baseline (${count} command templates)?`)) {
+                    stateManager.resetToSavedDefaults();
+                    sound.playSuccessSound?.() || sound.playCopySound();
                     location.reload();
                 }
             };
 
-            window.saveCurrentAsDefault = () => {
-                if (confirm('Set current text of all commands as the new default?')) {
-                    stateManager.saveCurrentAsDefault();
-                    alert('Current text set as new defaults!');
+            window.resetToFactoryDefaults = () => {
+                if (confirm('Warning: Are you sure you want to reset all commands and custom templates to factory original defaults? This will erase all custom edits.')) {
+                    stateManager.resetToFactoryDefaults();
+                    sound.playSuccessSound?.() || sound.playCopySound();
+                    location.reload();
                 }
             };
+
+            window.resetToDefaultCommands = () => window.resetToFactoryDefaults();
 
             window.switchDeptTab = (tabId) => DeptCommandsService.switchDeptTab(tabId);
             window.filterDeptCommands = () => DeptCommandsService.filterCommands();
@@ -1647,6 +1716,10 @@
                 nameInput.addEventListener('input', () => {
                     this.updatePreviews();
                     window.showFloatingSaveBtn();
+                    const fnInput = document.getElementById('export-filename-input');
+                    if (fnInput && !fnInput.dataset.customEdited) {
+                        this.generateDefaultConfigName();
+                    }
                 });
             }
             if (idInput) {
@@ -1726,12 +1799,38 @@
                 importInput.addEventListener('change', (e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                        stateManager.importDb(file, () => {
-                            alert('Backup database imported successfully!');
-                            location.reload();
-                        }, () => {
-                            alert('Invalid db.txt file format.');
-                        });
+                        const reader = new FileReader();
+                        reader.onload = (re) => {
+                            try {
+                                const imported = JSON.parse(re.target.result);
+                                const author = imported._exportMeta?.authorName || imported.name || imported.employeeName || 'Unknown / Colleague';
+                                const exportDate = imported._exportMeta?.exportedAt ? new Date(imported._exportMeta.exportedAt).toLocaleDateString() : 'N/A';
+                                const customCount = Object.keys(imported.customCommands || {}).length;
+                                const hasChannels = !!imported.discordChannels;
+
+                                const confirmMsg = `EMS Configuration Detected:\n` +
+                                    `• Author: ${author}\n` +
+                                    `• Exported: ${exportDate}\n` +
+                                    `• Custom Commands: ${customCount}\n` +
+                                    `• Discord Channels: ${hasChannels ? 'Configured' : 'Default'}\n\n` +
+                                    `Do you want to apply this configuration to your Companion?`;
+
+                                if (confirm(confirmMsg)) {
+                                    stateManager.importDb(file, () => {
+                                        sound.playSuccessSound?.() || sound.playCopySound();
+                                        alert('Configuration imported successfully!');
+                                        location.reload();
+                                    }, (err) => {
+                                        alert('Error importing configuration: ' + (err.message || 'Invalid file format'));
+                                    });
+                                }
+                            } catch (err) {
+                                alert('Invalid file format: Please provide a valid EMS Companion .txt configuration file.');
+                            } finally {
+                                importInput.value = '';
+                            }
+                        };
+                        reader.readAsText(file);
                     }
                 });
             }
@@ -1784,6 +1883,7 @@
 
             this.setupCopyBlocks();
             this.updatePreviews();
+            this.initDataCommandsUI();
         }
 
         setupCopyBlocks() {
@@ -1890,25 +1990,48 @@
         }
 
         initStep4Toggles() {
-            const setupToggle = (cbId, btnId) => {
+            const setupToggle = (cbId, btnId, badgeId, labelId) => {
                 const cb = document.getElementById(cbId);
                 const btn = document.getElementById(btnId);
+                const badge = document.getElementById(badgeId);
+                const label = document.getElementById(labelId);
                 if (!cb || !btn) return;
 
-                const updateLabel = () => {
-                    if (btn.classList.contains('success')) return;
-                    const isMails = cb.checked;
-                    const icon = isMails ? 'mail' : 'content_copy';
-                    const text = isMails ? 'Copy & Open Mails' : 'Copy';
-                    btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:0.95rem; margin-right:3px;">${icon}</span> <span class="btn-label">${text}</span>`;
+                if (stateManager.state.discordToggles?.[cbId] !== undefined) {
+                    cb.checked = stateManager.state.discordToggles[cbId];
+                }
+
+                const updateGuide = () => {
+                    const isOpenInApp = cb.checked;
+                    if (badge) {
+                        badge.className = `discord-target-badge ${isOpenInApp ? 'target-app' : 'target-browser'}`;
+                        badge.innerHTML = isOpenInApp 
+                            ? `<span class="material-symbols-outlined" style="font-size:0.8rem;">devices</span> App`
+                            : `<span class="material-symbols-outlined" style="font-size:0.8rem;">language</span> Browser`;
+                    }
+                    if (label) {
+                        label.title = isOpenInApp 
+                            ? 'Destination: Discord Desktop App (Toggle to switch to Web Browser)' 
+                            : 'Destination: Web Browser (Toggle to switch to Discord App)';
+                    }
+                    if (btn && !btn.classList.contains('success')) {
+                        const icon = isOpenInApp ? 'open_in_new' : 'open_in_browser';
+                        const text = isOpenInApp ? 'Copy & Open App' : 'Copy & Open Browser';
+                        btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:0.95rem; margin-right:3px;">${icon}</span> <span class="btn-label">${text}</span>`;
+                    }
                 };
 
-                cb.addEventListener('change', updateLabel);
-                updateLabel();
+                cb.addEventListener('change', () => {
+                    if (!stateManager.state.discordToggles) stateManager.state.discordToggles = {};
+                    stateManager.state.discordToggles[cbId] = cb.checked;
+                    stateManager.save();
+                    updateGuide();
+                });
+                updateGuide();
             };
 
-            setupToggle('cb-od4', 'btn-od4');
-            setupToggle('cb-off4', 'btn-off4');
+            setupToggle('cb-od4', 'btn-od4', 'badge-od4', 'toggle-label-od4');
+            setupToggle('cb-off4', 'btn-off4', 'badge-off4', 'toggle-label-off4');
         }
 
         showHelpToast(msg) {
@@ -1961,7 +2084,7 @@
                     const [_, timePart] = icStr.split(', ');
                     let [h, m] = timePart.split(':');
                     if (h === '24') h = '00';
-                    targetEl.innerText = `${targetId === 'od4' ? 'On duty' : 'Off duty'} : ${h}:${m}`;
+                    targetEl.innerText = `${targetId === 'od4' ? 'On duty' : 'Off duty'}: ${h}:${m}`;
                 }
 
                 const textToCopy = targetEl.innerText;
@@ -1970,6 +2093,7 @@
                 stateManager.state.customCommands[targetId] = newTemplate;
                 targetEl.dataset.template = newTemplate;
                 stateManager.save();
+                this.updateConfigUI?.();
 
                 try {
                     await navigator.clipboard.writeText(textToCopy);
@@ -1977,19 +2101,20 @@
 
                     const isStep4 = (targetId === 'od4' || targetId === 'off4');
                     const cb = isStep4 ? document.getElementById(targetId === 'od4' ? 'cb-od4' : 'cb-off4') : null;
-                    const isMails = cb ? cb.checked : false;
+                    const isOpenInApp = cb ? cb.checked : true;
 
                     const originalHTML = btn.innerHTML;
                     if (isStep4) {
-                        btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:0.95rem; margin-right:3px;">check</span> <span class="btn-label">${isMails ? 'Copied & Opened!' : 'Copied!'}</span>`;
+                        const openText = isOpenInApp ? 'Copied & Opening App...' : 'Copied & Opening Browser...';
+                        btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:0.95rem; margin-right:3px;">check</span> <span class="btn-label">${openText}</span>`;
                     } else {
                         btn.innerHTML = `${originalHTML} copied!`;
                     }
                     btn.classList.add('success');
                     setTimeout(() => {
                         if (isStep4) {
-                            const icon = cb && cb.checked ? 'mail' : 'content_copy';
-                            const text = cb && cb.checked ? 'Copy & Open Mails' : 'Copy';
+                            const icon = cb && cb.checked ? 'open_in_new' : 'open_in_browser';
+                            const text = cb && cb.checked ? 'Copy & Open App' : 'Copy & Open Browser';
                             btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:0.95rem; margin-right:3px;">${icon}</span> <span class="btn-label">${text}</span>`;
                         } else {
                             btn.innerHTML = originalHTML;
@@ -2033,11 +2158,17 @@
 
                     const discordKey = btn.getAttribute('data-discord-key');
                     if (discordKey) {
-                        const block = btn.closest('.copy-block') || btn.parentElement;
-                        const cbToggle = block.querySelector('input[type="checkbox"]') || (isStep4 ? cb : null);
-                        const shouldOpen = cbToggle ? cbToggle.checked : true;
-                        if (shouldOpen) {
-                            DiscordService.openChannel(stateManager.state.discordServerId, stateManager.state.discordChannels[discordKey]);
+                        if (isStep4) {
+                            // Toggle limits and guides where channel opens: ON = Discord App, OFF = Web Browser (never both)
+                            const targetMode = (cb && cb.checked) ? 'app' : 'browser';
+                            DiscordService.openChannel(stateManager.state.discordServerId, stateManager.state.discordChannels[discordKey], targetMode);
+                        } else {
+                            const block = btn.closest('.copy-block') || btn.parentElement;
+                            const cbToggle = block.querySelector('input[type="checkbox"]');
+                            const shouldOpen = cbToggle ? cbToggle.checked : true;
+                            if (shouldOpen) {
+                                DiscordService.openChannel(stateManager.state.discordServerId, stateManager.state.discordChannels[discordKey], 'app');
+                            }
                         }
                     }
 
@@ -2117,6 +2248,7 @@
                         stateManager.state.deletedCommands.push(targetId);
                     }
                     stateManager.save();
+                    this.updateConfigUI?.();
 
                     const block = document.getElementById(targetId)?.closest('.copy-block');
                     if (block) block.remove();
@@ -2164,35 +2296,19 @@
             const btnSave    = document.getElementById('btn-tab-save');
             const btnOffDuty = document.getElementById('btn-tab-offduty');
 
-            const enable  = (btn) => { if (btn) { btn.disabled = false; btn.classList.remove('disabled'); } };
-            const disable = (btn) => { if (btn) { btn.disabled = true;  btn.classList.add('disabled');    } };
-            const show = (btn) => { if (btn) { btn.style.display = ''; } };
-            const hide = (btn) => { if (btn) { btn.style.display = 'none'; } };
+            const enable = (btn) => {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.classList.remove('disabled');
+                    btn.style.display = '';
+                }
+            };
 
-            if (isOnDuty) {
-                // On Duty: all tabs accessible except On Duty
-                disable(btnOnDuty);
-                enable(btnRefresh);
-                enable(btnSave);
-                enable(btnOffDuty);
-                
-                // If on duty tab is currently selected, switch to refresh
-                if (btnOnDuty && btnOnDuty.classList.contains('active')) {
-                    btnRefresh?.click();
-                }
-            } else {
-                // Off Duty: only On Duty tab usable
-                show(btnOnDuty);
-                enable(btnOnDuty);
-                disable(btnRefresh);
-                disable(btnSave);
-                disable(btnOffDuty);
-                // Switch to On Duty tab if another tab is currently active
-                const activeTab = document.querySelector('.tab-content.active:not(#tab-onduty)');
-                if (activeTab || (btnOnDuty && !btnOnDuty.classList.contains('active'))) {
-                    btnOnDuty?.click();
-                }
-            }
+            // All tabs (on duty, off duty, refresh and save tabs) in the bodycam section should be enabled always
+            enable(btnOnDuty);
+            enable(btnRefresh);
+            enable(btnSave);
+            enable(btnOffDuty);
         }
 
         checkDutyState() {
@@ -2362,6 +2478,74 @@
                 const { loc } = stateManager.getTemplateVars();
                 caLoc.value = loc !== '[Location]' ? loc : '';
             }
+
+            this.updateConfigUI?.();
+        }
+
+        generateDefaultConfigName() {
+            const rawName = (stateManager.get('name') || stateManager.get('employeeName') || '').trim();
+            const cleanName = rawName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
+            const dateStr = new Date().toISOString().slice(0, 10);
+            const defaultName = cleanName ? `EMS_Config_${cleanName}_${dateStr}` : `EMS_Companion_Config_${dateStr}`;
+            const input = document.getElementById('export-filename-input');
+            if (input) {
+                delete input.dataset.customEdited;
+                input.value = defaultName;
+            }
+            this.updateConfigPreview();
+        }
+
+        updateConfigPreview() {
+            const input = document.getElementById('export-filename-input');
+            const preview = document.getElementById('export-filename-preview');
+            if (preview) {
+                let val = (input?.value || '').trim();
+                if (!val) {
+                    const rawName = (stateManager.get('name') || stateManager.get('employeeName') || '').trim();
+                    const cleanName = rawName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
+                    const dateStr = new Date().toISOString().slice(0, 10);
+                    val = cleanName ? `EMS_Config_${cleanName}_${dateStr}` : `EMS_Companion_Config_${dateStr}`;
+                }
+                const safeName = val.replace(/[^a-zA-Z0-9_\-\.]/g, '_');
+                preview.textContent = safeName.endsWith('.txt') ? safeName : safeName + '.txt';
+            }
+        }
+
+        updateConfigUI() {
+            const countBadge = document.getElementById('config-custom-count-badge');
+            if (countBadge) {
+                const count = Object.keys(stateManager.state.customCommands || {}).length;
+                countBadge.textContent = `${count} Custom Command${count === 1 ? '' : 's'}`;
+            }
+
+            const baselineBadge = document.getElementById('user-defaults-status-badge');
+            if (baselineBadge) {
+                const defCount = Object.keys(stateManager.state.userDefaults || {}).length;
+                if (defCount > 0) {
+                    baselineBadge.textContent = `${defCount} in Baseline`;
+                    baselineBadge.style.background = 'rgba(16, 185, 129, 0.15)';
+                    baselineBadge.style.color = '#34d399';
+                    baselineBadge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+                } else {
+                    baselineBadge.textContent = 'No Baseline Set';
+                    baselineBadge.style.background = 'rgba(245, 158, 11, 0.15)';
+                    baselineBadge.style.color = '#fbbf24';
+                    baselineBadge.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+                }
+            }
+            this.updateConfigPreview();
+        }
+
+        initDataCommandsUI() {
+            const filenameInput = document.getElementById('export-filename-input');
+            if (filenameInput) {
+                this.generateDefaultConfigName();
+                filenameInput.addEventListener('input', () => {
+                    filenameInput.dataset.customEdited = 'true';
+                    this.updateConfigPreview();
+                });
+            }
+            this.updateConfigUI();
         }
 
         renderBottomNav() {

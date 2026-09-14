@@ -149,17 +149,45 @@ class StateManager {
         return result;
     }
 
-    exportDb() {
-        const dataStr = JSON.stringify(this.state, null, 2);
+    exportDb(customFileName = '') {
+        const now = new Date();
+        const dateStr = now.toISOString().slice(0, 10);
+        const cleanName = (this.state.employeeName || this.state.name || '').trim().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
+        
+        let finalFileName = '';
+        if (customFileName && customFileName.trim()) {
+            finalFileName = customFileName.trim().replace(/[^a-zA-Z0-9_\-\.]/g, '_');
+            if (!finalFileName.toLowerCase().endsWith('.txt')) {
+                finalFileName += '.txt';
+            }
+        } else {
+            finalFileName = cleanName ? `EMS_Config_${cleanName}_${dateStr}.txt` : `EMS_Companion_Config_${dateStr}.txt`;
+        }
+
+        const customCount = Object.keys(this.state.customCommands || {}).length;
+        const payload = {
+            _exportMeta: {
+                appName: 'EMS Companion',
+                version: '2.1',
+                exportedAt: now.toISOString(),
+                authorName: (this.state.employeeName || this.state.name || 'Anonymous'),
+                authorId: (this.state.employeeId || this.state.id || ''),
+                customCommandsCount: customCount
+            },
+            ...this.state
+        };
+
+        const dataStr = JSON.stringify(payload, null, 2);
         const blob = new Blob([dataStr], { type: 'text/plain;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `EMS_Companion_Backup_${new Date().toISOString().slice(0, 10)}.txt`;
+        a.download = finalFileName;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+        return finalFileName;
     }
 
     importDb(file, onSuccess, onError) {
@@ -167,6 +195,15 @@ class StateManager {
         reader.onload = (e) => {
             try {
                 const imported = JSON.parse(e.target.result);
+                if (!imported || typeof imported !== 'object') {
+                    throw new Error('Invalid JSON structure');
+                }
+
+                const hasCommands = imported.customCommands || imported.deptCommands || imported._exportMeta || imported.discordChannels;
+                if (!hasCommands) {
+                    throw new Error('File does not appear to be an EMS Companion config or backup file.');
+                }
+
                 this.state = {
                     ...this.getDefaultState(),
                     ...imported,
@@ -179,8 +216,9 @@ class StateManager {
                         ...(imported.shiftRates || {})
                     }
                 };
+                delete this.state._exportMeta;
                 this.save();
-                if (onSuccess) onSuccess();
+                if (onSuccess) onSuccess(imported);
             } catch (err) {
                 console.error('Import error:', err);
                 if (onError) onError(err);
@@ -189,7 +227,7 @@ class StateManager {
         reader.readAsText(file);
     }
 
-    resetDefaults() {
+    resetToFactoryDefaults() {
         this.state.customCommands = {};
         this.state.userAddedCommands = [];
         this.state.userDefaults = {};
@@ -198,14 +236,19 @@ class StateManager {
         this.save();
     }
 
-    saveCurrentAsDefault() {
-        this.state.userDefaults = {};
-        document.querySelectorAll('.copy-content').forEach(el => {
-            if (el.id && el.dataset.template) {
-                this.state.userDefaults[el.id] = el.dataset.template;
-            }
-        });
+    resetToSavedDefaults() {
+        if (!this.state.userDefaults || Object.keys(this.state.userDefaults).length === 0) {
+            return false;
+        }
+        this.state.customCommands = { ...this.state.userDefaults };
         this.save();
+        return true;
+    }
+
+    saveCurrentAsDefault() {
+        this.state.userDefaults = { ...(this.state.customCommands || {}) };
+        this.save();
+        return Object.keys(this.state.userDefaults).length;
     }
 }
 

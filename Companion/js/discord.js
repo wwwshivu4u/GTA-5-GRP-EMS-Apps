@@ -6,7 +6,7 @@ import { stateManager } from './state.js';
 import { sound } from './audio.js';
 
 export class DiscordService {
-    static openChannel(serverId, channelId) {
+    static openChannel(serverId, channelId, target = 'app') {
         if (!serverId || !channelId) {
             alert('Discord Server ID or Channel ID is missing in Settings!');
             return;
@@ -15,16 +15,12 @@ export class DiscordService {
         const appUrl = `discord://-/channels/${serverId}/${channelId}`;
         const webUrl = `https://discord.com/channels/${serverId}/${channelId}`;
 
-        const startTime = Date.now();
-        window.location.href = appUrl;
-
-        // Fallback to web Discord if desktop client doesn't capture within 700ms
-        setTimeout(() => {
-            const endTime = Date.now();
-            if (!document.hidden && endTime - startTime < 700) {
-                window.open(webUrl, '_blank');
-            }
-        }, 500);
+        if (target === 'browser') {
+            window.open(webUrl, '_blank');
+        } else {
+            // Open exclusively in Discord Desktop client
+            window.location.href = appUrl;
+        }
     }
 
     static testChannel(channelKey) {
@@ -78,7 +74,7 @@ export class DiscordService {
 
         if (type === 'bodycam') {
             const status = document.getElementById('bc-status')?.value || state.bcStatus || 'On duty';
-            text = `${status} : ${edinH}:${edinM}`;
+            text = `${status}: ${edinH}:${edinM}`;
         } else if (type === 'codea') {
             const loc = document.getElementById('ca-loc')?.value || '[Location]';
             const status = document.getElementById('ca-status')?.value || 'flying back';

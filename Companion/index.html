@@ -160,7 +160,7 @@
                 <div class="settings-grid-wrapper">
                     <div class="settings-col">
                         <div class="glass-section">
-                            <div class="section-title"><span class="material-symbols-outlined" style="font-size:1.15rem; margin-right:4px; vertical-align:middle;">person</span> My Profile</div>
+                            <!-- <div class="section-title"><span class="material-symbols-outlined" style="font-size:1.15rem; margin-right:4px; vertical-align:middle;">person</span> My Profile</div>
                             <div class="grid-layout">
                                 <div class="input-group">
                                     <label>Character Name</label>
@@ -170,7 +170,7 @@
                                     <label>Player ID</label>
                                     <input type="text" id="myId" placeholder="e.g. 177919">
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="input-group" style="margin-top: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
                                 <span style="font-size: 0.85rem; color: var(--text-main);">Show Boot Sequence</span>
                                 <label class="switch">
@@ -182,14 +182,80 @@
 
 
 
-                        <div class="glass-section">
-                            <div class="section-title"><span class="material-symbols-outlined" style="font-size:1.15rem; margin-right:4px; vertical-align:middle;">database</span> Data Backup &amp; Commands</div>
-                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                                <button class="btn btn-primary btn-sm" onclick="exportDb()">Export db.txt</button>
-                                <input type="file" id="import-db-file" style="display:none;" accept=".txt">
-                                <button class="btn btn-sm" onclick="document.getElementById('import-db-file').click()">Import db.txt</button>
-                                <button class="btn btn-primary btn-sm" onclick="resetToDefaultCommands()">Reset Defaults</button>
-                                <button class="btn btn-primary btn-sm" onclick="saveCurrentAsDefault()">Set As Default</button>
+                        <div class="glass-section" id="section-data-commands">
+                            <div class="section-title">
+                                <span class="material-symbols-outlined icon-gradient-blue" style="font-size:1.25rem; margin-right:6px; vertical-align:middle;">tune</span>
+                                Data &amp; Commands Configuration
+                            </div>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.9rem; line-height: 1.4;">
+                                Save, share, and backup your custom commands, Discord channels, and templates as shareable <code style="color:var(--primary); background:rgba(59,130,246,0.1); padding:1px 4px; border-radius:4px;">.txt</code> files.
+                            </p>
+
+                            <!-- Export & Import Card -->
+                            <div class="config-action-card" style="background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem; margin-bottom: 0.85rem;">
+                                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.6rem;">
+                                    <span style="font-size:0.83rem; font-weight:600; color:var(--text-main); display:flex; align-items:center; gap:6px;">
+                                        <span class="material-symbols-outlined icon-gradient-purple" style="font-size:1rem;">share</span> Share &amp; Backup
+                                    </span>
+                                    <span id="config-custom-count-badge" class="badge" style="background:rgba(59,130,246,0.15); color:#60a5fa; font-size:0.72rem; padding:2px 8px; border-radius:12px; border:1px solid rgba(59,130,246,0.3);">
+                                        0 Custom Commands
+                                    </span>
+                                </div>
+
+                                <div class="input-group" style="margin-bottom: 0.65rem;">
+                                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">
+                                        <span>Config / Profile File Name</span>
+                                        <span style="color:var(--text-muted); font-size:0.7rem;" id="export-filename-preview">EMS_Config.txt</span>
+                                    </label>
+                                    <div style="position:relative;">
+                                        <input type="text" id="export-filename-input" placeholder="e.g. Thakur_Sergey_EMS_Config" style="padding-right: 2.2rem; font-size:0.85rem;">
+                                        <button type="button" onclick="window.app && window.app.generateDefaultConfigName()" title="Reset to auto name" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--text-muted); cursor:pointer;">
+                                            <span class="material-symbols-outlined" style="font-size:1rem;">refresh</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                    <button class="btn btn-primary" onclick="exportDb()" style="padding: 0.55rem; font-weight:600; font-size:0.82rem; display:flex; align-items:center; justify-content:center; gap:5px;">
+                                        <span class="material-symbols-outlined" style="font-size:1rem;">download</span> Export Config (.txt)
+                                    </button>
+                                    
+                                    <input type="file" id="import-db-file" style="display:none;" accept=".txt,.json">
+                                    <button class="btn btn-secondary" onclick="document.getElementById('import-db-file').click()" style="padding: 0.55rem; font-weight:600; font-size:0.82rem; display:flex; align-items:center; justify-content:center; gap:5px;">
+                                        <span class="material-symbols-outlined" style="font-size:1rem;">upload_file</span> Import Config (.txt)
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Defaults & Reset Card -->
+                            <div class="config-action-card" style="background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: 12px; padding: 0.85rem;">
+                                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.6rem;">
+                                    <span style="font-size:0.83rem; font-weight:600; color:var(--text-main); display:flex; align-items:center; gap:6px;">
+                                        <span class="material-symbols-outlined icon-gradient-amber" style="font-size:1rem;">settings_backup_restore</span> Defaults &amp; Reset
+                                    </span>
+                                    <span id="user-defaults-status-badge" class="badge" style="background:rgba(245,158,11,0.15); color:#fbbf24; font-size:0.72rem; padding:2px 8px; border-radius:12px; border:1px solid rgba(245,158,11,0.3);">
+                                        No Baseline Set
+                                    </span>
+                                </div>
+
+                                <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.65rem;">
+                                    Save your current setup as personal baseline, or restore commands whenever needed.
+                                </p>
+
+                                <div style="display:flex; flex-direction:column; gap:0.45rem;">
+                                    <button class="btn btn-secondary btn-sm" onclick="saveCurrentAsDefault()" style="width:100%; justify-content:center; font-size:0.8rem; padding:0.5rem; display:flex; align-items:center; gap:5px;">
+                                        <span class="material-symbols-outlined" style="font-size:0.95rem; color:#34d399;">bookmark_added</span> Save Current as My Default Baseline
+                                    </button>
+
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                        <button class="btn btn-warning btn-sm" onclick="resetToSavedDefaults()" id="btn-reset-saved-defaults" style="justify-content:center; font-size:0.78rem; padding:0.45rem; display:flex; align-items:center; gap:4px;">
+                                            <span class="material-symbols-outlined" style="font-size:0.9rem;">restore</span> Restore My Defaults
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" onclick="resetToFactoryDefaults()" style="justify-content:center; font-size:0.78rem; padding:0.45rem; display:flex; align-items:center; gap:4px;">
+                                            <span class="material-symbols-outlined" style="font-size:0.9rem;">restart_alt</span> Factory Reset
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -321,9 +387,9 @@
 
                 <div class="tabs-header">
                     <button class="tab-btn active" data-tab="tab-onduty" id="btn-tab-onduty">On Duty</button>
-                    <button class="tab-btn disabled" data-tab="tab-refresh" id="btn-tab-refresh" disabled>Refresh</button>
-                    <button class="tab-btn disabled" data-tab="tab-save" id="btn-tab-save" disabled>Save</button>
-                    <button class="tab-btn disabled" data-tab="tab-offduty" id="btn-tab-offduty" disabled>Off Duty</button>
+                    <button class="tab-btn" data-tab="tab-refresh" id="btn-tab-refresh">Refresh</button>
+                    <button class="tab-btn" data-tab="tab-save" id="btn-tab-save">Save</button>
+                    <button class="tab-btn" data-tab="tab-offduty" id="btn-tab-offduty">Off Duty</button>
                 </div>
 
                 <div class="tabs-body">
@@ -348,20 +414,23 @@
                                         <span class="material-symbols-outlined" style="font-size:1rem;">badge</span> Step 4: Discord Log
                                     </span>
                                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                        <label class="discord-toggle-label" title="Open Discord Mails on Copy">
+                                        <span class="discord-target-badge target-app" id="badge-od4">
+                                            <span class="material-symbols-outlined" style="font-size:0.8rem;">devices</span> App
+                                        </span>
+                                        <label class="discord-toggle-label" id="toggle-label-od4" title="Toggle destination: ON = Discord App, OFF = Web Browser">
                                             <input type="checkbox" class="discord-toggle-checkbox" id="cb-od4" checked>
                                             <span class="toggle-slider"></span>
                                         </label>
                                     </div>
                                 </div>
-                                <div class="copy-content" id="od4" contenteditable="true">On duty : --:--</div>
+                                <div class="copy-content" id="od4" contenteditable="true">On duty: --:--</div>
                                 <!-- <div class="step-help-text" id="od4-help-text">
                                     <span class="material-symbols-outlined" style="font-size:0.85rem; vertical-align:middle; color:#34d399;">info</span> Bodycam log copied, just paste it in Mails and upload bodyshot with it
                                 </div> -->
                                 <div class="step-generator-footer">
                                     <span class="step-live-clock"><span class="material-symbols-outlined" style="font-size:0.85rem; vertical-align:middle; margin-right:2px;">schedule</span> IC: <strong id="od4-clock-time">--:--</strong></span>
                                     <button class="btn copy-btn bc-btn btn-success btn-xs" id="btn-od4" data-target="od4" data-discord-key="bodycam" disabled style="padding: 0.35rem 0.75rem;">
-                                        <span class="material-symbols-outlined" style="font-size:0.95rem; margin-right:3px;">mail</span> <span class="btn-label">Copy &amp; Open Mails</span>
+                                        <span class="material-symbols-outlined" style="font-size:0.95rem; margin-right:3px;">mail</span> <span class="btn-label">Copy &amp; Open App</span>
                                     </button>
                                 </div>
                             </div>
@@ -417,20 +486,23 @@
                                         <span class="material-symbols-outlined" style="font-size:1rem;">badge</span> Step 4: Discord Log
                                     </span>
                                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                        <label class="discord-toggle-label" title="Open Discord Mails on Copy">
+                                        <span class="discord-target-badge target-app" id="badge-off4">
+                                            <span class="material-symbols-outlined" style="font-size:0.8rem;">devices</span> App
+                                        </span>
+                                        <label class="discord-toggle-label" id="toggle-label-off4" title="Toggle destination: ON = Discord App, OFF = Web Browser">
                                             <input type="checkbox" class="discord-toggle-checkbox" id="cb-off4" checked>
                                             <span class="toggle-slider"></span>
                                         </label>
                                     </div>
                                 </div>
-                                <div class="copy-content" id="off4" contenteditable="true">Off duty : --:--</div>
+                                <div class="copy-content" id="off4" contenteditable="true">Off duty: --:--</div>
                                 <!-- <div class="step-help-text" id="off4-help-text">
                                     <span class="material-symbols-outlined" style="font-size:0.85rem; vertical-align:middle; color:#f87171;">info</span> Bodycam log copied, just paste it in Mails and upload bodyshot with it
                                 </div> -->
                                 <div class="step-generator-footer">
                                     <span class="step-live-clock"><span class="material-symbols-outlined" style="font-size:0.85rem; vertical-align:middle; margin-right:2px;">schedule</span> IC: <strong id="off4-clock-time">--:--</strong></span>
                                     <button class="btn copy-btn bc-btn btn-danger btn-xs" id="btn-off4" data-target="off4" data-discord-key="bodycam" disabled style="padding: 0.35rem 0.75rem;">
-                                        <span class="material-symbols-outlined" style="font-size:0.95rem; margin-right:3px;">mail</span> <span class="btn-label">Copy &amp; Open Mails</span>
+                                        <span class="material-symbols-outlined" style="font-size:0.95rem; margin-right:3px;">mail</span> <span class="btn-label">Copy &amp; Open App</span>
                                     </button>
                                 </div>
                             </div>
@@ -1014,7 +1086,7 @@
                         <div class="section-body">
                             <ul style="font-size: 0.85rem; padding-left: 1.2rem; color: var(--text-muted); line-height: 1.6;">
                                 <li><strong>Selling Medkits:</strong> Flex 'G' muscle -&gt; Organization -&gt; Sell A Medkit. (Max 50 at a time)</li>
-                                <li><strong>Selling Insurance:</strong> Flex 'G' muscle -&gt; Organization -&gt; Sell Insurance. (HCs only)</li>
+                                <li><strong>Selling Insurance:</strong> Flex 'G' muscle -&gt; Organization -&gt; Sell Insurance.</li>
                                 <li><strong>Heal A Player:</strong> Flex 'Z' muscle directly on the player.</li>
                                 <li><strong>Checking Illness:</strong> Flex 'G' muscle -&gt; Organization -&gt; Learn a player's Illness.</li>
                                 <li><strong>Selling Pills:</strong> Flex 'G' muscle -&gt; Organization -&gt; Sell the pill for the disease. (Max 20 Pills)<br>
