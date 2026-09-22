@@ -5,7 +5,7 @@
   "hosting": [
     {
       "target": "companion",
-      "public": "Companion",
+      "public": "EMS Companion",
       "ignore": [
         "firebase.json",
         "**/.*",
@@ -14,7 +14,7 @@
     },
     {
       "target": "shift",
-      "public": "Shift Guide",
+      "public": "EMS Shift Guide",
       "ignore": [
         "firebase.json",
         "**/.*",
@@ -23,7 +23,16 @@
     },
     {
       "target": "hrms",
-      "public": "HRMS",
+      "public": "EMS HRMS",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ]
+    },
+    {
+      "target": "marketplace",
+      "public": "Marketplace",
       "ignore": [
         "firebase.json",
         "**/.*",

@@ -1,36 +1,38 @@
-# 🚑 GTA V GRP EMS Assist
+# 🚑 GTA5GRP
 
-![Project Header](https://img.shields.io/badge/Project-GTA_V_GRP_EMS_Assist-blue)
+![Project Header](https://img.shields.io/badge/Project-GTA5GRP-blue)
 ![Version](https://img.shields.io/badge/Version-2.0-green)
 ![Hosting](https://img.shields.io/badge/Firebase-Hosting-orange)
 ![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20Mobile%20%7C%20Android%20Auto-brightgreen)
 
-Welcome to the **GTA V GRP EMS Assist** repository! This project is an all-in-one frontend software suite built for the Grand RP (GRP) Emergency Medical Services (EMS) faction. It streamlines daily field operations, bodycam logs, shift timing, departmental comms, and high-command HR/payroll management.
+Welcome to the **GTA5GRP** repository! This project is an all-in-one frontend software suite built for Grand RP (GRP). It streamlines daily Emergency Medical Services (EMS) field operations, bodycam logs, shift timing, departmental comms, high-command HR/payroll management, and market radar tools.
 
 ---
 
 ## 🏗️ Project Ecosystem
 
-The repository contains three specialized applications deployed via Firebase Hosting:
+The repository contains four specialized applications deployed via Firebase Hosting:
 
 ```mermaid
 graph TD;
-    Field[EMS Field Duties] -->|Logs, Codes & Shift Timing| Companion[EMS Companion App]
-    Field -->|Shift Reference & Quotas| ShiftGuide[Shift Guide]
+    Field[EMS Field Duties] -->|Logs, Codes & Shift Timing| Companion[EMS Companion]
+    Field -->|Shift Reference & Quotas| ShiftGuide[EMS Shift Guide]
     Companion -->|Generates Formatted Logs| Discord[Discord Channels]
-    Discord -->|Ingested & Parsed| HRMS[HRMS Portal]
+    Discord -->|Ingested & Parsed| HRMS[EMS HRMS]
     HRMS -->|Calculates Payouts & Bonuses| Leaderboard[Payroll & Leaderboards]
+    Field -->|Market Price & Route Radar| Marketplace[Marketplace Radar]
 ```
 
-1. **[EMS Companion App](Companion/)** 🩺 — In-game dashboard with Dynamic Island shift timer, quick logs, radio codes, and an Android Auto-style split layout for secondary screens and car displays.
-2. **[HRMS Portal](HRMS/)** 📊 — High Command administration suite for parsing Discord logs, tracking roster hours, calculating bonuses, and exporting payroll.
-3. **[Shift Guide](Shift%20Guide/)** ⏱️ — Dedicated shift tracker and reference guide for duty quotas and medical procedures.
+1. **[EMS Companion](EMS%20Companion/)** 🩺 — In-game dashboard with Dynamic Island shift timer, quick logs, radio codes, and an Android Auto-style split layout (`https://ems-companion-gtav-grp.web.app`).
+2. **[EMS HRMS](EMS%20HRMS/)** 📊 — High Command administration suite for parsing Discord logs, tracking roster hours, calculating bonuses, and exporting payroll (`https://ems-hrms-gtav-grp.web.app`).
+3. **[EMS Shift Guide](EMS%20Shift%20Guide/)** ⏱️ — Dedicated shift tracker and reference guide for duty quotas and medical procedures (`https://ems-shift-guide-gtav-grp.web.app`).
+4. **[Marketplace Radar](Marketplace/)** 🛒 — Buyer market price radar and route assistant (`https://gtav-marketplace-companion.web.app`).
 
 ---
 
-## 1. 🩺 EMS Companion App
+## 1. 🩺 EMS Companion
 
-The **EMS Companion App** is an interactive, glassmorphism-styled field dashboard optimized for dual-monitor setups, mobile devices, in-game browser overlays, and car dash displays.
+The **EMS Companion** is an interactive, glassmorphism-styled field dashboard optimized for dual-monitor setups, mobile devices, in-game browser overlays, and car dash displays.
 
 ### ✨ Key Features
 
@@ -78,9 +80,9 @@ block-beta
 
 ---
 
-## 2. 📊 HRMS (Human Resources Management System)
+## 2. 📊 EMS HRMS (Human Resources Management System)
 
-The **HRMS Portal** is the administrative command center for EMS High Command to process attendance, calculate wages, and manage the faction roster.
+The **EMS HRMS Portal** is the administrative command center for EMS High Command to process attendance, calculate wages, and manage the faction roster.
 
 ### ✨ Features
 - **Discord Log Parser**: Parses raw Discord duty channel logs using regex and fuzzy string matching.
@@ -94,9 +96,9 @@ The **HRMS Portal** is the administrative command center for EMS High Command to
 
 ---
 
-## 3. ⏱️ Shift Guide
+## 3. ⏱️ EMS Shift Guide
 
-The **Shift Guide** is a focused reference and time-tracking utility for individual medical personnel.
+The **EMS Shift Guide** is a focused reference and time-tracking utility for individual medical personnel.
 
 ### ✨ Features
 - **Shift Duration Counter**: Real-time counter to verify minimum shift requirements.
@@ -125,14 +127,17 @@ The **Shift Guide** is a focused reference and time-tracking utility for individ
 To run any of the apps locally, you can serve the directory using any static web server (e.g. Python, Node, or VSCode Live Server):
 
 ```bash
-# Serve the Companion App
-python -m http.server 8080 --directory Companion
+# Serve EMS Companion
+python -m http.server 8080 --directory "EMS Companion"
 
-# Serve the HRMS
-python -m http.server 8081 --directory HRMS
+# Serve EMS HRMS
+python -m http.server 8081 --directory "EMS HRMS"
 
-# Serve the Shift Guide
-python -m http.server 8082 --directory "Shift Guide"
+# Serve EMS Shift Guide
+python -m http.server 8082 --directory "EMS Shift Guide"
+
+# Serve Marketplace Radar
+python -m http.server 8083 --directory Marketplace
 ```
 
 Open your browser at `http://localhost:8080`.
@@ -144,14 +149,17 @@ The repository is pre-configured with multi-target hosting in [`firebase.json`](
 # Deploy all targets
 firebase deploy
 
-# Deploy only the Companion app
+# Deploy only EMS Companion (https://ems-companion-gtav-grp.web.app)
 firebase deploy --only hosting:companion
 
-# Deploy only HRMS
+# Deploy only EMS HRMS (https://ems-hrms-gtav-grp.web.app)
 firebase deploy --only hosting:hrms
 
-# Deploy only Shift Guide
+# Deploy only EMS Shift Guide (https://ems-shift-guide-gtav-grp.web.app)
 firebase deploy --only hosting:shift
+
+# Deploy only Marketplace Radar (https://gtav-marketplace-companion.web.app)
+firebase deploy --only hosting:marketplace
 ```
 
 ---

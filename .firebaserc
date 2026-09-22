@@ -9,10 +9,13 @@
           "ems-companion-gtav-grp"
         ],
         "shift": [
-          "ems-shift-gtav-grp"
+          "ems-shift-guide-gtav-grp"
         ],
         "hrms": [
           "ems-hrms-gtav-grp"
+        ],
+        "marketplace": [
+          "gtav-marketplace-companion"
         ]
       }
     }
