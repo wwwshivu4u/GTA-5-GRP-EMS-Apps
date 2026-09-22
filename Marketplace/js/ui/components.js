@@ -432,8 +432,81 @@ window.MarketApp = window.MarketApp || {};
     `;
   }
 
+  /**
+   * Render Market Price Trend Banner comparing against active baseline snapshot.
+   */
+  function renderTrendBanner(container, activeSnapshot, priceDiffs, useBonus, onSwitchBaseline) {
+    if (!container) return;
+    if (!activeSnapshot) {
+      container.classList.add('hidden');
+      return;
+    }
+
+    const diffEntries = Object.values(priceDiffs || {});
+    let upCount = 0, downCount = 0, sameCount = 0;
+    diffEntries.forEach(d => {
+      if (d.isHigher) upCount++;
+      else if (d.isLower) downCount++;
+      else sameCount++;
+    });
+
+    container.classList.remove('hidden');
+
+    if (diffEntries.length === 0) {
+      container.innerHTML = `
+        <div class="glass-card px-4 py-2.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 border border-gray-800 bg-gray-950/40 text-xs">
+          <div class="flex items-center gap-2 text-gray-400">
+            <span class="text-emerald-400">📸</span>
+            <span>Baseline snapshot recorded: <strong class="text-gray-200">${activeSnapshot.label}</strong>. Future syncs will compare against this to track price trends.</span>
+          </div>
+          <button class="open-history-btn text-emerald-400 hover:text-emerald-300 font-medium underline shrink-0 text-left sm:text-right">
+            Manage Snapshots
+          </button>
+        </div>
+      `;
+    } else {
+      container.innerHTML = `
+        <div class="glass-card px-4 py-2.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-emerald-500/30 bg-emerald-950/20 text-xs shadow-lg shadow-emerald-950/20">
+          <div class="flex flex-wrap items-center gap-2.5">
+            <div class="flex items-center gap-1.5 font-bold text-gray-200">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Live Price Trends</span>
+            </div>
+            <span class="text-gray-400 font-mono text-[11px] truncate max-w-[240px]" title="Comparing against baseline: ${activeSnapshot.label}">
+              vs <span class="text-emerald-300 font-semibold">${activeSnapshot.label}</span>
+            </span>
+            <div class="flex items-center gap-1.5 font-mono text-xs">
+              <span class="inline-flex items-center gap-1 text-emerald-400 bg-emerald-950/90 px-2 py-0.5 rounded-lg border border-emerald-600/50 shadow-sm" title="${upCount} items with higher prices">
+                ▲ <strong>${upCount}</strong> Spikes
+              </span>
+              <span class="inline-flex items-center gap-1 text-red-400 bg-red-950/90 px-2 py-0.5 rounded-lg border border-red-600/50 shadow-sm" title="${downCount} items with lower prices">
+                ▼ <strong>${downCount}</strong> Drops
+              </span>
+              <span class="inline-flex items-center gap-1 text-gray-300 bg-gray-900/90 px-2 py-0.5 rounded-lg border border-gray-700/60" title="${sameCount} items with unchanged prices">
+                = <strong>${sameCount}</strong> Stable
+              </span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button class="open-history-btn inline-flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300 font-semibold px-2.5 py-1 rounded-lg hover:bg-emerald-950/60 transition border border-emerald-700/40">
+              <span>Change Baseline / View History</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    container.querySelectorAll('.open-history-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (typeof onSwitchBaseline === 'function') onSwitchBaseline();
+      });
+    });
+  }
+
   exports.Components = {
     renderOverviewStats,
+    renderTrendBanner,
     renderGridCards,
     renderTableView,
     renderCargoDrawer

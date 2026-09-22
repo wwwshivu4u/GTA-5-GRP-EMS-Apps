@@ -11,7 +11,8 @@ window.MarketApp = window.MarketApp || {};
     CARGO: 'grp_market_cargo_items',
     VIEW_MODE: 'grp_market_view_mode',
     USE_BONUS: 'grp_market_use_bonus',
-    SNAPSHOTS: 'grp_market_price_snapshots'
+    SNAPSHOTS: 'grp_market_price_snapshots',
+    ACTIVE_SNAPSHOT_ID: 'grp_market_active_snapshot_id'
   };
 
   function getSavedData(key, fallback = null) {
@@ -36,32 +37,59 @@ window.MarketApp = window.MarketApp || {};
     return getSavedData(KEYS.SNAPSHOTS, []);
   }
 
-  function saveSnapshot(label, items, rawData) {
+  function saveSnapshot(label, items, rawData, source = 'manual', diffSummary = null) {
     const snapshots = getSnapshots();
     const newSnapshot = {
-      id: 'snap_' + Date.now(),
-      label: label || `Snapshot ${new Date().toLocaleTimeString()}`,
+      id: 'snap_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+      label: label || `Snapshot ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
       timestamp: new Date().toISOString(),
-      items: items.map(i => ({
+      source: source || 'manual',
+      items: (items || []).map(i => ({
         name: i.name,
         bestBasePrice: i.bestBasePrice,
         bestBonusPrice: i.bestBonusPrice,
         category: i.category
       })),
-      rawData
+      rawData,
+      diffSummary: diffSummary || null
     };
 
-    // Keep up to 10 latest snapshots
+    // Keep up to 30 latest snapshots in chronological history
     snapshots.unshift(newSnapshot);
-    if (snapshots.length > 10) snapshots.pop();
+    if (snapshots.length > 30) snapshots.pop();
 
     setSavedData(KEYS.SNAPSHOTS, snapshots);
     return newSnapshot;
   }
 
+  function deleteSnapshot(id) {
+    let snapshots = getSnapshots();
+    snapshots = snapshots.filter(s => s.id !== id);
+    setSavedData(KEYS.SNAPSHOTS, snapshots);
+    return snapshots;
+  }
+
+  function clearSnapshots() {
+    setSavedData(KEYS.SNAPSHOTS, []);
+  }
+
   function getLatestPreviousSnapshot() {
     const snapshots = getSnapshots();
     return snapshots.length > 0 ? snapshots[0] : null;
+  }
+
+  /**
+   * Helper to summarize price diff trends.
+   */
+  function getDiffSummary(diffs) {
+    if (!diffs) return { up: 0, down: 0, same: 0, total: 0 };
+    let up = 0, down = 0, same = 0;
+    Object.values(diffs).forEach(d => {
+      if (d.isHigher) up++;
+      else if (d.isLower) down++;
+      else same++;
+    });
+    return { up, down, same, total: up + down + same };
   }
 
   /**
@@ -115,7 +143,10 @@ window.MarketApp = window.MarketApp || {};
     setSavedData,
     getSnapshots,
     saveSnapshot,
+    deleteSnapshot,
+    clearSnapshots,
     getLatestPreviousSnapshot,
+    getDiffSummary,
     computePriceDiffs,
     getCargo,
     saveCargo

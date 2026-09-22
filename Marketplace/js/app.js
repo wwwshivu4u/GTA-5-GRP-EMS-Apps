@@ -33,40 +33,108 @@ window.MarketApp = window.MarketApp || {};
     state.useBonus = App.Storage.getSavedData(App.Storage.KEYS.USE_BONUS, false);
     state.cargo = App.Storage.getCargo();
 
-    // 2. Load latest previous snapshot for price trend diffing
-    state.activeSnapshot = App.Storage.getLatestPreviousSnapshot();
-
-    // 3. Load stored raw data or fallback to sample
+    // 2. Load stored raw data or fallback to sample
     const savedRaw = App.Storage.getSavedData(App.Storage.KEYS.RAW_DATA, null);
     const initialText = savedRaw || App.INITIAL_RAW_DATA;
-    loadData(initialText, savedRaw ? 'Saved Local Data' : 'Initial Sample');
+    loadData(initialText, savedRaw ? 'Saved Local Data' : 'Initial Sample', { isInitialLoad: true });
 
-    // 4. Bind DOM events & shortcuts
+    // 3. Bind DOM events & shortcuts
     bindEvents();
     bindKeyboardShortcuts();
     setupRemoteFeedPolling();
     updateViewModeButtons();
+    updateSnapshotCountBadge();
   }
 
   /**
-   * Parses and loads market text into state and triggers rendering.
+   * Parses and loads market text into state, saves a snapshot into history on every sync,
+   * calculates price trends against previous baseline, and triggers rendering.
    */
-  function loadData(rawText, sourceLabel = 'manual') {
+  function loadData(rawText, sourceLabel = 'manual', options = {}) {
     if (!rawText || !rawText.trim()) return;
 
     const parsed = App.Parser.parseMarketData(rawText);
+    if (!parsed || parsed.items.length === 0) return;
+
+    const isInitialLoad = options.isInitialLoad || false;
+    const isAutoPoll = options.isAutoPoll || false;
+
     state.rawData = rawText;
     state.parsedItems = parsed.items;
     state.allBuyers = new Set(parsed.buyers);
 
-    // Save to storage
+    // Save current raw data to storage
     App.Storage.setSavedData(App.Storage.KEYS.RAW_DATA, rawText);
 
-    // Compute diffs against snapshot
-    if (state.activeSnapshot) {
-      state.priceDiffs = App.Storage.computePriceDiffs(state.parsedItems, state.activeSnapshot, state.useBonus);
+    const existingSnapshots = App.Storage.getSnapshots();
+    const isDataIdenticalToLatest = existingSnapshots.length > 0 && existingSnapshots[0].rawData === rawText;
+
+    if (isInitialLoad) {
+      if (existingSnapshots.length === 0) {
+        // First run ever: record initial sample as baseline snapshot
+        const initialSnap = App.Storage.saveSnapshot(
+          sourceLabel || 'Initial Sample',
+          state.parsedItems,
+          rawText,
+          'sample',
+          null
+        );
+        state.activeSnapshot = initialSnap;
+        state.priceDiffs = {};
+      } else {
+        // Page reload: find stored baseline or use previous snapshot
+        const savedBaselineId = App.Storage.getSavedData(App.Storage.KEYS.ACTIVE_SNAPSHOT_ID, null);
+        let baseline = null;
+        if (savedBaselineId) {
+          baseline = existingSnapshots.find(s => s.id === savedBaselineId);
+        }
+        if (!baseline) {
+          baseline = existingSnapshots.length > 1 ? existingSnapshots[1] : existingSnapshots[0];
+        }
+
+        state.activeSnapshot = baseline;
+        if (state.activeSnapshot && state.activeSnapshot.id !== existingSnapshots[0].id) {
+          state.priceDiffs = App.Storage.computePriceDiffs(state.parsedItems, state.activeSnapshot, state.useBonus);
+        } else {
+          state.priceDiffs = {};
+        }
+      }
     } else {
-      state.priceDiffs = {};
+      // New Data Sync! (Manual paste, clipboard sync, or feed update)
+      if (isAutoPoll && isDataIdenticalToLatest) {
+        // Skip duplicate automatic snapshots if data hasn't changed
+        return;
+      }
+
+      // 1. Determine baseline for price trend comparison:
+      // The latest snapshot before this sync becomes our trend baseline!
+      const previousBaseline = existingSnapshots.length > 0 ? existingSnapshots[0] : null;
+
+      if (previousBaseline) {
+        state.priceDiffs = App.Storage.computePriceDiffs(state.parsedItems, previousBaseline, state.useBonus);
+        state.activeSnapshot = previousBaseline;
+        App.Storage.setSavedData(App.Storage.KEYS.ACTIVE_SNAPSHOT_ID, previousBaseline.id);
+      } else {
+        state.priceDiffs = {};
+      }
+
+      // 2. Compute trend summary stats (up / down / same)
+      const diffSummary = App.Storage.getDiffSummary(state.priceDiffs);
+
+      // 3. Save this sync into snapshot history!
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const snapLabel = `${sourceLabel} (${timeStr})`;
+      const newSnap = App.Storage.saveSnapshot(
+        snapLabel,
+        state.parsedItems,
+        rawText,
+        sourceLabel,
+        diffSummary
+      );
+
+      if (!previousBaseline) {
+        state.activeSnapshot = newSnap;
+      }
     }
 
     // Refresh UI
@@ -74,6 +142,7 @@ window.MarketApp = window.MarketApp || {};
     renderOverview();
     renderMainContent();
     renderCargoDrawer();
+    updateSnapshotCountBadge();
 
     // Update modal raw text & status label
     const rawInput = document.getElementById('rawTextInput');
@@ -87,6 +156,25 @@ window.MarketApp = window.MarketApp || {};
   function renderOverview() {
     const strip = document.getElementById('quickStatsStrip');
     App.Components.renderOverviewStats(strip, state.parsedItems, state.allBuyers, state.useBonus);
+    renderTrendBanner();
+  }
+
+  function renderTrendBanner() {
+    const banner = document.getElementById('trendIndicatorBar');
+    if (banner && App.Components.renderTrendBanner) {
+      App.Components.renderTrendBanner(banner, state.activeSnapshot, state.priceDiffs, state.useBonus, () => {
+        openModal();
+        switchModalTab('snapshots');
+      });
+    }
+  }
+
+  function updateSnapshotCountBadge() {
+    const count = App.Storage.getSnapshots().length;
+    const badge = document.getElementById('snapshotHistoryCount');
+    const tabBadge = document.getElementById('tabSnapshotsBadge');
+    if (badge) badge.textContent = count;
+    if (tabBadge) tabBadge.textContent = count;
   }
 
   function renderMainContent() {
@@ -597,18 +685,41 @@ window.MarketApp = window.MarketApp || {};
       });
     }
 
-    // Save Price Snapshot Button
-    const saveSnapshotBtn = document.getElementById('saveSnapshotBtn');
-    if (saveSnapshotBtn) {
-      saveSnapshotBtn.addEventListener('click', () => {
-        const label = prompt('Enter a label for this price snapshot (e.g. "Morning Drop"):', `Snapshot ${new Date().toLocaleTimeString()}`);
-        if (label) {
-          const snap = App.Storage.saveSnapshot(label, state.parsedItems, state.rawData);
-          state.activeSnapshot = snap;
-          state.priceDiffs = App.Storage.computePriceDiffs(state.parsedItems, snap, state.useBonus);
-          renderMainContent();
+    // Snapshots & History Buttons
+    const viewSnapshotsBtn = document.getElementById('viewSnapshotsBtn') || document.getElementById('saveSnapshotBtn');
+    if (viewSnapshotsBtn) {
+      viewSnapshotsBtn.addEventListener('click', () => {
+        openModal();
+        switchModalTab('snapshots');
+      });
+    }
+
+    const takeManualSnapshotModalBtn = document.getElementById('takeManualSnapshotModalBtn');
+    if (takeManualSnapshotModalBtn) {
+      takeManualSnapshotModalBtn.addEventListener('click', () => {
+        const defaultLabel = `Manual Snapshot (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;
+        const label = prompt('Enter a label for this price snapshot (e.g. "Morning Drop"):', defaultLabel);
+        if (label && label.trim()) {
+          const snap = App.Storage.saveSnapshot(label.trim(), state.parsedItems, state.rawData, 'manual');
           renderSnapshotsList();
-          App.Notifications.success(`Snapshot "${label}" saved! Current prices will compare against it.`);
+          updateSnapshotCountBadge();
+          App.Notifications.success(`Snapshot "${label.trim()}" saved to history!`);
+        }
+      });
+    }
+
+    const clearAllSnapshotsBtn = document.getElementById('clearAllSnapshotsBtn');
+    if (clearAllSnapshotsBtn) {
+      clearAllSnapshotsBtn.addEventListener('click', () => {
+        if (confirm('Clear all snapshot history? This will reset all historical trend comparisons.')) {
+          App.Storage.clearSnapshots();
+          state.activeSnapshot = null;
+          state.priceDiffs = {};
+          renderSnapshotsList();
+          renderTrendBanner();
+          renderMainContent();
+          updateSnapshotCountBadge();
+          App.Notifications.info('Snapshot history cleared.');
         }
       });
     }
@@ -646,6 +757,7 @@ window.MarketApp = window.MarketApp || {};
     const modal = document.getElementById('inputModal');
     if (modal) modal.classList.remove('hidden');
     renderSnapshotsList();
+    updateSnapshotCountBadge();
   }
 
   function closeModal() {
@@ -662,12 +774,12 @@ window.MarketApp = window.MarketApp || {};
     };
 
     Object.values(tabs).forEach(t => {
-      if (t.btn) t.btn.className = 'px-3 py-1.5 text-xs font-medium rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/60 transition';
+      if (t.btn) t.btn.className = 'px-3 py-1.5 text-xs font-medium rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/60 transition flex items-center gap-1.5';
       if (t.content) t.content.classList.add('hidden');
     });
 
     if (tabs[tabKey]) {
-      if (tabs[tabKey].btn) tabs[tabKey].btn.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-800 text-white border border-gray-700';
+      if (tabs[tabKey].btn) tabs[tabKey].btn.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-800 text-white border border-gray-700 flex items-center gap-1.5';
       if (tabs[tabKey].content) tabs[tabKey].content.classList.remove('hidden');
     }
 
@@ -683,31 +795,82 @@ window.MarketApp = window.MarketApp || {};
     const snapshots = App.Storage.getSnapshots();
     if (snapshots.length === 0) {
       container.innerHTML = `
-        <div class="text-center py-8 text-gray-500 text-xs">
-          No snapshots saved yet. Click "Save Snapshot" to record today's prices and track trends over time.
+        <div class="text-center py-10 text-gray-500 text-xs">
+          <div class="w-10 h-10 mx-auto mb-2 text-gray-600">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <p class="font-medium text-gray-400">No snapshots recorded yet.</p>
+          <p class="text-gray-500 mt-1">Every time you sync prices via Manual Paste, Clipboard, or Feed, a snapshot is automatically saved here.</p>
         </div>
       `;
       return;
     }
 
-    container.innerHTML = snapshots.map(s => {
-      const isCurrentActive = state.activeSnapshot && state.activeSnapshot.id === s.id;
+    container.innerHTML = snapshots.map((s, idx) => {
+      const isLatestSync = idx === 0;
+      const isActiveBaseline = state.activeSnapshot && state.activeSnapshot.id === s.id;
       const dateStr = new Date(s.timestamp).toLocaleString();
-      return `
-        <div class="flex items-center justify-between p-3 rounded-xl bg-gray-950/70 border border-gray-800 hover:border-gray-700">
-          <div>
-            <div class="text-xs font-bold text-white flex items-center gap-2">
-              <span>${s.label}</span>
-              ${isCurrentActive ? '<span class="text-[10px] text-emerald-400 bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-700/50">Active Baseline</span>' : ''}
-            </div>
-            <div class="text-[11px] text-gray-400 font-mono mt-0.5">${dateStr} • ${s.items.length} items</div>
+
+      let sourceBadge = '';
+      const src = (s.source || '').toLowerCase();
+      if (src.includes('clipboard')) {
+        sourceBadge = '<span class="text-[10px] text-purple-300 bg-purple-950/80 px-1.5 py-0.5 rounded border border-purple-800/50 font-mono font-medium">📋 Clipboard</span>';
+      } else if (src.includes('manual') || src.includes('paste')) {
+        sourceBadge = '<span class="text-[10px] text-cyan-300 bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-800/50 font-mono font-medium">📝 Paste</span>';
+      } else if (src.includes('feed') || src.includes('auto')) {
+        sourceBadge = '<span class="text-[10px] text-emerald-300 bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-800/50 font-mono font-medium">⚡ Feed</span>';
+      } else {
+        sourceBadge = '<span class="text-[10px] text-gray-300 bg-gray-900 px-1.5 py-0.5 rounded border border-gray-700 font-mono font-medium">📸 Snapshot</span>';
+      }
+
+      let diffSummaryHtml = '';
+      if (s.diffSummary) {
+        diffSummaryHtml = `
+          <div class="flex items-center gap-1.5 font-mono text-[10px] mt-1.5">
+            <span class="inline-flex items-center gap-0.5 text-emerald-400 bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-800/50" title="${s.diffSummary.up} prices rose">▲ ${s.diffSummary.up}</span>
+            <span class="inline-flex items-center gap-0.5 text-red-400 bg-red-950/80 px-1.5 py-0.5 rounded border border-red-800/50" title="${s.diffSummary.down} prices dropped">▼ ${s.diffSummary.down}</span>
+            <span class="inline-flex items-center gap-0.5 text-gray-400 bg-gray-900 px-1.5 py-0.5 rounded border border-gray-800" title="${s.diffSummary.same} prices unchanged">= ${s.diffSummary.same}</span>
           </div>
-          <div class="flex items-center gap-2">
-            <button class="restore-snapshot-btn px-2.5 py-1 rounded-lg bg-emerald-950/60 text-emerald-300 border border-emerald-700/50 hover:bg-emerald-900/60 text-xs font-medium" data-id="${s.id}">
-              Compare Diff
+        `;
+      }
+
+      return `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl bg-gray-950/80 border ${isActiveBaseline ? 'border-emerald-600/70 shadow-lg shadow-emerald-950/40 bg-emerald-950/10' : 'border-gray-800 hover:border-gray-700'} gap-3 transition">
+          <div class="min-w-0 flex-1">
+            <div class="flex flex-wrap items-center gap-2 mb-1">
+              <span class="text-xs font-bold text-white">${s.label}</span>
+              ${sourceBadge}
+              ${isLatestSync ? '<span class="text-[10px] text-cyan-400 bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-800/50 font-mono">Current Live</span>' : ''}
+              ${isActiveBaseline ? '<span class="text-[10px] text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-500/50 font-semibold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>Active Baseline</span>' : ''}
+            </div>
+            <div class="text-[11px] text-gray-400 font-mono flex items-center gap-2">
+              <span>${dateStr}</span>
+              <span>•</span>
+              <span>${s.items.length} items</span>
+            </div>
+            ${diffSummaryHtml}
+          </div>
+          <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
+            <button 
+              class="restore-snapshot-btn px-3 py-1.5 rounded-lg ${isActiveBaseline ? 'bg-emerald-950 text-emerald-300 border border-emerald-600 font-bold' : 'bg-gray-800 hover:bg-emerald-950/80 text-gray-200 hover:text-emerald-300 border border-gray-700 hover:border-emerald-600/50'} text-xs font-medium transition" 
+              data-id="${s.id}"
+              title="Use this snapshot as baseline to show price increases and drops on all items"
+            >
+              ${isActiveBaseline ? '✓ Active Baseline' : 'Compare Trends'}
             </button>
-            <button class="load-snapshot-data-btn px-2.5 py-1 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 text-xs font-medium" data-id="${s.id}">
-              Load Raw
+            <button 
+              class="load-snapshot-data-btn px-2.5 py-1.5 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-700/80 text-xs font-medium transition" 
+              data-id="${s.id}"
+              title="Restore this market price data into the main dashboard"
+            >
+              Load Data
+            </button>
+            <button 
+              class="delete-snapshot-btn p-1.5 rounded-lg bg-gray-900 hover:bg-red-950/60 text-gray-500 hover:text-red-400 border border-gray-800 hover:border-red-800/50 text-xs transition" 
+              data-id="${s.id}"
+              title="Delete snapshot"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
             </button>
           </div>
         </div>
@@ -721,10 +884,13 @@ window.MarketApp = window.MarketApp || {};
         const snap = snapshots.find(s => s.id === id);
         if (snap) {
           state.activeSnapshot = snap;
+          App.Storage.setSavedData(App.Storage.KEYS.ACTIVE_SNAPSHOT_ID, snap.id);
           state.priceDiffs = App.Storage.computePriceDiffs(state.parsedItems, snap, state.useBonus);
+          renderOverview();
+          renderTrendBanner();
           renderMainContent();
           renderSnapshotsList();
-          App.Notifications.success(`Comparing live prices against baseline: "${snap.label}"`);
+          App.Notifications.success(`Price trends now comparing against "${snap.label}".`);
         }
       });
     });
@@ -734,9 +900,32 @@ window.MarketApp = window.MarketApp || {};
         const id = btn.dataset.id;
         const snap = snapshots.find(s => s.id === id);
         if (snap && snap.rawData) {
-          loadData(snap.rawData, `Snapshot: ${snap.label}`);
+          loadData(snap.rawData, `Snapshot (${snap.label})`);
           closeModal();
-          App.Notifications.info(`Loaded raw price list from "${snap.label}".`);
+          App.Notifications.info(`Loaded prices from snapshot "${snap.label}".`);
+        }
+      });
+    });
+
+    container.querySelectorAll('.delete-snapshot-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        if (confirm('Delete this snapshot from history?')) {
+          App.Storage.deleteSnapshot(id);
+          if (state.activeSnapshot && state.activeSnapshot.id === id) {
+            const remaining = App.Storage.getSnapshots();
+            state.activeSnapshot = remaining.length > 0 ? remaining[0] : null;
+            if (state.activeSnapshot) {
+              state.priceDiffs = App.Storage.computePriceDiffs(state.parsedItems, state.activeSnapshot, state.useBonus);
+            } else {
+              state.priceDiffs = {};
+            }
+          }
+          renderSnapshotsList();
+          renderTrendBanner();
+          renderMainContent();
+          updateSnapshotCountBadge();
+          App.Notifications.info('Snapshot deleted.');
         }
       });
     });

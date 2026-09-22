@@ -182,6 +182,11 @@
       <!-- Injected dynamically by components.js -->
     </div>
 
+    <!-- Trend Comparison Indicator Bar -->
+    <div id="trendIndicatorBar" class="hidden">
+      <!-- Injected dynamically by components.js -->
+    </div>
+
     <!-- Overview Bar & Quick Exporters -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
       <div class="text-sm text-gray-400 flex flex-wrap items-center gap-2">
@@ -195,9 +200,10 @@
 
       <!-- Quick Action Buttons: Save Snapshot, Export Discord, Export CSV -->
       <div class="flex items-center gap-2 text-xs">
-        <button id="saveSnapshotBtn" class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-300 border border-gray-700/80 transition" title="Save snapshot to track daily price drops & rises">
+        <button id="viewSnapshotsBtn" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-300 border border-gray-700/80 transition" title="View Snapshot History & Price Trends">
           <span>📸</span>
-          <span class="hidden sm:inline">Save Snapshot</span>
+          <span class="hidden sm:inline">Snapshots & Trends</span>
+          <span id="snapshotHistoryCount" class="px-1.5 py-0.2 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-700/50 text-[10px] font-mono">0</span>
         </button>
         <button id="exportDiscordBtn" class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-300 border border-gray-700/80 transition" title="Copy markdown price sheet for Discord">
           <span>📢</span>
@@ -254,8 +260,9 @@
           <button id="tabBotCodeBtn" class="px-3 py-1.5 text-xs font-medium rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/60 transition">
             Discord Bot Script
           </button>
-          <button id="tabSnapshotsBtn" class="px-3 py-1.5 text-xs font-medium rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/60 transition">
-            Snapshots & History
+          <button id="tabSnapshotsBtn" class="px-3 py-1.5 text-xs font-medium rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/60 transition flex items-center gap-1.5">
+            <span>Snapshots & History</span>
+            <span id="tabSnapshotsBadge" class="px-1.5 py-0.2 rounded-full bg-gray-800 text-emerald-400 text-[10px] font-mono">0</span>
           </button>
         </div>
         <button id="closeModalBtn" class="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-gray-800">
@@ -403,12 +410,25 @@ client.run("YOUR_DISCORD_BOT_TOKEN")</code></pre>
 
       <!-- Tab 4: Snapshots & Price Trend Baseline -->
       <div id="tabSnapshotsContent" class="p-6 flex-1 flex flex-col overflow-y-auto space-y-4 hidden">
-        <div class="text-xs text-gray-300">
-          <p class="font-semibold text-emerald-400">Price History Snapshots & Trend Comparison</p>
-          <p class="text-gray-400 mt-0.5">Compare live market prices against previous snapshot baselines to see price spikes (▲) or price crashes (▼).</p>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-800">
+          <div class="text-xs text-gray-300">
+            <p class="font-semibold text-emerald-400 flex items-center gap-1.5">
+              <span>📸</span>
+              <span>Sync Snapshots History & Trend Baselines</span>
+            </p>
+            <p class="text-gray-400 mt-0.5">Every data sync is automatically saved as a snapshot. Click any snapshot below to compare live price trends or reload past prices.</p>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button id="takeManualSnapshotModalBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow transition">
+              <span>+ Take Snapshot</span>
+            </button>
+            <button id="clearAllSnapshotsBtn" class="px-2.5 py-1.5 rounded-lg bg-gray-800 hover:bg-red-950/60 text-gray-400 hover:text-red-400 border border-gray-700 hover:border-red-800/50 text-xs font-medium transition" title="Clear snapshot history">
+              Clear History
+            </button>
+          </div>
         </div>
 
-        <div id="snapshotsListContainer" class="space-y-2">
+        <div id="snapshotsListContainer" class="space-y-2.5">
           <!-- Populated by app.js -->
         </div>
       </div>
