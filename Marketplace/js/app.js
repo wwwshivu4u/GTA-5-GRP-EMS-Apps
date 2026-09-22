@@ -486,6 +486,63 @@ window.MarketApp = window.MarketApp || {};
       });
     }
 
+    // Discord Channel Quick Launch (Try Discord App first, fallback to browser new tab)
+    const openDiscordChannelBtn = document.getElementById('openDiscordChannelBtn');
+    const DISCORD_CHANNEL_WEB_URL = 'https://discord.com/channels/1054043484614574170/1055887524125474926/';
+    const DISCORD_CHANNEL_APP_URL = 'discord://-/channels/1054043484614574170/1055887524125474926';
+
+    if (openDiscordChannelBtn) {
+      openDiscordChannelBtn.addEventListener('click', (e) => {
+        if (e) e.preventDefault();
+
+        // If user holds Ctrl/Cmd or middle-clicks, directly open in browser tab
+        if (e.ctrlKey || e.metaKey || e.button === 1) {
+          window.open(DISCORD_CHANNEL_WEB_URL, '_blank', 'noopener,noreferrer');
+          return;
+        }
+
+        let hasBlurred = false;
+        let hasFallenBack = false;
+
+        const onBlur = () => {
+          hasBlurred = true;
+          cleanup();
+        };
+
+        const onVisibilityChange = () => {
+          if (document.hidden) {
+            hasBlurred = true;
+            cleanup();
+          }
+        };
+
+        function cleanup() {
+          window.removeEventListener('blur', onBlur);
+          document.removeEventListener('visibilitychange', onVisibilityChange);
+        }
+
+        window.addEventListener('blur', onBlur, { once: true });
+        document.addEventListener('visibilitychange', onVisibilityChange, { once: true });
+
+        // 1. Try launching Discord Desktop app via custom protocol
+        window.location.href = DISCORD_CHANNEL_APP_URL;
+
+        // 2. Fallback to browser in a new tab if app/protocol dialog didn't trigger focus change
+        setTimeout(() => {
+          cleanup();
+          if (!hasBlurred && !document.hidden && !hasFallenBack) {
+            hasFallenBack = true;
+            const newWindow = window.open(DISCORD_CHANNEL_WEB_URL, '_blank', 'noopener,noreferrer');
+            if (!newWindow) {
+              // If popup blocker intervened, inform user & navigate
+              App.Notifications.info('Opening Discord channel in browser...');
+              window.location.href = DISCORD_CHANNEL_WEB_URL;
+            }
+          }
+        }, 1200);
+      });
+    }
+
     // Modal Tabs Navigation
     const tabManualBtn = document.getElementById('tabManualBtn');
     const tabAutoBtn = document.getElementById('tabAutoBtn');
