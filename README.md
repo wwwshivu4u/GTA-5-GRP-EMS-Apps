@@ -20,7 +20,6 @@ graph TD;
     Companion -->|Generates Formatted Logs| Discord[Discord Channels]
     Discord -->|Ingested & Parsed| HRMS[EMS HRMS]
     HRMS -->|Calculates Payouts & Bonuses| Leaderboard[Payroll & Leaderboards]
-    Field -->|Market Price & Route Radar| Marketplace[Marketplace Radar]
 ```
 
 1. **[EMS Companion](EMS%20Companion/)** 🩺 — In-game dashboard with Dynamic Island shift timer, quick logs, radio codes, and an Android Auto-style split layout (`https://ems-companion-gtav-grp.web.app`).
