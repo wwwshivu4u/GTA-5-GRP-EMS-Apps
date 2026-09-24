@@ -29,15 +29,6 @@
         "**/.*",
         "**/node_modules/**"
       ]
-    },
-    {
-      "target": "marketplace",
-      "public": "Marketplace",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**"
-      ]
     }
   ]
 }
