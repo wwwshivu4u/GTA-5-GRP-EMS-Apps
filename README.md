@@ -134,8 +134,6 @@ python -m http.server 8081 --directory "EMS HRMS"
 # Serve EMS Shift Guide
 python -m http.server 8082 --directory "EMS Shift Guide"
 
-# Serve Marketplace Radar
-python -m http.server 8083 --directory Marketplace
 ```
 
 Open your browser at `http://localhost:8080`.
@@ -156,11 +154,9 @@ firebase deploy --only hosting:hrms
 # Deploy only EMS Shift Guide (https://ems-shift-guide-gtav-grp.web.app)
 firebase deploy --only hosting:shift
 
-# Deploy only Marketplace Radar (https://marketplace-companion-gtav-grp.web.app)
-firebase deploy --only hosting:marketplace
 ```
 
 ---
 
 ## 📄 License
-Maintained for the Grand RP EMS Community. Designed and engineered for high-performance roleplay operations.
+Maintained for the Grand RP Community. Designed and engineered for high-performance roleplay operations.
