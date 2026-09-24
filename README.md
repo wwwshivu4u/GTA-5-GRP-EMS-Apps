@@ -26,7 +26,6 @@ graph TD;
 1. **[EMS Companion](EMS%20Companion/)** 🩺 — In-game dashboard with Dynamic Island shift timer, quick logs, radio codes, and an Android Auto-style split layout (`https://ems-companion-gtav-grp.web.app`).
 2. **[EMS HRMS](EMS%20HRMS/)** 📊 — High Command administration suite for parsing Discord logs, tracking roster hours, calculating bonuses, and exporting payroll (`https://ems-hrms-gtav-grp.web.app`).
 3. **[EMS Shift Guide](EMS%20Shift%20Guide/)** ⏱️ — Dedicated shift tracker and reference guide for duty quotas and medical procedures (`https://ems-shift-guide-gtav-grp.web.app`).
-4. **[Marketplace Radar](Marketplace/)** 🛒 — Buyer market price radar and route assistant (`https://marketplace-companion-gtav-grp.web.app`).
 
 ---
 
