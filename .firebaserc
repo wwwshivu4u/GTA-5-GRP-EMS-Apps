@@ -14,6 +14,9 @@
         "hrms": [
           "ems-hrms-gtav-grp"
         ],
+        "sahp-companion": [
+          "sahp-companion-gtav-grp"
+        ]
       }
     }
   },

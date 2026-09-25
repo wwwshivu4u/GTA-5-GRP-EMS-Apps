@@ -1,0 +1,47 @@
+HUMAN RESOURCES — REQUIRED ACTION
+@Human Resource Department
+
+HR is responsible for ensuring that every current and newly hired SAHP employee has properly read, agreed to, and signed the Employment Contract.
+
+No employee should be considered fully processed until this requirement has been completed.
+
+---
+
+CURRENT SAHP EMPLOYEES
+If you are already employed by SAHP, report to Reception and complete the following :
+
+/me takes the Employment Contract out of the drawer and carefully reads it.
+
+/do Signs the Employment Contract after carefully reading and agreeing to all of its terms.
+
+/me places the signed Employment Contract back into the drawer.
+
+
+---
+
+NEW SAHP EMPLOYEES
+When processing a new employee, the HR representative must provide them with the contract first.
+
+HR Representative:
+
+/me gives the Employment Contract to [Person Name].
+
+
+New Employee:
+
+/me takes the Employment Contract and carefully reads it.
+
+/do Signs the Employment Contract after carefully reading and agreeing to all of its terms.
+
+/me gives the signed Employment Contract back to [HR Name].
+
+
+---
+
+IMPORTANT
+All employees are expected to read the Charter carefully before signing. By signing the Employment Contract, you acknowledge that you have read, understood, and agreed to comply with its terms.
+
+Human Resources is expected to ensure this process is completed for the entire organization.
+
+— Sheriff Rage Maxx
+San Andreas Highway Patrol

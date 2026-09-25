@@ -1,0 +1,1906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <title>SAHP Companion - Mobile Data Terminal</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="SAHP-LOGO.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+</head>
+<body>
+    <!-- AI Splash Screen / Boot Sequence -->
+    <div id="ai-splash-screen">
+        <div class="splash-content">
+            <div class="ai-core-container">
+                <div class="core-ring ring-1"></div>
+                <div class="core-ring ring-2"></div>
+                <div class="core-ring ring-3"></div>
+                <div class="core-center"></div>
+            </div>
+            <div class="status-header">SAN ANDREAS HIGHWAY PATROL</div>
+            <div class="status-text" id="splash-status-text">INITIALIZING HIGHWAY PATROL MDT SYSTEM...</div>
+            <div class="status-progress-bar">
+                <div class="status-progress-fill" id="splash-progress-fill"></div>
+            </div>
+            <div class="status-logs" id="splash-logs">
+                <div>&gt; POLICE CAD TERMINAL: [ INITIALIZING ]</div>
+                <div>&gt; PENAL CODE DATABASE: [ VERIFYING ]</div>
+                <div>&gt; DISPATCH UPLINK: [ CONNECTING ]</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Container -->
+    <div class="app-container">
+        <!-- Background Overlay -->
+        <div class="bg-blur"></div>
+
+        <!-- TOP STATUS BAR (Dynamic Island) -->
+        <div class="top-bar" id="sahp-top-bar">
+            <!-- Progress Outline SVG Animation -->
+            <svg class="progress-outline-svg">
+                <defs>
+                    <linearGradient id="policeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#3b82f6" />
+                        <stop offset="50%" stop-color="#38bdf8" />
+                        <stop offset="100%" stop-color="#ef4444" />
+                    </linearGradient>
+                </defs>
+                <rect class="progress-outline-rect" id="progress-outline-rect" x="0" y="0" width="100%" height="100%" rx="20" pathLength="1000"></rect>
+            </svg>
+
+            <!-- Department Branding & Duty Indicator -->
+            <div class="topbar-branding">
+                <img src="SAHP-LOGO.png" alt="SAHP" class="sahp-badge-mini">
+                <div class="topbar-titles">
+                    <span class="topbar-org">SAN ANDREAS HIGHWAY PATROL</span>
+                    <span class="topbar-sub">CAD &bull; MDT PATROL COMPANION</span>
+                </div>
+                <div class="topbar-duty-pill off-duty" id="topbar-duty-status-pill" onclick="window.app.toggleDutyStatus()" title="Click to toggle Duty Status">
+                    <span class="pulse-dot"></span> <span id="topbar-duty-status-text">OFF DUTY</span>
+                </div>
+                <div class="topbar-officer-pill" id="topbar-officer-pill" onclick="openModal('modal-settings')" title="Click to edit Officer Profile">
+                    <span class="material-symbols-outlined" style="font-size:0.95rem; color:var(--gold);">badge</span>
+                    <span id="topbar-officer-name">TROOPER [UNASSIGNED]</span>
+                </div>
+            </div>
+
+            <!--
+            =====================================================
+            ROTA / SHIFT TIMER (COMMENTED OUT AS REQUESTED)
+            =====================================================
+            <div class="di-view" id="tb-default-view">
+                <img src="SAHP-LOGO.png" alt="SAHP" class="sahp-badge-mini">
+                <div style="font-size: 0.92rem; color: var(--text-muted); font-weight: 600;">
+                    Complete on-duty bodycam logs or select assignment to start shift
+                </div>
+                <div style="display: flex; gap: 0.5rem; align-items: center; margin-left: 0.5rem;">
+                    <select id="rota-location" class="rota-select">
+                        <option value="Patrol (Mission Row)">Patrol (Mission Row)</option>
+                        <option value="Patrol (Vinewood / Rockford)">Patrol (Vinewood / Rockford)</option>
+                        <option value="Patrol (Sandy Shores / Highway)">Patrol (Sandy Shores / Highway)</option>
+                        <option value="Traffic Enforcement">Traffic Enforcement</option>
+                        <option value="Detective Bureau">Detective Bureau</option>
+                        <option value="Air Support (Air One)">Air Support (Air One)</option>
+                        <option value="DOC Booking / Transport">DOC Booking / Transport</option>
+                    </select>
+                    <button class="btn btn-success btn-sm" onclick="window.app.startShift()">
+                        <span class="material-symbols-outlined" style="font-size:1.1rem;">play_arrow</span><span>Start</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="di-view hidden" id="tb-compact-view">
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                    <button class="btn btn-danger btn-sm" onclick="window.app.showConfirmEndShift()">
+                        <span class="material-symbols-outlined" style="font-size:1.1rem;">stop</span><span>End</span>
+                    </button>
+                    <div id="compact-main-timer">0 hr 00:00</div>
+                    <span class="compact-loc-pill">
+                        <span class="material-symbols-outlined" style="font-size:0.85rem;">local_police</span>
+                        <span id="compact-loc-val">Patrol (Mission Row)</span>
+                    </span>
+                    <span class="compact-bonus-pill" id="compact-bonus-pill" title="Estimated Shift Salary + Bounties">
+                        <span class="material-symbols-outlined" style="font-size:0.85rem;">payments</span>
+                        <span class="material-symbols-outlined night-icon hidden" id="compact-night-icon" style="font-size:0.85rem; color:#f1c40f;" title="Night Shift Active (00:00-06:00 IC)">dark_mode</span>
+                        <span id="compact-bonus-val">$0</span>
+                    </span>
+                    <span class="compact-arrest-pill" onclick="openModal('modal-arrest')" title="Click to view 25-Min Arrest Timer">
+                        <span class="material-symbols-outlined" style="font-size:0.85rem;">timer</span>
+                        <span>Arrest: <strong id="compact-arrest-val">25:00</strong></span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="di-view hidden" id="tb-confirm-view">
+                <div style="display: flex; gap: 0.6rem; align-items: center;">
+                    <button class="btn btn-secondary btn-sm" onclick="window.app.cancelConfirmEndShift()">
+                        <span class="material-symbols-outlined" style="font-size:1.1rem;">arrow_back</span><span>Back</span>
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="window.app.confirmEndShift()" style="font-weight: bold;">
+                        Confirm End Shift?
+                    </button>
+                </div>
+            </div>
+            -->
+
+            <!-- Highlighted & Enlarged Dual Clock HUD (IC & Local) -->
+            <div id="big-live-clock">
+                <div class="hud-clock-group">
+                    <div class="hud-clock-card ic-card">
+                        <div class="hud-clock-badge"><span class="material-symbols-outlined" style="font-size:0.85rem;">schedule</span> IC TIME</div>
+                        <div class="hud-clock-digits ic-digits">--:--:--</div>
+                    </div>
+                    <div class="hud-clock-card local-card">
+                        <div class="hud-clock-badge"><span class="material-symbols-outlined" style="font-size:0.85rem;">public</span> LOCAL TIME</div>
+                        <div class="hud-clock-digits local-digits">--:--:--</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN TACTICAL DASHBOARD GRID (Full Screen, No Empty Space) -->
+        <main class="dashboard-main">
+            <div class="tactical-grid">
+                <!-- 1: Bodycam & Protocols -->
+                <div class="tactical-card" onclick="openModal('modal-bodycam')">
+                    <div class="card-glow glow-rose"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-rose">MANDATORY</span>
+                        <span class="card-tag">LOG-01</span>
+                    </div>
+                    <div class="card-icon-wrap icon-rose">
+                        <span class="material-symbols-outlined icon-gradient-rose">videocam</span>
+                    </div>
+                    <h3 class="card-title">BODYCAM &amp; PROTOCOLS</h3>
+                    <p class="card-desc">Uniform &amp; Undercover attach sequences, red-light check, cloud backup &amp; finishing shift logs.</p>
+                    <div class="card-footer-action">
+                        <span>Open Protocols</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 2: Comms & Radio 10-Codes -->
+                <div class="tactical-card" onclick="openModal('modal-radio')">
+                    <div class="card-glow glow-blue"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-blue">DISPATCH</span>
+                        <span class="card-tag">RAD-02</span>
+                    </div>
+                    <div class="card-icon-wrap icon-blue">
+                        <span class="material-symbols-outlined icon-gradient-blue">podcasts</span>
+                    </div>
+                    <h3 class="card-title">COMMS &amp; 10-CODES</h3>
+                    <p class="card-desc">Tactical 10-codes, inter-department comms (/d), panic panic callouts and status transmissions.</p>
+                    <div class="card-footer-action">
+                        <span>Open Comms</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 3: Penal Code Engine -->
+                <div class="tactical-card highlight-card" onclick="openModal('modal-penal')">
+                    <div class="card-glow glow-gold"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-gold">CALCULATOR</span>
+                        <span class="card-tag">PEN-03</span>
+                    </div>
+                    <div class="card-icon-wrap icon-gold">
+                        <span class="material-symbols-outlined icon-gradient-gold">gavel</span>
+                    </div>
+                    <h3 class="card-title">PENAL CODE ENGINE</h3>
+                    <p class="card-desc">Search 135+ offenses with instant fine sums, prison sentence totals, bail clearance &amp; PDA formatting.</p>
+                    <div class="card-footer-action">
+                        <span>Launch Engine</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 4: Arrest & 25-Min Custody -->
+                <div class="tactical-card" onclick="openModal('modal-arrest')">
+                    <div class="card-glow glow-emerald"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-emerald">DETENTION</span>
+                        <span class="card-tag">ARR-04</span>
+                    </div>
+                    <div class="card-icon-wrap icon-emerald">
+                        <span class="material-symbols-outlined icon-gradient-emerald">lock_clock</span>
+                    </div>
+                    <h3 class="card-title">ARREST &amp; 25-MIN TIMER</h3>
+                    <p class="card-desc">25-minute detention countdown, Miranda warning, lawyer pause locks, sub-timers &amp; booking RP.</p>
+                    <div class="card-footer-action">
+                        <span>Open Custody</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 5: Traffic Codes & Impound -->
+                <div class="tactical-card" onclick="openModal('modal-traffic')">
+                    <div class="card-glow glow-cyan"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-cyan">TRAFFIC</span>
+                        <span class="card-tag">TRF-05</span>
+                    </div>
+                    <div class="card-icon-wrap icon-cyan">
+                        <span class="material-symbols-outlined icon-gradient-cyan">speed</span>
+                    </div>
+                    <h3 class="card-title">TRAFFIC &amp; IMPOUND</h3>
+                    <p class="card-desc">Speeding radar bands, reckless driving fines, impound fee tier matrix &amp; vehicle seizure rules.</p>
+                    <div class="card-footer-action">
+                        <span>Open Traffic</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 6: Dress Codes & Rank Uniforms -->
+                <div class="tactical-card" onclick="openModal('modal-dresscodes')">
+                    <div class="card-glow glow-amber"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-amber">INSPECTION</span>
+                        <span class="card-tag">UNI-06</span>
+                    </div>
+                    <div class="card-icon-wrap icon-amber">
+                        <span class="material-symbols-outlined icon-gradient-amber">apparel</span>
+                    </div>
+                    <h3 class="card-title">DRESS CODES &amp; RANKS</h3>
+                    <p class="card-desc">Uniform guidelines for Cadets, Patrol, Detectives, SWAT tactical loadouts &amp; High Command dress.</p>
+                    <div class="card-footer-action">
+                        <span>View Uniforms</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 7: RP & HR Commands -->
+                <div class="tactical-card" onclick="openModal('modal-roleplay')">
+                    <div class="card-glow glow-purple"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-purple">ROLEPLAY</span>
+                        <span class="card-tag">CMD-07</span>
+                    </div>
+                    <div class="card-icon-wrap icon-purple">
+                        <span class="material-symbols-outlined icon-gradient-purple">psychology</span>
+                    </div>
+                    <h3 class="card-title">RP &amp; HR COMMANDS</h3>
+                    <p class="card-desc">Complete /me, /do, /try, /todo emotes, weapon checks, breathalyzers, search &amp; frisk RP actions.</p>
+                    <div class="card-footer-action">
+                        <span>View Commands</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 8: Article 7 Parking Map -->
+                <div class="tactical-card" onclick="openModal('modal-article7')">
+                    <div class="card-glow glow-teal"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-teal">TOWING</span>
+                        <span class="card-tag">PRK-08</span>
+                    </div>
+                    <div class="card-icon-wrap icon-teal">
+                        <span class="material-symbols-outlined icon-gradient-emerald">local_parking</span>
+                    </div>
+                    <h3 class="card-title">ARTICLE 7 PARKING</h3>
+                    <p class="card-desc">Downtown red-zone curbs, Mission Row tow boundaries, valid impound proof requirements &amp; maps.</p>
+                    <div class="card-footer-action">
+                        <span>View Parking</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 9: §2.4 Prohibited Items -->
+                <div class="tactical-card" onclick="openModal('modal-prohibited')">
+                    <div class="card-glow glow-rose"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-rose">CONTRABAND</span>
+                        <span class="card-tag">SEC-09</span>
+                    </div>
+                    <div class="card-icon-wrap icon-rose">
+                        <span class="material-symbols-outlined icon-gradient-rose">block</span>
+                    </div>
+                    <h3 class="card-title">PROHIBITED ITEMS (§2.4)</h3>
+                    <p class="card-desc">Class 1 &amp; Class 2 weapon restrictions, illegal narcotics threshold, body armor &amp; confiscation logs.</p>
+                    <div class="card-footer-action">
+                        <span>Inspect Items</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 10: Quick Officer Notepad -->
+                <div class="tactical-card" onclick="openModal('modal-notes')">
+                    <div class="card-glow glow-amber"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-amber">AUTO-SAVE</span>
+                        <span class="card-tag">NOT-10</span>
+                    </div>
+                    <div class="card-icon-wrap icon-amber">
+                        <span class="material-symbols-outlined icon-gradient-amber">edit_note</span>
+                    </div>
+                    <h3 class="card-title">FIELD NOTEPAD</h3>
+                    <p class="card-desc">Real-time persistent field scratchpad for license plates, suspect IDs, dispatch notes &amp; arrest drafts.</p>
+                    <div class="card-footer-action">
+                        <span>Open Notepad</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 11: MDT Settings & Config -->
+                <div class="tactical-card" onclick="openModal('modal-settings')">
+                    <div class="card-glow glow-slate"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-slate">CONFIG</span>
+                        <span class="card-tag">CFG-11</span>
+                    </div>
+                    <div class="card-icon-wrap icon-slate">
+                        <span class="material-symbols-outlined icon-gradient-slate">tune</span>
+                    </div>
+                    <h3 class="card-title">SETTINGS &amp; PROFILES</h3>
+                    <p class="card-desc">Officer callsign &amp; badge, skip boot screen toggle, Discord routing channels, backup &amp; baselines.</p>
+                    <div class="card-footer-action">
+                        <span>Open Settings</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 12: About SAHP / Manual -->
+                <div class="tactical-card" onclick="openAboutTeam()">
+                    <div class="card-glow glow-gold"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-gold">DEPARTMENT</span>
+                        <span class="card-tag">MAN-12</span>
+                    </div>
+                    <div class="card-icon-wrap icon-gold">
+                        <span class="material-symbols-outlined icon-gradient-gold">local_police</span>
+                    </div>
+                    <h3 class="card-title">ABOUT SAHP COMMAND</h3>
+                    <p class="card-desc">Official EN3 Highway Patrol guidelines, state jurisdiction values, chain of command &amp; reference manual.</p>
+                    <div class="card-footer-action">
+                        <span>Department Info</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- =====================================================
+             MODALS OVERLAY
+             ===================================================== -->
+        <div class="modal-overlay" id="modalOverlay">
+
+            <!-- MODAL 1: BODYCAM LOGS -->
+            <div class="modal-content" id="modal-bodycam">
+                <div class="modal-header">
+                    <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-rose" style="font-size:1.4rem; margin-right:6px;">videocam</span> Bodycam Protocols</span>
+                    <span class="duty-pill off-duty" id="modal-duty-status-pill"><span class="pulse-dot"></span> <span class="duty-pill-text">OFF DUTY</span></span>
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
+
+                <div class="tabs-header">
+                    <button class="tab-btn active" onclick="switchTab(this, 'tab-bc-uniform')">Uniform</button>
+                    <button class="tab-btn" onclick="switchTab(this, 'tab-bc-uc')">Undercover</button>
+                    <button class="tab-btn" onclick="switchTab(this, 'tab-bc-refresh')">Refresh</button>
+                    <button class="tab-btn" onclick="switchTab(this, 'tab-bc-save')">Save &amp; Cloud</button>
+                    <button class="tab-btn" onclick="switchTab(this, 'tab-bc-shift')">Finishing Shift</button>
+                    <button class="tab-btn" onclick="switchTab(this, 'tab-bc-drone')">Drone</button>
+                    <button class="tab-btn" onclick="switchTab(this, 'tab-bc-lawyer')">Footage to Lawyer</button>
+                    <button class="tab-btn" onclick="switchTab(this, 'tab-bc-traffic')">Traffic Stop / VIN</button>
+                </div>
+
+                <div class="tabs-body">
+                    <!-- TAB 1: UNIFORM ATTACH -->
+                    <div class="tab-content active" id="tab-bc-uniform">
+                        <div class="copy-blocks-grid">
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 1: Attach Bodycam (Chest)</span><button class="btn copy-btn bc-btn" data-target="od1" onclick="window.app.handleBodycamStepClick(this)"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content" id="od1" contenteditable="true">/me Takes out bodycam, attaches it to chest, checks its ballistic, water proof</div>
+                            </div>
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 2: Recording &amp; Red Light Check</span><button class="btn copy-btn bc-btn" data-target="od2" onclick="window.app.handleBodycamStepClick(this)" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content" id="od2" contenteditable="true">/me makes sure it is recording and checks for the red light</div>
+                            </div>
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 3: Verification Check</span><button class="btn copy-btn bc-btn" data-target="od3" onclick="window.app.handleBodycamStepClick(this)" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content" id="od3" contenteditable="true">/do It is recording, is ballistic and water proof</div>
+                            </div>
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 4: Cell Tower Uplink</span><button class="btn copy-btn" onclick="copySimple('/me connects PDA to the nearest cell tower')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">/me connects PDA to the nearest cell tower</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: UNDERCOVER ATTACH -->
+                    <div class="tab-content" id="tab-bc-uc">
+                        <div class="copy-blocks-grid">
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 1: Conceal &amp; Attach (Belt)</span><button class="btn copy-btn" onclick="copySimple('/me takes out bodycam and attaches it to belt, hides it, checks its ballistic and water proof')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">/me takes out bodycam and attaches it to belt, hides it, checks its ballistic and water proof</div>
+                            </div>
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 2: Recording Check</span><button class="btn copy-btn" onclick="copySimple('/me makes sure it is recording and checks for the red light')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">/me makes sure it is recording and checks for the red light</div>
+                            </div>
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 3: Verification Check</span><button class="btn copy-btn" onclick="copySimple('/do It is recording, is ballistic and water proof')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">/do It is recording, is ballistic and water proof</div>
+                            </div>
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 4: Cell Tower Uplink</span><button class="btn copy-btn" onclick="copySimple('/me connects PDA to the nearest cell tower')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">/me connects PDA to the nearest cell tower</div>
+                            </div>
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 5: Stash Drone</span><button class="btn copy-btn" onclick="copySimple('/me takes the drone from the trunk and puts it in the backpack')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">/me takes the drone from the trunk and puts it in the backpack</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: REFRESH TAB -->
+                    <div class="tab-content" id="tab-bc-refresh">
+                        <div style="font-size:0.8rem; color:#38bdf8; background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.25); border-radius:10px; padding:0.6rem 0.9rem; margin-bottom:0.75rem;">
+                            <span class="material-symbols-outlined" style="font-size:0.95rem; vertical-align:middle;">info</span> Turn on your bodycam or screen recorder, then type the command clearly on camera.
+                        </div>
+                        <div class="copy-blocks-grid">
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 1: Refresh Action</span><button class="btn copy-btn bc-btn" data-target="ref1" onclick="window.app.handleBodycamStepClick(this)"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content" id="ref1" contenteditable="true">/me refreshing bodycam</div>
+                            </div>
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 2: Recording Confirmation</span><button class="btn copy-btn bc-btn" data-target="ref2" onclick="window.app.handleBodycamStepClick(this)" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content" id="ref2" contenteditable="true">/do It is recording</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 4: SAVE TAB -->
+                    <div class="tab-content" id="tab-bc-save">
+                        <div class="copy-blocks-grid">
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 1: Save &amp; Cloud Upload</span><button class="btn copy-btn bc-btn" data-target="sav1" onclick="window.app.handleBodycamStepClick(this)"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content" id="sav1" contenteditable="true">/me saves bodycam, uploads it to the Department Cloud and continues recording</div>
+                            </div>
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 2: Verification Check</span><button class="btn copy-btn bc-btn" data-target="sav2" onclick="window.app.handleBodycamStepClick(this)" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content" id="sav2" contenteditable="true">/do It is recording</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 5: FINISHING SHIFT TAB -->
+                    <div class="tab-content" id="tab-bc-shift">
+                        <div class="copy-blocks-grid">
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 1: Save to SD Card &amp; Servers</span><button class="btn copy-btn bc-btn" data-target="off1" onclick="window.app.handleBodycamStepClick(this)"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content" id="off1" contenteditable="true">/me saves bodycam contents onto an SD card and uploads contents to Department servers</div>
+                            </div>
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 2: Store Badge &amp; Gear in Locker</span><button class="btn copy-btn bc-btn" data-target="off2" onclick="window.app.handleBodycamStepClick(this)" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content" id="off2" contenteditable="true">/me puts the badge in the locker</div>
+                            </div>
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 3: Power Down Bodycam</span><button class="btn copy-btn bc-btn" data-target="off3" onclick="window.app.handleBodycamStepClick(this)" disabled><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content" id="off3" contenteditable="true">/do Bodycam is turned off and stored safely</div>
+                            </div>
+                        </div>
+                        <div style="margin-top:0.8rem;">
+                            <button class="btn btn-primary discord-jump-btn" data-discord-channel="bodycam" onclick="window.app.openDiscordChannel('bodycam')" style="width:100%;">
+                                <span class="material-symbols-outlined">upload_file</span> Open #bodycam-logs on Discord
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TAB 6: DRONE TAB -->
+                    <div class="tab-content" id="tab-bc-drone">
+                        <div style="font-size:0.75rem; color:#38bdf8; font-weight:700; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.5px;">Drone in Uniform:</div>
+                        <div class="copy-blocks-grid" style="margin-bottom:1.1rem;">
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Deploy Drone (Uniform)</span><button class="btn copy-btn" onclick="copySimple('/me launches the Department Drone')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">/me launches the Department Drone</div>
+                            </div>
+                        </div>
+
+                        <div style="font-size:0.75rem; color:#c084fc; font-weight:700; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.5px;">Drone Undercover (3-Step Sequence):</div>
+                        <div class="copy-blocks-grid">
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 1: Trunk to Backpack</span><button class="btn copy-btn" onclick="copySimple('/me takes the drone from the trunk and puts it in the backpack')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">/me takes the drone from the trunk and puts it in the backpack</div>
+                            </div>
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 2: Backpack to Launch</span><button class="btn copy-btn" onclick="copySimple('/me takes the drone from the backpack and launches it')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">/me takes the drone from the backpack and launches it</div>
+                            </div>
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 3: Ground to Backpack</span><button class="btn copy-btn" onclick="copySimple('/me takes the drone from the ground and puts it in the backpack')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">/me takes the drone from the ground and puts it in the backpack</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 7: FOOTAGE TO LAWYER TAB -->
+                    <div class="tab-content" id="tab-bc-lawyer">
+                        <div class="copy-blocks-grid">
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 1: Export to SD Card &amp; Cloud Backup</span><button class="btn copy-btn" onclick="copySimple('/me saves bodycam contents onto an SD card and uploads contents to Department servers')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">/me saves bodycam contents onto an SD card and uploads contents to Department servers</div>
+                            </div>
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 2: Hand SD Card to Lawyer</span><button class="btn copy-btn" onclick="copySimple('/me Takes SD card out of the bodycam and hands it to the lawyer')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">/me Takes SD card out of the bodycam and hands it to the lawyer</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 8: TRAFFIC STOP / VIN TAB -->
+                    <div class="tab-content" id="tab-bc-traffic">
+                        <div class="copy-blocks-grid">
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 1: Search License Plate in Database</span><button class="btn copy-btn" onclick="copySimple('/me writes down license plate and searches the license plate through the Department database')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">/me writes down license plate and searches the license plate through the Department database</div>
+                            </div>
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 2: Physical VIN Check</span><button class="btn copy-btn" onclick="copySimple('/me Kneels down, feels the VIN number under the car and run it through Department Database')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">/me Kneels down, feels the VIN number under the car and run it through Department Database</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL 2: COMMS & RADIO CODES -->
+            <div class="modal-content" id="modal-radio">
+                <div class="modal-header">
+                    <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-blue" style="font-size:1.4rem; margin-right:6px;">podcasts</span> Comms &amp; Radio Codes</span>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button class="btn btn-secondary btn-sm discord-jump-btn" data-discord-channel="radiocodes" onclick="window.app.openDiscordChannel('radiocodes')">
+                            <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> #radio-codes
+                        </button>
+                        <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                    </div>
+                </div>
+
+                <div style="padding: 1rem 1.6rem 0;">
+                    <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.5rem; text-align: center; text-transform:uppercase; letter-spacing:0.8px; font-weight:700;">
+                        Tactical Quick Codes (Instant 1-Click Clipboard Copy)
+                    </div>
+                    
+                    <!-- ENLARGED TACTICAL QUICK CODES GRID -->
+                    <div class="quick-codes-grid">
+                        <button class="quick-code-btn btn-qc-clear" onclick="copySimple('10-4')">
+                            <span>10-4</span><span class="code-sub">Affirmative</span>
+                        </button>
+                        <button class="quick-code-btn" onclick="copySimple('10-2')">
+                            <span>10-2</span><span class="code-sub">Negative</span>
+                        </button>
+                        <button class="quick-code-btn btn-qc-clear" onclick="copySimple('10-8 where am I needed?')">
+                            <span>10-8</span><span class="code-sub">Available / In-Service</span>
+                        </button>
+                        <button class="quick-code-btn" onclick="copySimple('10-7 out of service')">
+                            <span>10-7</span><span class="code-sub">Break / AFK</span>
+                        </button>
+                        <button class="quick-code-btn" onclick="copySimple('10-9 out of service / unavailable')">
+                            <span>10-9</span><span class="code-sub">Unavailable</span>
+                        </button>
+                        <button class="quick-code-btn btn-qc-emergency" onclick="copySimple('10-10 Shots Fired at [LOC]!')">
+                            <span>10-10</span><span class="code-sub">Shots Fired</span>
+                        </button>
+                        <button class="quick-code-btn" onclick="copySimple('TANGO 10-10 Training Shots Fired')">
+                            <span>TANGO 10-10</span><span class="code-sub">Training Shots</span>
+                        </button>
+                        <button class="quick-code-btn btn-qc-warn" onclick="copySimple('10-11 Robbery in progress at [LOC]!')">
+                            <span>10-11</span><span class="code-sub">Robbery Active</span>
+                        </button>
+                        <button class="quick-code-btn btn-qc-panic" onclick="copySimple('10-13 AGENT DOWN! ALL UNITS RESPOND!')">
+                            <span>10-13</span><span class="code-sub">Officer Down</span>
+                        </button>
+                        <button class="quick-code-btn btn-qc-clear" onclick="copySimple('10-15 suspect in custody at [LOC]')">
+                            <span>10-15</span><span class="code-sub">Suspect Secured</span>
+                        </button>
+                        <button class="quick-code-btn" onclick="copySimple('10-17 enroute to DOC with 10-15')">
+                            <span>10-17</span><span class="code-sub">DOC Convoy</span>
+                        </button>
+                        <button class="quick-code-btn" onclick="copySimple('10-19 returning to Mission Row HQ')">
+                            <span>10-19</span><span class="code-sub">Return to HQ</span>
+                        </button>
+                        <button class="quick-code-btn" onclick="copySimple('10-20 What is your current location?')">
+                            <span>10-20</span><span class="code-sub">Location</span>
+                        </button>
+                        <button class="quick-code-btn" onclick="copySimple('10-23 arrived at scene [LOC]')">
+                            <span>10-23</span><span class="code-sub">Arrived Scene</span>
+                        </button>
+                        <button class="quick-code-btn btn-qc-warn" onclick="copySimple('10-32 Backup needed at [LOC]!')">
+                            <span>10-32</span><span class="code-sub">Backup Needed</span>
+                        </button>
+                        <button class="quick-code-btn btn-qc-emergency" onclick="copySimple('10-80 Vehicle Pursuit in progress! Heading [DIRECTION]')">
+                            <span>10-80</span><span class="code-sub">Vehicle Pursuit</span>
+                        </button>
+                        <button class="quick-code-btn btn-qc-warn" onclick="copySimple('10-80 Foxtrot Foot pursuit in progress at [LOC]!')">
+                            <span>10-80F</span><span class="code-sub">Foot Pursuit</span>
+                        </button>
+                        <button class="quick-code-btn btn-qc-clear" onclick="copySimple('10-99 situation concluded / booking complete')">
+                            <span>10-99</span><span class="code-sub">Concluded / Done</span>
+                        </button>
+                        <button class="quick-code-btn btn-qc-warn" onclick="copySimple('Code 2, responding lights only')">
+                            <span>Code 2</span><span class="code-sub">Semi-Emergency</span>
+                        </button>
+                        <button class="quick-code-btn btn-qc-emergency" onclick="copySimple('Code 3, responding lights and sirens!')">
+                            <span>Code 3</span><span class="code-sub">Emergency</span>
+                        </button>
+                        <button class="quick-code-btn btn-qc-clear" onclick="copySimple('Code 4, situation under control')">
+                            <span>Code 4</span><span class="code-sub">All Clear</span>
+                        </button>
+                        <button class="quick-code-btn btn-qc-panic" onclick="copySimple('11-99 OFFICER IN DISTRESS! ALL UNITS RESPOND!')">
+                            <span>11-99</span><span class="code-sub">PANIC ALARM</span>
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="tabs-body" style="padding-top:0;">
+                    <!-- TAB 1: COMPLETE 10-CODES DIRECTORY -->
+                    <div class="tab-content active" id="tab-rc-10codes">
+                        <div class="glass-section" style="padding:0.4rem 0;">
+                            <div class="rc-table-row"><span class="rc-code-badge">10-1</span><span class="rc-code-desc">Roll call / Announcement — all units return to headquarters</span><button class="btn copy-btn" onclick="copySimple('10-1 all units return to headquarters')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-2</span><span class="rc-code-desc">Negative</span><button class="btn copy-btn" onclick="copySimple('10-2')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-3</span><span class="rc-code-desc">Stop Transmitting</span><button class="btn copy-btn" onclick="copySimple('10-3 clear the radio channel')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-4</span><span class="rc-code-desc">Acknowledged / Affirmative</span><button class="btn copy-btn" onclick="copySimple('10-4')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-5</span><span class="rc-code-desc">Repeat Last Transmission</span><button class="btn copy-btn" onclick="copySimple('10-5 repeat last transmission')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-6</span><span class="rc-code-desc">Disregard the Last Transmission</span><button class="btn copy-btn" onclick="copySimple('10-6 disregard last transmission')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-7</span><span class="rc-code-desc">Break at Headquarters (AFK)</span><button class="btn copy-btn" onclick="copySimple('10-7 Break at headquarters')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-8</span><span class="rc-code-desc">In-service / Available</span><button class="btn copy-btn" onclick="copySimple('10-8 available and in-service')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-9</span><span class="rc-code-desc">Out of Service / Unavailable</span><button class="btn copy-btn" onclick="copySimple('10-9 out of service')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-10</span><span class="rc-code-desc">Shots Fired</span><button class="btn copy-btn" onclick="copySimple('10-10 Shots Fired at {LOC}')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">TANGO 10-10</span><span class="rc-code-desc">Training Shots Fired</span><button class="btn copy-btn" onclick="copySimple('TANGO 10-10 Training Shots Fired at {LOC}')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-11</span><span class="rc-code-desc">Robbery in Progress</span><button class="btn copy-btn" onclick="copySimple('10-11 Robbery in progress at {LOC}!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-12</span><span class="rc-code-desc">Estimated Time of Arrival (ETA)</span><button class="btn copy-btn" onclick="copySimple('10-12 ETA is 2 minutes')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge" style="color:#ef4444;">10-13</span><span class="rc-code-desc">Agent / Government Employee Down (Top Priority)</span><button class="btn copy-btn" onclick="copySimple('10-13 OFFICER DOWN AT {LOC}! ALL UNITS RESPOND!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-15</span><span class="rc-code-desc">Suspect in Custody</span><button class="btn copy-btn" onclick="copySimple('10-15 suspect secured at {LOC}')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-16</span><span class="rc-code-desc">Injured Civilian</span><button class="btn copy-btn" onclick="copySimple('10-16 injured civilian at {LOC}, requesting EMS')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-17</span><span class="rc-code-desc">En route</span><button class="btn copy-btn" onclick="copySimple('10-17 enroute to DOC with 10-15 and convoy')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-19</span><span class="rc-code-desc">Return to Headquarters</span><button class="btn copy-btn" onclick="copySimple('10-19 returning to Mission Row HQ')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-20</span><span class="rc-code-desc">Location Check</span><button class="btn copy-btn" onclick="copySimple('10-20 what is your current location?')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-21</span><span class="rc-code-desc">Status Check (Specify current status &amp; location)</span><button class="btn copy-btn" onclick="copySimple('10-21 status check on all active units')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-22</span><span class="rc-code-desc">Hostage Situation</span><button class="btn copy-btn" onclick="copySimple('10-22 Hostage Situation at {LOC}! Hold fire!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-23</span><span class="rc-code-desc">Arrived at Scene</span><button class="btn copy-btn" onclick="copySimple('10-23 arrived on scene at {LOC}')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-32</span><span class="rc-code-desc">Backup Needed (Specify units and location)</span><button class="btn copy-btn" onclick="copySimple('10-32 Need backup at {LOC}!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-35</span><span class="rc-code-desc">Ambulance Needs Assistance</span><button class="btn copy-btn" onclick="copySimple('10-35 Ambulance requesting police escort at {LOC}')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-41</span><span class="rc-code-desc">Start of Watch</span><button class="btn copy-btn" onclick="copySimple('10-41 start of watch')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-42</span><span class="rc-code-desc">End of Watch</span><button class="btn copy-btn" onclick="copySimple('10-42 end of watch')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-51</span><span class="rc-code-desc">Vehicle Traffic Stop</span><button class="btn copy-btn" onclick="copySimple('10-51 conducting traffic stop at {LOC} on vehicle [PLATE]')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-52</span><span class="rc-code-desc">Felony Traffic Stop</span><button class="btn copy-btn" onclick="copySimple('10-52 Felony traffic stop at {LOC}! Requesting code 3 backup!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-70</span><span class="rc-code-desc">Suspect has Warrants</span><button class="btn copy-btn" onclick="copySimple('10-70 suspect has active felony warrants')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-75</span><span class="rc-code-desc">Vehicle Wanted / Stolen</span><button class="btn copy-btn" onclick="copySimple('10-75 stolen vehicle spotted at {LOC}')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-80</span><span class="rc-code-desc">Vehicle Pursuit</span><button class="btn copy-btn" onclick="copySimple('10-80 Vehicle pursuit initiated on [VEHICLE] heading [DIR]!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-80 Foxtrot</span><span class="rc-code-desc">Foot Pursuit</span><button class="btn copy-btn" onclick="copySimple('10-80 Foxtrot Foot pursuit at {LOC}! Suspect fleeing on foot!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-90</span><span class="rc-code-desc">Crime in Progress</span><button class="btn copy-btn" onclick="copySimple('10-90 crime in progress at {LOC}!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-92</span><span class="rc-code-desc">Armed Robbery in Progress</span><button class="btn copy-btn" onclick="copySimple('10-92 Armed Robbery in progress at {LOC}! Suspects armed!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-99</span><span class="rc-code-desc">Situation Concluded</span><button class="btn copy-btn" onclick="copySimple('10-99 situation concluded, scene is code 4')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: STATUS CODES (Code A to Code 7) -->
+                    <div class="tab-content" id="tab-rc-status" style="display:none;">
+                        <div class="copy-blocks-grid">
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Code A — Game Crash</span><button class="btn copy-btn" onclick="copySimple('Code A, flying back immediately')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">Code A — (( Game crash ))</div>
+                            </div>
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Code B — Paused RP</span><button class="btn copy-btn" onclick="copySimple('Code B, situation paused for admin')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">Code B — (( Paused RP, admin situation ))</div>
+                            </div>
+                            <div class="copy-block" style="border-color:rgba(239,68,68,0.4);">
+                                <div class="copy-header" style="background:rgba(239,68,68,0.1);">
+                                    <span style="color:#f87171;">Code 1 — Life-Threatening Emergency</span>
+                                    <button class="btn copy-btn" onclick="copySimple('Code 1, responding ASAP lights and sirens!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button>
+                                </div>
+                                <div class="copy-content" style="color:#f87171;">Drop what you are doing and respond immediately (Lights &amp; Sirens)</div>
+                            </div>
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Code 2 — Semi-Emergency</span><button class="btn copy-btn" onclick="copySimple('Code 2, responding lights only')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">Semi-emergency (Lights only, no siren)</div>
+                            </div>
+                            <div class="copy-block" style="border-color:rgba(56,189,248,0.4);">
+                                <div class="copy-header" style="background:rgba(56,189,248,0.1);">
+                                    <span style="color:#38bdf8;">Code 3 — Emergency</span>
+                                    <button class="btn copy-btn" onclick="copySimple('Code 3, responding lights and sirens!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button>
+                                </div>
+                                <div class="copy-content" style="color:#38bdf8;">Emergency response (Lights &amp; Sirens active)</div>
+                            </div>
+                            <div class="copy-block" style="border-color:rgba(16,185,129,0.4);">
+                                <div class="copy-header" style="background:rgba(16,185,129,0.1);">
+                                    <span style="color:#34d399;">Code 4 — Situation Under Control</span>
+                                    <button class="btn copy-btn" onclick="copySimple('Code 4, situation under control, scene clear')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button>
+                                </div>
+                                <div class="copy-content" style="color:#34d399;">Situation under control / All clear. Further units cancel response.</div>
+                            </div>
+                            <div class="copy-block" style="border-color:rgba(239,68,68,0.5);">
+                                <div class="copy-header" style="background:rgba(239,68,68,0.15);"><span style="color:#ef4444; font-weight:700;">Code 5 — Terrorist Attack</span><button class="btn copy-btn" onclick="copySimple('Code 5! Terrorist attack at [LOC]! All state agencies respond!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content" style="color:#ef4444;">Terrorist attack declared. Full tactical mobilization.</div>
+                            </div>
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Code 6 — Out of Vehicle</span><button class="btn copy-btn" onclick="copySimple('Code 6 at [LOC]')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">Officer is on foot / out of patrol cruiser conducting activities.</div>
+                            </div>
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Code 7 — Conducting an Investigation</span><button class="btn copy-btn" onclick="copySimple('Code 7 conducting investigation at [LOC]')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">Conducting an active investigation / scene processing.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: DEPT COMMANDS (Tactical Radio Calls) -->
+                    <div class="tab-content" id="tab-rc-dept" style="display:none;">
+                        <div class="dept-chips-container" style="display:flex; gap:0.4rem; overflow-x:auto; margin-bottom:0.8rem; padding-bottom:0.4rem;">
+                            <button class="dept-chip active" data-dept-tab="dept-tab-bgc" onclick="switchDeptTab('dept-tab-bgc')"><span class="material-symbols-outlined chip-icon" style="color:#38bdf8;">badge</span> Background Check</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-doj" onclick="switchDeptTab('dept-tab-doj')"><span class="material-symbols-outlined chip-icon" style="color:#a78bfa;">gavel</span> DOJ / Lawyers</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-fib" onclick="switchDeptTab('dept-tab-fib')"><span class="material-symbols-outlined chip-icon" style="color:#ff6b35;">security</span> FIB Agency</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-ems" onclick="switchDeptTab('dept-tab-ems')"><span class="material-symbols-outlined chip-icon" style="color:#ef4444;">medical_services</span> EMS Medical</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-gov" onclick="switchDeptTab('dept-tab-gov')"><span class="material-symbols-outlined chip-icon" style="color:#00d4ff;">account_balance</span> Government</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-global" onclick="switchDeptTab('dept-tab-global')"><span class="material-symbols-outlined chip-icon" style="color:#10b981;">public</span> Global / All</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-broadcasts" onclick="switchDeptTab('dept-tab-broadcasts')"><span class="material-symbols-outlined chip-icon" style="color:#ef4444;">campaign</span> Robberies</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-bank" onclick="switchDeptTab('dept-tab-bank')"><span class="material-symbols-outlined chip-icon" style="color:#f59e0b;">account_balance</span> Bank Robbery</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-prison" onclick="switchDeptTab('dept-tab-prison')"><span class="material-symbols-outlined chip-icon" style="color:#f97316;">lock</span> DOC &amp; Prison</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-subs" onclick="switchDeptTab('dept-tab-subs')"><span class="material-symbols-outlined chip-icon" style="color:#06b6d4;">directions_boat</span> Subs / Carrier</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-acc" onclick="switchDeptTab('dept-tab-acc')"><span class="material-symbols-outlined chip-icon" style="color:#10b981;">domain</span> ACC</button>
+                            <button class="dept-chip" data-dept-tab="dept-tab-meetings" onclick="switchDeptTab('dept-tab-meetings')"><span class="material-symbols-outlined chip-icon" style="color:#a855f7;">groups</span> Meetings</button>
+                              <!-- BGC Commands -->
+                        <div id="dept-tab-bgc" class="dept-tab-content active">
+                            <div class="copy-blocks-grid">
+                                <div class="copy-block"><div class="copy-header"><span>How Copy?</span><button class="btn copy-btn" onclick="copySimple('SAHP To ALL: How Copy?')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To ALL: How Copy?</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Request BGC</span><button class="btn copy-btn" onclick="copySimple('SAHP To [DEPT/LAST]: (Name of person) wants to join SAHP. Can I have a BGC on them please?')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To [DEPT/LAST]: (Name of person) wants to join SAHP. Can I have a BGC on them please?</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>BGC Clear Response</span><button class="btn copy-btn" onclick="copySimple('SAHP To [DEPT/LAST]: 10-4 BGC on (Name) is clean with no criminal history. Clear to proceed.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To [DEPT/LAST]: 10-4 BGC on (Name) is clean with no criminal history. Clear to proceed.</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>10-4 Appreciated</span><button class="btn copy-btn" onclick="copySimple('SAHP To [DEPT/LAST]: 10-4! Appreciate your prompt assistance always!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To [DEPT/LAST]: 10-4! Appreciate your prompt assistance always!</div></div>
+                            </div>
+                        </div>
+
+                        <!-- DOJ Related -->
+                        <div id="dept-tab-doj" class="dept-tab-content" style="display:none;">
+                            <div class="copy-blocks-grid">
+                                <div class="copy-block"><div class="copy-header"><span>Radio Check</span><button class="btn copy-btn" onclick="copySimple('SAHP to DOJ: How copy?')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to DOJ: How copy?</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Affirmative Traffic</span><button class="btn copy-btn" onclick="copySimple('SAHP to DOJ: Good copy, send traffic!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to DOJ: Good copy, send traffic!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Negative Copy</span><button class="btn copy-btn" onclick="copySimple('SAHP to DOJ: Bad copy!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to DOJ: Bad copy!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Busy (Pursuit)</span><button class="btn copy-btn" onclick="copySimple('SAHP to DOJ: Bad copy, we\'re currently in a pursuit!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to DOJ: Bad copy, we're currently in a pursuit!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Lawyer Request at DOC</span><button class="btn copy-btn" onclick="copySimple('SAHP to DOJ: We have a 10-15 at DOC requesting a lawyer, see any available?')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to DOJ: We have a 10-15 at DOC requesting a lawyer, see any available?</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Appreciation</span><button class="btn copy-btn" onclick="copySimple('SAHP to DOJ: 10-4, much appreciated!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to DOJ: 10-4, much appreciated!</div></div>
+                            </div>
+                        </div>
+
+                        <!-- FIB Related -->
+                        <div id="dept-tab-fib" class="dept-tab-content" style="display:none;">
+                            <div class="copy-blocks-grid">
+                                <div class="copy-block"><div class="copy-header"><span>Radio Check</span><button class="btn copy-btn" onclick="copySimple('SAHP to FIB: How copy?')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to FIB: How copy?</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Affirmative Traffic</span><button class="btn copy-btn" onclick="copySimple('SAHP to FIB: Good copy, send traffic!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to FIB: Good copy, send traffic!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Negative Copy</span><button class="btn copy-btn" onclick="copySimple('SAHP to FIB: Bad copy!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to FIB: Bad copy!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Busy (Pursuit)</span><button class="btn copy-btn" onclick="copySimple('SAHP to FIB: Bad copy, we\'re currently in a pursuit!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to FIB: Bad copy, we're currently in a pursuit!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Investigation Assistance</span><button class="btn copy-btn" onclick="copySimple('SAHP to FIB: Requesting assistance for a multi-vehicle collision investigation.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to FIB: Requesting assistance for a multi-vehicle collision investigation.</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Appreciation</span><button class="btn copy-btn" onclick="copySimple('SAHP to FIB: 10-4, much appreciated!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to FIB: 10-4, much appreciated!</div></div>
+                            </div>
+                        </div>
+
+                        <!-- EMS Related -->
+                        <div id="dept-tab-ems" class="dept-tab-content" style="display:none;">
+                            <div class="copy-blocks-grid">
+                                <div class="copy-block"><div class="copy-header"><span>Radio Check</span><button class="btn copy-btn" onclick="copySimple('SAHP to EMS: How copy?')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to EMS: How copy?</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Affirmative Traffic</span><button class="btn copy-btn" onclick="copySimple('SAHP to EMS: Good copy, send traffic!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to EMS: Good copy, send traffic!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Negative Copy</span><button class="btn copy-btn" onclick="copySimple('SAHP to EMS: Bad copy!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to EMS: Bad copy!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Busy (Crash Scene)</span><button class="btn copy-btn" onclick="copySimple('SAHP to EMS: Bad copy, we\'re currently managing a crash site!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to EMS: Bad copy, we're currently managing a crash site!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Collision Medical Response</span><button class="btn copy-btn" onclick="copySimple('SAHP to EMS: Requesting immediate medical assistance at highway collision.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to EMS: Requesting immediate medical assistance at highway collision.</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Appreciation</span><button class="btn copy-btn" onclick="copySimple('SAHP to EMS: 10-4, much appreciated!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to EMS: 10-4, much appreciated!</div></div>
+                            </div>
+                        </div>
+
+                        <!-- GOV Related -->
+                        <div id="dept-tab-gov" class="dept-tab-content" style="display:none;">
+                            <div class="copy-blocks-grid">
+                                <div class="copy-block"><div class="copy-header"><span>Radio Check</span><button class="btn copy-btn" onclick="copySimple('SAHP to GOV: How copy?')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to GOV: How copy?</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Affirmative Traffic</span><button class="btn copy-btn" onclick="copySimple('SAHP to GOV: Good copy, send traffic!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to GOV: Good copy, send traffic!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Copy</span><button class="btn copy-btn" onclick="copySimple('SAHP to GOV: Copy')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to GOV: Copy</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Busy (Pursuit)</span><button class="btn copy-btn" onclick="copySimple('SAHP to GOV: Bad copy, we\'re currently in a pursuit!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to GOV: Bad copy, we're currently in a pursuit!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Units En Route</span><button class="btn copy-btn" onclick="copySimple('SAHP to GOV: Troopers enroute!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to GOV: Troopers enroute!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Capitol Meeting</span><button class="btn copy-btn" onclick="copySimple('SAHP to GOV: Can we have a quick meeting at capitol?')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to GOV: Can we have a quick meeting at capitol?</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Landing Permission (Lawn)</span><button class="btn copy-btn" onclick="copySimple('SAHP to GOV: Requesting permission to land on your lawn.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to GOV: Requesting permission to land on your lawn.</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Unit in Custody</span><button class="btn copy-btn" onclick="copySimple('SAHP to GOV: We have one of your units in custody. Could you 10-17 to DOC?')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to GOV: We have one of your units in custody. Could you 10-17 to DOC?</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Appreciation</span><button class="btn copy-btn" onclick="copySimple('SAHP to GOV: 10-4, much appreciated!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to GOV: 10-4, much appreciated!</div></div>
+                            </div>
+                        </div>
+
+                        <!-- Global Broadcasts -->
+                        <div id="dept-tab-global" class="dept-tab-content" style="display:none;">
+                            <div class="copy-blocks-grid">
+                                <div class="copy-block"><div class="copy-header"><span>Situation Inquiry</span><button class="btn copy-btn" onclick="copySimple('SAHP to GLOBAL: What\'s the situation?')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to GLOBAL: What's the situation?</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Store Robbery Regroup</span><button class="btn copy-btn" onclick="copySimple('SAHP to ALL: Global is re-grouping after the latest store robbery. Please dispatch max units.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to ALL: Global is re-grouping after the latest store robbery. Please dispatch max units.</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>High-Speed Pursuit</span><button class="btn copy-btn" onclick="copySimple('SAHP to ALL: Global is in for a high-speed pursuit, send all available units!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to ALL: Global is in for a high-speed pursuit, send all available units!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Highway Collision</span><button class="btn copy-btn" onclick="copySimple('SAHP to ALL: Major collision on the highway, send all available units!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to ALL: Major collision on the highway, send all available units!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Sobriety Checkpoint</span><button class="btn copy-btn" onclick="copySimple('SAHP to ALL: Global is for a sobriety checkpoint, everyone is invited!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to ALL: Global is for a sobriety checkpoint, everyone is invited!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Roadblock Activation</span><button class="btn copy-btn" onclick="copySimple('SAHP to ALL: Be on standby for a possible roadblock activation!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to ALL: Be on standby for a possible roadblock activation!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Global 10-99 (Concluded)</span><button class="btn copy-btn" onclick="copySimple('SAHP to ALL: The Global is 10-99.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP to ALL: The Global is 10-99.</div></div>
+                            </div>
+                        </div>
+
+                        <!-- Robberies -->
+                        <div id="dept-tab-broadcasts" class="dept-tab-content" style="display:none;">
+                            <div class="copy-blocks-grid">
+                                <div class="copy-block"><div class="copy-header"><span>Store Robbery</span><button class="btn copy-btn" onclick="copySimple('SAHP To ALL: Store Robbery in progress at [LOC]! Units respond Code 3!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To ALL: Store Robbery in progress at [LOC]! Units respond Code 3!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Gun Store Robbery</span><button class="btn copy-btn" onclick="copySimple('SAHP To ALL: Gun Store Robbery in progress at [LOC]! High alert, suspect armed!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To ALL: Gun Store Robbery in progress at [LOC]! High alert, suspect armed!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Hostage Situation</span><button class="btn copy-btn" onclick="copySimple('SAHP To ALL: Hostage Situation at [LOC]! Set up outer perimeter, negotiator enroute!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To ALL: Hostage Situation at [LOC]! Set up outer perimeter, negotiator enroute!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Officer Needs Help (11-99)</span><button class="btn copy-btn" onclick="copySimple('SAHP To ALL: 11-99! Trooper in distress at [LOC]! ALL AVAILABLE UNITS RESPOND CODE 3!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To ALL: 11-99! Trooper in distress at [LOC]! ALL AVAILABLE UNITS RESPOND CODE 3!</div></div>
+                            </div>
+                        </div>
+
+                        <!-- Bank Robbery -->
+                        <div id="dept-tab-bank" class="dept-tab-content" style="display:none;">
+                            <div class="copy-blocks-grid">
+                                <div class="copy-block"><div class="copy-header"><span>Bank Alarm Triggered</span><button class="btn copy-btn" onclick="copySimple('SAHP To ALL: 10-10 Bank Robbery alarm triggered! Establishing tactical perimeter.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To ALL: 10-10 Bank Robbery alarm triggered! Establishing tactical perimeter.</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Request Heavy Backup</span><button class="btn copy-btn" onclick="copySimple('SAHP To LSPD/FIB/NG: Requesting all tactical units and barricades at Bank!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To LSPD/FIB/NG: Requesting all tactical units and barricades at Bank!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Hostages Negotiated</span><button class="btn copy-btn" onclick="copySimple('SAHP To ALL: Hostage negotiations concluded, prepare for tactical breach/pursuit!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To ALL: Hostage negotiations concluded, prepare for tactical breach/pursuit!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Code 4 (All Clear)</span><button class="btn copy-btn" onclick="copySimple('SAHP To ALL: Bank secured, suspects in custody / neutralized. Scene is Code 4.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To ALL: Bank secured, suspects in custody / neutralized. Scene is Code 4.</div></div>
+                            </div>
+                        </div>
+
+                        <!-- DOC & Prison -->
+                        <div id="dept-tab-prison" class="dept-tab-content" style="display:none;">
+                            <div class="copy-blocks-grid">
+                                <div class="copy-block"><div class="copy-header"><span>10-17 Transport Announcement</span><button class="btn copy-btn" onclick="copySimple('[BADGE] To Dispatch: I am 10-17 to DOC with [NUMBER] of 10-15 and convoy.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">[BADGE] To Dispatch: I am 10-17 to DOC with [NUMBER] of 10-15 and convoy.</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>State Lawyer Request</span><button class="btn copy-btn" onclick="copySimple('[BADGE] To Dispatch: My 10-15 is requesting a state lawyer at DOC.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">[BADGE] To Dispatch: My 10-15 is requesting a state lawyer at DOC.</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>10-99 Booking Completed</span><button class="btn copy-btn" onclick="copySimple('[BADGE] To Dispatch: Show my last 10-15 is now 10-99 and I am 10-19 to Paleto Bay SAHP HQ.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">[BADGE] To Dispatch: Show my last 10-15 is now 10-99 and I am 10-19 to Paleto Bay SAHP HQ.</div></div>
+                            </div>
+                        </div>
+
+                        <!-- Subs / Carrier -->
+                        <div id="dept-tab-subs" class="dept-tab-content" style="display:none;">
+                            <div class="copy-blocks-grid">
+                                <div class="copy-block"><div class="copy-header"><span>Carrier Assembly</span><button class="btn copy-btn" onclick="copySimple('SAHP To ALL: Units staging at marina/helipad for Aircraft Carrier operation!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To ALL: Units staging at marina/helipad for Aircraft Carrier operation!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Carrier Tactical Move</span><button class="btn copy-btn" onclick="copySimple('SAHP To ALL: State convoy moving in. Watch elevated sniper positions and sea approach!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To ALL: State convoy moving in. Watch elevated sniper positions and sea approach!</div></div>
+                            </div>
+                        </div>
+
+                        <!-- ACC -->
+                        <div id="dept-tab-acc" class="dept-tab-content" style="display:none;">
+                            <div class="copy-blocks-grid">
+                                <div class="copy-block"><div class="copy-header"><span>ACC Deployment</span><button class="btn copy-btn" onclick="copySimple('SAHP To ALL: Heavy units deploying to ACC. Maintain defensive lines!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To ALL: Heavy units deploying to ACC. Maintain defensive lines!</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>ACC Barricades Deployed</span><button class="btn copy-btn" onclick="copySimple('SAHP To ALL: Tactical barricades deployed. Checkpoints active.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To ALL: Tactical barricades deployed. Checkpoints active.</div></div>
+                            </div>
+                        </div>
+
+                        <!-- Meetings -->
+                        <div id="dept-tab-meetings" class="dept-tab-content" style="display:none;">
+                            <div class="copy-blocks-grid">
+                                <div class="copy-block"><div class="copy-header"><span>Quick Meeting</span><button class="btn copy-btn" onclick="copySimple('SAHP To [DEPT/LAST]: Can we have a quick command meeting at your HQ?')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To [DEPT/LAST]: Can we have a quick command meeting at your HQ?</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>ETA 5 Mins</span><button class="btn copy-btn" onclick="copySimple('SAHP To [DEPT/LAST]: ETA to your HQ 5 minutes.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To [DEPT/LAST]: ETA to your HQ 5 minutes.</div></div>
+                                <div class="copy-block"><div class="copy-header"><span>Air One Landing Permission</span><button class="btn copy-btn" onclick="copySimple('SAHP To [DEPT/LAST]: Air One requesting permission to land on your rooftop helipad.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To [DEPT/LAST]: Air One requesting permission to land on your rooftop helipad.</div></div>
+                            </div>
+                        </div>                    </div>
+                    </div>
+
+                    <!-- TAB 4: MIRANDA & MARTIAL LAW RIGHTS -->
+                    <div class="tab-content" id="tab-rc-miranda" style="display:none;">
+                        <div class="copy-blocks-grid">
+                            <div class="copy-block" style="border-color:rgba(56,189,248,0.4);">
+                                <div class="copy-header" style="background:rgba(56,189,248,0.1);">
+                                    <span style="color:#38bdf8; font-weight:700;">Standard Miranda Rights</span>
+                                    <button class="btn copy-btn" onclick="copySimple('You have the right to remain silent, anything you say can and will be used against you in the court of law. You have the right to an attorney, if you cannot afford an attorney, one will be appointed to you by the state, if available.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button>
+                                </div>
+                                <div class="copy-content">
+                                    You have the right to remain silent, anything you say can and will be used against you in the court of law. You have the right to an attorney, if you cannot afford an attorney, one will be appointed to you by the state, if available.
+                                </div>
+                            </div>
+
+                            <div class="copy-block" style="border-color:rgba(239,68,68,0.4);">
+                                <div class="copy-header" style="background:rgba(239,68,68,0.1);">
+                                    <span style="color:#f87171; font-weight:700;">Martial Law Rights (No Government Present)</span>
+                                    <button class="btn copy-btn" onclick="copySimple('You have right to remain silent, Anything you say can and will be used against you in the court of law, Due to the Martial Law, There are no state attorneys available.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button>
+                                </div>
+                                <div class="copy-content">
+                                    You have right to remain silent, Anything you say can and will be used against you in the court of law, Due to the Martial Law, There are no state attorneys available.
+                                </div>
+                            </div>
+
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Understanding Check</span><button class="btn copy-btn" onclick="copySimple('Do You Understand your rights I just read to you?')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">Do You Understand your rights I just read to you?</div>
+                            </div>
+
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Silence Acknowledgment (After 3 Attempts)</span><button class="btn copy-btn" onclick="copySimple('I will take your silence as a yes.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">I will take your silence as a yes.</div>
+                                <div style="font-size:0.75rem; color:var(--text-muted); padding:0.4rem 0.95rem; background:rgba(3,7,18,0.3);">
+                                    *Make sure to read the rights at least 3 times. If they don't respond, state the above acknowledgment.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL: DRESS CODES & UNIFORM GUIDE -->
+            <div class="modal-content" id="modal-dresscodes" style="max-width: 950px;">
+                <div class="modal-header">
+                    <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-gold" style="font-size:1.4rem; margin-right:6px;">apparel</span> Department Uniform &amp; Dress Codes</span>
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
+
+                <div class="modal-body-scroll">
+                    <!-- Search & Filter Controls -->
+                    <div style="display:flex; gap:0.6rem; align-items:center; margin-bottom:0.8rem; flex-wrap:wrap;">
+                        <div class="penal-search-bar" style="margin-bottom:0; flex:1; min-width:240px;">
+                            <span class="material-symbols-outlined penal-search-icon">search</span>
+                            <input type="text" class="penal-search-input" placeholder="Search by rank name or number (e.g., Trooper, Captain, @6)..." oninput="searchDresscodes(this.value)" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="dresscode-ranks-filter">
+                        <button class="penal-chip dresscode-rank-chip active" onclick="filterDresscodes(this, 'ALL')">All Ranks (3 - 22)</button>
+                        <button class="penal-chip dresscode-rank-chip" onclick="filterDresscodes(this, 'entry')">Entry (3 - 4)</button>
+                        <button class="penal-chip dresscode-rank-chip" onclick="filterDresscodes(this, 'trooper')">Trooper (5 - 8)</button>
+                        <button class="penal-chip dresscode-rank-chip" onclick="filterDresscodes(this, 'senior')">Senior (9 - 12)</button>
+                        <button class="penal-chip dresscode-rank-chip" onclick="filterDresscodes(this, 'nco')">Corporal &amp; Sgt (13 - 19)</button>
+                        <button class="penal-chip dresscode-rank-chip" onclick="filterDresscodes(this, 'command')">Command (20 - 22)</button>
+                    </div>
+
+                    <div class="dresscode-grid" id="dresscode-cards-container">
+                        <!-- TIER 1: TRAINEE & PROBIE -->
+                        <div class="dresscode-card" data-tier="entry">
+                            <div class="dresscode-card-header">
+                                <div class="dresscode-rank-title">
+                                    <span class="material-symbols-outlined" style="color:#94a3b8; font-size:1.15rem;">shield</span>
+                                    <span>Rank 3 | Trainee &bull; Rank 4 | Probie</span>
+                                </div>
+                                <span class="dresscode-tier-badge tier-entry">Entry Tier</span>
+                            </div>
+                            <div class="dresscode-items-grid">
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Headwear</span><span class="dresscode-item-val">Option 1, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Outwear</span><span class="dresscode-item-val">Option 4, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Pants</span><span class="dresscode-item-val">Option 1, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Shoes</span><span class="dresscode-item-val">Option 4, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Accessories</span><span class="dresscode-item-val">Option 3, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Add. Accessories</span><span class="dresscode-item-val">Option 2, Color 1</span></div>
+                            </div>
+                        </div>
+
+                        <!-- TIER 2: TROOPER I - III -->
+                        <div class="dresscode-card" data-tier="trooper">
+                            <div class="dresscode-card-header">
+                                <div class="dresscode-rank-title">
+                                    <span class="material-symbols-outlined" style="color:#38bdf8; font-size:1.15rem;">local_police</span>
+                                    <span>Rank 5 | Probation &bull; Ranks 6-8 | Trooper I, II, III</span>
+                                </div>
+                                <span class="dresscode-tier-badge tier-trooper">Patrol Trooper</span>
+                            </div>
+                            <div class="dresscode-items-grid">
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Headwear</span><span class="dresscode-item-val">Option 1, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Outwear</span><span class="dresscode-item-val">Option 12, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Pants</span><span class="dresscode-item-val">Option 8, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Shoes</span><span class="dresscode-item-val">Option 1, Color 2</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Accessories</span><span class="dresscode-item-val">Option 12, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Add. Accessories</span><span class="dresscode-item-val">Option 8, Color 1</span></div>
+                            </div>
+                        </div>
+
+                        <!-- TIER 3: SENIOR TROOPER I & II -->
+                        <div class="dresscode-card" data-tier="senior">
+                            <div class="dresscode-card-header">
+                                <div class="dresscode-rank-title">
+                                    <span class="material-symbols-outlined" style="color:#34d399; font-size:1.15rem;">stars</span>
+                                    <span>Ranks 9-10 | Senior Trooper I &amp; II</span>
+                                </div>
+                                <span class="dresscode-tier-badge tier-senior">Senior Tier</span>
+                            </div>
+                            <div class="dresscode-items-grid">
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Headwear</span><span class="dresscode-item-val">Option 1, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Outwear</span><span class="dresscode-item-val">Option 12, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Pants</span><span class="dresscode-item-val">Option 2, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Shoes</span><span class="dresscode-item-val">Option 8, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Accessories</span><span class="dresscode-item-val">Option 9, Color 3</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Add. Accessories</span><span class="dresscode-item-val">Option 9, Color 1</span></div>
+                            </div>
+                        </div>
+
+                        <!-- TIER 4: SENIOR TROOPER III & MASTER TROOPER I -->
+                        <div class="dresscode-card" data-tier="senior">
+                            <div class="dresscode-card-header">
+                                <div class="dresscode-rank-title">
+                                    <span class="material-symbols-outlined" style="color:#34d399; font-size:1.15rem;">stars</span>
+                                    <span>Rank 11 | Senior III &bull; Rank 12 | Master I</span>
+                                </div>
+                                <span class="dresscode-tier-badge tier-senior">Senior Tier</span>
+                            </div>
+                            <div class="dresscode-items-grid">
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Headwear</span><span class="dresscode-item-val">Option 1, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Outwear</span><span class="dresscode-item-val">Option 20, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Pants</span><span class="dresscode-item-val">Option 3, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Shoes</span><span class="dresscode-item-val">Option 8, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Accessories</span><span class="dresscode-item-val">Option 9, Color 3</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Add. Accessories</span><span class="dresscode-item-val">Option 3, Color 1</span></div>
+                            </div>
+                        </div>
+
+                        <!-- TIER 5: MASTER TROOPER II - III & CORPORAL -->
+                        <div class="dresscode-card" data-tier="nco">
+                            <div class="dresscode-card-header">
+                                <div class="dresscode-rank-title">
+                                    <span class="material-symbols-outlined" style="color:#a855f7; font-size:1.15rem;">military_tech</span>
+                                    <span>Ranks 13-14 | Master II, III &bull; Rank 15 | Corporal</span>
+                                </div>
+                                <span class="dresscode-tier-badge" style="background:rgba(168,85,247,0.15); color:#c084fc; border:1px solid rgba(168,85,247,0.3);">NCO Tier</span>
+                            </div>
+                            <div class="dresscode-items-grid">
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Headwear</span><span class="dresscode-item-val">Option 1, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Outwear</span><span class="dresscode-item-val">Option 10, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Pants</span><span class="dresscode-item-val">Option 2, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Shoes</span><span class="dresscode-item-val">Option 8, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Accessories</span><span class="dresscode-item-val">Option 9, Color 3</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Add. Accessories</span><span class="dresscode-item-val">Option 8, Color 1</span></div>
+                            </div>
+                        </div>
+
+                        <!-- TIER 6: CORPORALS & SERGEANTS -->
+                        <div class="dresscode-card" data-tier="nco">
+                            <div class="dresscode-card-header">
+                                <div class="dresscode-rank-title">
+                                    <span class="material-symbols-outlined" style="color:#a855f7; font-size:1.15rem;">military_tech</span>
+                                    <span>Ranks 16-17 | Sr/Master Cpl &bull; 18-19 | Sgt, Sr Sgt</span>
+                                </div>
+                                <span class="dresscode-tier-badge" style="background:rgba(168,85,247,0.15); color:#c084fc; border:1px solid rgba(168,85,247,0.3);">Sergeant Tier</span>
+                            </div>
+                            <div class="dresscode-items-grid">
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Headwear</span><span class="dresscode-item-val">Option 1, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Outwear</span><span class="dresscode-item-val">Option 3, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Pants</span><span class="dresscode-item-val">Option 2, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Shoes</span><span class="dresscode-item-val">Option 8, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Accessories</span><span class="dresscode-item-val">Option 9, Color 3</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Add. Accessories</span><span class="dresscode-item-val">Option 8, Color 1</span></div>
+                            </div>
+                        </div>
+
+                        <!-- TIER 7: SUPERVISOR -->
+                        <div class="dresscode-card" data-tier="command">
+                            <div class="dresscode-card-header">
+                                <div class="dresscode-rank-title">
+                                    <span class="material-symbols-outlined" style="color:#fbbf24; font-size:1.15rem;">workspace_premium</span>
+                                    <span>Rank 20 | Supervisor</span>
+                                </div>
+                                <span class="dresscode-tier-badge tier-command">Command</span>
+                            </div>
+                            <div class="dresscode-items-grid">
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Headwear</span><span class="dresscode-item-val">Option 1, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Outwear</span><span class="dresscode-item-val">Option 3, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Pants</span><span class="dresscode-item-val">Option 3, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Shoes</span><span class="dresscode-item-val">Option 2, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Accessories</span><span class="dresscode-item-val">Option 8, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Add. Accessories</span><span class="dresscode-item-val">Option 6, Color 1</span></div>
+                            </div>
+                        </div>
+
+                        <!-- TIER 8: CAPTAIN -->
+                        <div class="dresscode-card" data-tier="command">
+                            <div class="dresscode-card-header">
+                                <div class="dresscode-rank-title">
+                                    <span class="material-symbols-outlined" style="color:#fbbf24; font-size:1.15rem;">workspace_premium</span>
+                                    <span>Rank 21 | Captain</span>
+                                </div>
+                                <span class="dresscode-tier-badge tier-command">High Command</span>
+                            </div>
+                            <div class="dresscode-items-grid">
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Headwear</span><span class="dresscode-item-val">Option 1, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Outwear</span><span class="dresscode-item-val">Option 8, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Pants</span><span class="dresscode-item-val">Option 7, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Shoes</span><span class="dresscode-item-val">Option 7, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Accessories</span><span class="dresscode-item-val">Option 4, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Add. Accessories</span><span class="dresscode-item-val">Option 6, Color 1</span></div>
+                            </div>
+                        </div>
+
+                        <!-- TIER 9: LIEUTENANT -->
+                        <div class="dresscode-card" data-tier="command">
+                            <div class="dresscode-card-header">
+                                <div class="dresscode-rank-title">
+                                    <span class="material-symbols-outlined" style="color:#fbbf24; font-size:1.15rem;">workspace_premium</span>
+                                    <span>Rank 22 | Lieutenant</span>
+                                </div>
+                                <span class="dresscode-tier-badge tier-command">High Command</span>
+                            </div>
+                            <div class="dresscode-items-grid">
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Headwear</span><span class="dresscode-item-val">Option 1, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Outwear</span><span class="dresscode-item-val">Option 15, Color 2</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Pants</span><span class="dresscode-item-val">Option 7, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Shoes</span><span class="dresscode-item-val">Option 7, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Accessories</span><span class="dresscode-item-val">Option 4, Color 1</span></div>
+                                <div class="dresscode-item-cell"><span class="dresscode-item-lbl">Add. Accessories</span><span class="dresscode-item-val">Option 8, Color 1</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL: ROLEPLAY COMMANDS & HR PROTOCOLS -->
+            <div class="modal-content" id="modal-roleplay" style="max-width: 950px;">
+                <div class="modal-header">
+                    <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-purple" style="font-size:1.4rem; margin-right:6px;">psychology</span> Roleplay Commands (/me, /try, /do, /todo) &amp; HR</span>
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
+
+                <div class="tabs-header">
+                    <button class="tab-btn active" onclick="switchTab(this, 'tab-rp-hr')">HR Contracts</button>
+                    <button class="tab-btn" onclick="switchTab(this, 'tab-rp-arrest')">Arrest &amp; Custody</button>
+                    <button class="tab-btn" onclick="switchTab(this, 'tab-rp-traffic')">Traffic Stop &amp; Search</button>
+                    <button class="tab-btn" onclick="switchTab(this, 'tab-rp-dui')">Field Sobriety / DUI</button>
+                    <button class="tab-btn" onclick="switchTab(this, 'tab-rp-medical')">Medical Triage</button>
+                </div>
+
+                <div class="tabs-body">
+                    <!-- TAB 1: HR & EMPLOYMENT CONTRACTS -->
+                    <div class="tab-content active" id="tab-rp-hr">
+                        <div class="glass-section" style="margin-bottom:0.8rem; border-color:rgba(168,85,247,0.35);">
+                            <div class="section-title" style="color:#c084fc;"><span class="material-symbols-outlined icon-gradient-purple" style="font-size:1.2rem; margin-right:6px;">badge</span> Current SAHP / Department Employees</div>
+                            <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.6rem;">
+                                If you are already employed, report to Reception and complete the contract signing sequence:
+                            </div>
+
+                            <div class="rp-command-block">
+                                <div class="rp-command-header"><span class="rp-type-tag tag-me">/ME COMMAND</span><button class="btn copy-btn" onclick="copySimple('/me takes the Employment Contract out of the drawer and carefully reads it.')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                                <div class="rp-command-text">/me takes the Employment Contract out of the drawer and carefully reads it.</div>
+                            </div>
+                            <div class="rp-command-block">
+                                <div class="rp-command-header"><span class="rp-type-tag tag-do">/DO COMMAND</span><button class="btn copy-btn" onclick="copySimple('/do Signs the Employment Contract after carefully reading and agreeing to all of its terms.')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                                <div class="rp-command-text">/do Signs the Employment Contract after carefully reading and agreeing to all of its terms.</div>
+                            </div>
+                            <div class="rp-command-block">
+                                <div class="rp-command-header"><span class="rp-type-tag tag-me">/ME COMMAND</span><button class="btn copy-btn" onclick="copySimple('/me places the signed Employment Contract back into the drawer.')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                                <div class="rp-command-text">/me places the signed Employment Contract back into the drawer.</div>
+                            </div>
+                        </div>
+
+                        <div class="glass-section" style="margin-bottom:0.8rem; border-color:rgba(56,189,248,0.35);">
+                            <div class="section-title" style="color:#38bdf8;"><span class="material-symbols-outlined icon-gradient-blue" style="font-size:1.2rem; margin-right:6px;">how_to_reg</span> New Department Employees (HR Onboarding)</div>
+                            <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.6rem;">
+                                When onboarding a new employee, the HR representative provides the contract first:
+                            </div>
+
+                            <div style="font-size:0.75rem; color:#38bdf8; font-weight:700; margin-bottom:0.3rem;">HR Representative:</div>
+                            <div class="rp-command-block">
+                                <div class="rp-command-header"><span class="rp-type-tag tag-me">/ME COMMAND</span><button class="btn copy-btn" onclick="copySimple('/me gives the Employment Contract to [Person Name].')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                                <div class="rp-command-text">/me gives the Employment Contract to [Person Name].</div>
+                            </div>
+
+                            <div style="font-size:0.75rem; color:#34d399; font-weight:700; margin:0.6rem 0 0.3rem;">New Employee:</div>
+                            <div class="rp-command-block">
+                                <div class="rp-command-header"><span class="rp-type-tag tag-me">/ME COMMAND</span><button class="btn copy-btn" onclick="copySimple('/me takes the Employment Contract and carefully reads it.')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                                <div class="rp-command-text">/me takes the Employment Contract and carefully reads it.</div>
+                            </div>
+                            <div class="rp-command-block">
+                                <div class="rp-command-header"><span class="rp-type-tag tag-do">/DO COMMAND</span><button class="btn copy-btn" onclick="copySimple('/do Signs the Employment Contract after carefully reading and agreeing to all of its terms.')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                                <div class="rp-command-text">/do Signs the Employment Contract after carefully reading and agreeing to all of its terms.</div>
+                            </div>
+                            <div class="rp-command-block">
+                                <div class="rp-command-header"><span class="rp-type-tag tag-me">/ME COMMAND</span><button class="btn copy-btn" onclick="copySimple('/me gives the signed Employment Contract back to [HR Name].')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                                <div class="rp-command-text">/me gives the signed Employment Contract back to [HR Name].</div>
+                            </div>
+                        </div>
+
+                        <div class="glass-section" style="padding:0.75rem; background:rgba(3,7,18,0.35);">
+                            <div style="font-size:0.78rem; color:#fbbf24; font-weight:700; display:flex; align-items:center; gap:4px; margin-bottom:4px;">
+                                <span class="material-symbols-outlined" style="font-size:0.95rem;">info</span> Human Resources Mandatory Compliance
+                            </div>
+                            <div style="font-size:0.75rem; color:var(--text-muted); line-height:1.4;">
+                                All employees are expected to read the Charter carefully before signing. By signing the Employment Contract, you acknowledge that you have read, understood, and agreed to comply with all organization terms.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: ARREST & CUSTODY RP -->
+                    <div class="tab-content" id="tab-rp-arrest" style="display:none;">
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-me">/ME</span><button class="btn copy-btn" onclick="copySimple('/me unholsters handcuffs from duty belt and fastens them onto suspect\'s wrists')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/me unholsters handcuffs from duty belt and fastens them onto suspect's wrists</div>
+                            <div class="rp-command-explanation">Apply standard issue mechanical handcuffs.</div>
+                        </div>
+
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-do">/DO</span><button class="btn copy-btn" onclick="copySimple('/do Are the handcuffs securely locked and double-latched?')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/do Are the handcuffs securely locked and double-latched?</div>
+                            <div class="rp-command-explanation">Prompts suspect to state whether cuffs locked or if resistance was offered.</div>
+                        </div>
+
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-me">/ME</span><button class="btn copy-btn" onclick="copySimple('/me conducts a thorough pat-down search over suspect\'s outer garments and waistband')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/me conducts a thorough pat-down search over suspect's outer garments and waistband</div>
+                            <div class="rp-command-explanation">Conduct frisk/search of detained suspect.</div>
+                        </div>
+
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-try">/TRY</span><button class="btn copy-btn" onclick="copySimple('/try finds illegal firearms, narcotics, or stolen items on suspect')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/try finds illegal firearms, narcotics, or stolen items on suspect</div>
+                            <div class="rp-command-explanation">50/50 server check for discovering concealed contraband.</div>
+                        </div>
+
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-do">/DO</span><button class="btn copy-btn" onclick="copySimple('/do What items of identification and property would be found on suspect?')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/do What items of identification and property would be found on suspect?</div>
+                            <div class="rp-command-explanation">Queries suspect for their IC inventory items.</div>
+                        </div>
+
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-todo">/TODO</span><button class="btn copy-btn" onclick="copySimple('/todo Watch your head* guides suspect into the rear seat of the patrol cruiser')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/todo Watch your head* guides suspect into the rear seat of the patrol cruiser</div>
+                            <div class="rp-command-explanation">Spoken dialogue combined with in-game vehicle placement action.</div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: TRAFFIC STOP & SEARCH RP -->
+                    <div class="tab-content" id="tab-rp-traffic" style="display:none;">
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-me">/ME</span><button class="btn copy-btn" onclick="copySimple('/me taps the vehicle\'s rear left taillight with their left hand to leave fingerprint evidence')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/me taps the vehicle's rear left taillight with their left hand to leave fingerprint evidence</div>
+                            <div class="rp-command-explanation">Standard police procedure when approaching a stopped vehicle.</div>
+                        </div>
+
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-todo">/TODO</span><button class="btn copy-btn" onclick="copySimple('/todo Good day, Trooper with the SAHP* presents department badge and identification')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/todo Good day, Trooper with the SAHP* presents department badge and identification</div>
+                            <div class="rp-command-explanation">Formal verbal greeting and badge presentation.</div>
+                        </div>
+
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-me">/ME</span><button class="btn copy-btn" onclick="copySimple('/me receives driver\'s license and vehicle registration documents from the driver')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/me receives driver's license and vehicle registration documents from the driver</div>
+                            <div class="rp-command-explanation">Accepting documents for verification.</div>
+                        </div>
+
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-me">/ME</span><button class="btn copy-btn" onclick="copySimple('/me enters driver\'s credentials and vehicle plate into the cruiser MDT terminal')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/me enters driver's credentials and vehicle plate into the cruiser MDT terminal</div>
+                            <div class="rp-command-explanation">Checking CAD database for wanted status or suspended license.</div>
+                        </div>
+
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-me">/ME</span><button class="btn copy-btn" onclick="copySimple('/me writes down license plate and searches the license plate through the Department database')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/me writes down license plate and searches the license plate through the Department database</div>
+                            <div class="rp-command-explanation">Standard lookup of vehicle registration in police records.</div>
+                        </div>
+
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-me">/ME</span><button class="btn copy-btn" onclick="copySimple('/me Kneels down, feels the VIN number under the car and run it through Department Database')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/me Kneels down, feels the VIN number under the car and run it through Department Database</div>
+                            <div class="rp-command-explanation">Check vehicle VIN under chassis to detect swapped or stolen plates.</div>
+                        </div>
+
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-try">/TRY</span><button class="btn copy-btn" onclick="copySimple('/try finds illegal contraband or weapons inside the glovebox or trunk')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/try finds illegal contraband or weapons inside the glovebox or trunk</div>
+                            <div class="rp-command-explanation">Server check when searching an impounded or suspicious vehicle.</div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 4: FIELD SOBRIETY / DUI RP -->
+                    <div class="tab-content" id="tab-rp-dui" style="display:none;">
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-me">/ME</span><button class="btn copy-btn" onclick="copySimple('/me unclips alcohol breathalyzer device and fastens a new sterile tube')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/me unclips alcohol breathalyzer device and fastens a new sterile tube</div>
+                        </div>
+
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-todo">/TODO</span><button class="btn copy-btn" onclick="copySimple('/todo Please blow steadily into this breathalyzer for 5 seconds* holds mouthpiece to suspect')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/todo Please blow steadily into this breathalyzer for 5 seconds* holds mouthpiece to suspect</div>
+                        </div>
+
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-try">/TRY</span><button class="btn copy-btn" onclick="copySimple('/try breathalyzer display registers blood alcohol level above legal limit (0.08% BAC)')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/try breathalyzer display registers blood alcohol level above legal limit (0.08% BAC)</div>
+                            <div class="rp-command-explanation">Random check to determine if suspect fails the sobriety test.</div>
+                        </div>
+
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-do">/DO</span><button class="btn copy-btn" onclick="copySimple('/do What reading is displayed on the digital breathalyzer screen?')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/do What reading is displayed on the digital breathalyzer screen?</div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 5: MEDICAL TRIAGE RP -->
+                    <div class="tab-content" id="tab-rp-medical" style="display:none;">
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-me">/ME</span><button class="btn copy-btn" onclick="copySimple('/me kneels beside victim and places two fingers on their carotid artery to check for pulse')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/me kneels beside victim and places two fingers on their carotid artery to check for pulse</div>
+                        </div>
+
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-try">/TRY</span><button class="btn copy-btn" onclick="copySimple('/try detects a steady and palpable pulse at the victim\'s neck')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/try detects a steady and palpable pulse at the victim's neck</div>
+                        </div>
+
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-do">/DO</span><button class="btn copy-btn" onclick="copySimple('/do Is the victim breathing or bleeding heavily from gunshot wounds?')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/do Is the victim breathing or bleeding heavily from gunshot wounds?</div>
+                        </div>
+
+                        <div class="rp-command-block">
+                            <div class="rp-command-header"><span class="rp-type-tag tag-me">/ME</span><button class="btn copy-btn" onclick="copySimple('/me retrieves sterile trauma gauze and applies firm direct pressure to bleeding wound')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rp-command-text">/me retrieves sterile trauma gauze and applies firm direct pressure to bleeding wound</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL 3: PENAL CODE & CITATION ENGINE -->
+            <div class="modal-content" id="modal-penal" style="max-width: 950px;">
+                <div class="modal-header">
+                    <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-gold" style="font-size:1.4rem; margin-right:6px;">gavel</span> EN3 Penal Code &amp; Citation Engine</span>
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
+
+                <div class="modal-body-scroll">
+                    <!-- Search Input -->
+                    <div class="penal-search-bar">
+                        <span class="material-symbols-outlined penal-search-icon">search</span>
+                        <input type="text" id="penal-search-input" class="penal-search-input" placeholder="Search by penal code (e.g. 2.6.4, 3.10), crime keyword, or remarks..." autocomplete="off">
+                    </div>
+
+                    <!-- Category Chips Filter -->
+                    <div class="penal-categories-bar">
+                        <button class="penal-chip active" onclick="filterPenalCategory(this, 'ALL')">All Crimes (135)</button>
+                        <button class="penal-chip" onclick="filterPenalCategory(this, 'Crimes Against Society')">Crimes Against Society</button>
+                        <button class="penal-chip" onclick="filterPenalCategory(this, 'Crimes Against the State')">Crimes Against the State</button>
+                        <button class="penal-chip" onclick="filterPenalCategory(this, 'Malfeasance')">Malfeasance (Public Servants)</button>
+                        <button class="penal-chip" onclick="filterPenalCategory(this, 'Judicial & Statute Crimes')">Judicial &amp; Statute</button>
+                        <button class="penal-chip" onclick="filterPenalCategory(this, 'Traffic Regulations (Penal)')">Traffic Regulations</button>
+                    </div>
+
+                    <!-- Penal Code Table -->
+                    <div class="penal-table-container">
+                        <div style="padding: 0.6rem 1rem; background: rgba(15,23,42,0.8); border-bottom: 1px solid var(--card-border); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); display: grid; grid-template-columns: 90px 1fr 100px 90px 65px 70px 40px; text-transform:uppercase; letter-spacing:0.5px;">
+                            <span>Code</span>
+                            <span>Law Description</span>
+                            <span>Fine</span>
+                            <span>Sentence</span>
+                            <span>Stars</span>
+                            <span>Bail</span>
+                            <span>Charge</span>
+                        </div>
+                        <div id="penal-table-body">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Live Citation / Booking Calculation Summary -->
+                    <div class="citation-summary-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:700; font-size:0.95rem; color:var(--text-main); display:flex; align-items:center; gap:6px;">
+                                <span class="material-symbols-outlined icon-gradient-gold" style="font-size:1.15rem;">calculate</span> Citation &amp; Charge Summary
+                            </span>
+                            <button class="btn btn-secondary btn-xs" onclick="window.app.clearSelectedCharges()" style="color:#ef4444;">
+                                <span class="material-symbols-outlined" style="font-size:0.85rem;">delete</span> Clear Selection
+                            </button>
+                        </div>
+
+                        <div class="citation-stats-grid">
+                            <div class="citation-stat-box">
+                                <div class="citation-stat-title">Total Fine</div>
+                                <div class="citation-stat-val money" id="stat-total-fine">$0</div>
+                            </div>
+                            <div class="citation-stat-box">
+                                <div class="citation-stat-title">Total Sentence</div>
+                                <div class="citation-stat-val sentence" id="stat-total-sentence">-</div>
+                            </div>
+                            <div class="citation-stat-box">
+                                <div class="citation-stat-title">Wanted Stars</div>
+                                <div class="citation-stat-val stars" id="stat-max-stars">-</div>
+                            </div>
+                            <div class="citation-stat-box">
+                                <div class="citation-stat-title">Bail Eligibility</div>
+                                <div class="citation-stat-val" id="stat-bail-status">-</div>
+                            </div>
+                        </div>
+
+                        <!-- Formatted In-Game PDA Text Box -->
+                        <div class="input-group" style="margin-top:0.4rem; margin-bottom:0;">
+                            <label style="display:flex; justify-content:space-between;">
+                                <span>In-Game PDA Charge Format (Flex 'J' Muscle)</span>
+                                <span style="color:var(--text-muted); font-size:0.7rem;">Ready to paste directly into PDA wanted issue</span>
+                            </label>
+                            <div id="citation-pda-text" style="background:rgba(3,7,18,0.7); border:1px solid var(--card-border); padding:0.75rem; border-radius:10px; font-family:'JetBrains Mono',monospace; font-size:0.84rem; color:#38bdf8; min-height:44px; word-break:break-all;">
+                                Select one or more penal codes above to generate PDA citation charges...
+                            </div>
+                        </div>
+
+                        <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+                            <button class="btn btn-primary" id="btn-copy-pda" style="flex:1; min-width:140px; padding:0.65rem;" onclick="window.app.copyPdaCitation()">
+                                <span class="material-symbols-outlined" style="font-size:1rem;">content_copy</span> Copy for PDA (J)
+                            </button>
+                            <button class="btn btn-info discord-jump-btn" data-discord-channel="finelog" style="padding:0.65rem 0.9rem;" onclick="window.app.openDiscordChannel('finelog')">
+                                <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> #fine-log
+                            </button>
+                            <button class="btn btn-success discord-jump-btn" data-discord-channel="arrestlogs" style="padding:0.65rem 0.9rem;" onclick="window.app.openDiscordChannel('arrestlogs')">
+                                <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> #arrest-logs
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL 4: ARRESTING PROCEDURE & 25-MIN TIMER -->
+            <div class="modal-content" id="modal-arrest" style="max-width: 900px;">
+                <div class="modal-header">
+                    <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-rose" style="font-size:1.4rem; margin-right:6px;">lock_clock</span> Arrest Procedure &amp; 25-Minute Timer</span>
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
+
+                <div class="modal-body-scroll">
+                    <!-- 25-Minute Timer Interactive Card -->
+                    <div class="arrest-timer-card">
+                        <div class="timer-circle-wrap">
+                            <svg class="timer-svg" viewBox="0 0 170 170">
+                                <circle class="timer-bg-circle" cx="85" cy="85" r="75"></circle>
+                                <circle class="timer-progress-circle" id="timer-progress-circle" cx="85" cy="85" r="75"></circle>
+                            </svg>
+                            <div class="timer-center-text">
+                                <span class="timer-countdown-display" id="arrest-modal-countdown">25:00</span>
+                                <span class="timer-countdown-label">ARREST TIMER</span>
+                            </div>
+                        </div>
+
+                        <div id="arrest-timer-status-text" style="font-size:0.85rem; font-weight:700; margin-bottom:0.6rem;">
+                            <span style="color:var(--text-muted);">STANDBY (25 MINUTE LIMIT)</span>
+                        </div>
+
+                        <div class="timer-action-buttons">
+                            <button class="btn btn-success" style="flex:1;" onclick="window.app.startArrestTimer()">
+                                <span class="material-symbols-outlined">play_arrow</span> Start 25m Timer
+                            </button>
+                            <button class="btn btn-warning" style="flex:1;" onclick="window.app.pauseArrestTimerForLawyer()">
+                                <span class="material-symbols-outlined">pause</span> Pause (Lawyer)
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="window.app.resetArrestTimer()">
+                                <span class="material-symbols-outlined">refresh</span> Reset
+                            </button>
+                        </div>
+
+                        <!-- Lawyer Sub-Timers -->
+                        <div class="lawyer-subtimers-grid">
+                            <div class="subtimer-box">
+                                <span class="subtimer-name">Private Lawyer (15m)</span>
+                                <span class="subtimer-val" id="subtimer-private-val">15:00</span>
+                                <button class="btn btn-secondary btn-xs" onclick="window.app.startSubTimer('private', 15*60, 'subtimer-private-val')">Start</button>
+                            </div>
+                            <div class="subtimer-box">
+                                <span class="subtimer-name">State Call Wait (2m)</span>
+                                <span class="subtimer-val" id="subtimer-state-val">02:00</span>
+                                <button class="btn btn-secondary btn-xs" onclick="window.app.startSubTimer('stateCall', 2*60, 'subtimer-state-val')">Start</button>
+                            </div>
+                            <div class="subtimer-box">
+                                <span class="subtimer-name">Bodycam Proof (10m)</span>
+                                <span class="subtimer-val" id="subtimer-bodycam-val">10:00</span>
+                                <button class="btn btn-secondary btn-xs" onclick="window.app.startSubTimer('bodycam', 10*60, 'subtimer-bodycam-val')">Start</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step-by-Step Arrest Guide -->
+                    <div class="glass-section">
+                        <div class="section-title"><span class="material-symbols-outlined icon-gradient-blue" style="font-size:1.15rem; margin-right:4px;">list_alt</span> Standard Operating Arrest Workflow</div>
+
+                        <div class="copy-blocks-grid">
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 1: Handcuff Suspect (Flex 'Z' Muscle)</span><button class="btn copy-btn" onclick="copySimple('Sir/Mam I am going to be putting you in handcuffs now, please stand still.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">Sir/Mam I am going to be putting you in handcuffs now, please stand still.</div>
+                                <div style="font-size:0.75rem; color:var(--text-muted); padding: 0.3rem 0.95rem; background:rgba(3,7,18,0.3);">
+                                    *Always holster weapon before action. Suspect must stand still. If fleeing, taze suspect.
+                                </div>
+                            </div>
+
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 2: Grab by Arm (Flex 'X' Muscle)</span><button class="btn copy-btn" onclick="copySimple('Sir/Mam I am going to be grabing you by the arm now.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">Sir/Mam I am going to be grabing you by the arm now.</div>
+                            </div>
+
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 3: Vehicle Placement (Flex 'C' Muscle on Suspect)</span><button class="btn copy-btn" onclick="copySimple('Sir/Mam I am going to be placing you in the vehicle now, please watch your head.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">Sir/Mam I am going to be placing you in the vehicle now, please watch your head.</div>
+                            </div>
+
+                            <div class="copy-block" style="border-color:rgba(56,189,248,0.35);">
+                                <div class="copy-header" style="background:rgba(56,189,248,0.1);">
+                                    <span style="color:#38bdf8; font-weight:700;">Step 4: Miranda Rights Recitation (Read 1 to 3 times)</span>
+                                    <button class="btn copy-btn" onclick="copySimple('You are under arrest. You have the right to remain silent. Anything you say can and will be used against you in a court of law. You have the right to an attorney. If you cannot afford an attorney, one will be appointed to you by the state if available. Do you understand the rights I just read to you?')">
+                                        <span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span>
+                                    </button>
+                                </div>
+                                <div class="copy-content" style="color:#38bdf8;">
+"You are under arrest,
+You have the right to remain silent,
+Anything you say can and will be used against you in the court of law.
+You have the right to an attorney,
+If you cannot afford an attorney, one will be appointed to you by the state if available.
+Do you understand the rights I just read to you?"
+                                </div>
+                                <div style="font-size:0.75rem; color:var(--text-muted); padding: 0.4rem 0.95rem; background:rgba(3,7,18,0.3);">
+                                    *If suspect ignores or states they don't understand, wait 5 seconds and repeat (up to 3 times total). After 3 attempts, inform them you read them 3 times.
+                                </div>
+                            </div>
+
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 5: DOC Transport Radio Call</span><button class="btn copy-btn" onclick="copySimple('(BADGE NUMBER) To Dispatch, I am 10-17 to DOC with (NUMBER) of 10-15 and convoy.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">(BADGE NUMBER) To Dispatch, I am 10-17 to DOC with (NUMBER) of 10-15 and convoy.</div>
+                            </div>
+
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 6: DOC Jumpsuit Size Check</span><button class="btn copy-btn" onclick="copySimple('Sir/Mam What size jumpsuit are you?')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">Sir/Mam What size jumpsuit are you?</div>
+                                <div class="copy-content" style="border-top:1px solid rgba(255,255,255,0.06); color:#94a3b8;">/me grabs a *SIZE* jumpsuit from behind the counter</div>
+                            </div>
+
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 7: Search &amp; Confiscation (Flex 'G' -> Org -> Search)</span><button class="btn copy-btn" onclick="copySimple('Sir/Mam I am going to search you for any identification and illegal items.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">Sir/Mam I am going to search you for any identification and illegal items.</div>
+                                <div style="font-size:0.75rem; color:var(--text-muted); padding: 0.4rem 0.95rem; background:rgba(3,7,18,0.3);">
+                                    *Seize weapons with serial 'XXX' or government weapons. Allow 'AMMO' weapons only if valid gun license held. Log photos in #confiscation-logs.
+                                </div>
+                            </div>
+
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 8: Final Jumpsuit &amp; Jailing (Flex 'G' -> Org -> Arrest)</span><button class="btn copy-btn" onclick="copySimple('Sir/Mam I am going to be putting you in your jumpsuit now.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">Sir/Mam I am going to be putting you in your jumpsuit now.</div>
+                            </div>
+
+                            <div class="copy-block">
+                                <div class="copy-header"><span>Step 9: 10-99 Booking Completed Radio Call</span><button class="btn copy-btn" onclick="copySimple('(BADGE NUMBER) to dispatch, show my last 10-15 is now 10-99 and I am 10-19.')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">(BADGE NUMBER) to dispatch, show my last 10-15 is now 10-99 and I am 10-19.</div>
+                            </div>
+                        </div>
+                        <div style="margin-top:0.85rem;">
+                            <button class="btn btn-success discord-jump-btn" data-discord-channel="arrestlogs" style="width:100%; padding:0.65rem 1rem;" onclick="window.app.openDiscordChannel('arrestlogs')">
+                                <span class="material-symbols-outlined" style="font-size:1.15rem;">upload_file</span> Open #arrest-logs on Discord
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL 5: TRAFFIC CODES & IMPOUND CALCULATOR -->
+            <div class="modal-content" id="modal-traffic" style="max-width: 900px;">
+                <div class="modal-header">
+                    <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.4rem; margin-right:6px;">speed</span> Traffic Codes &amp; Impound Regulations</span>
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
+
+                <div class="modal-body-scroll">
+                    <!-- Speed Limits Banner -->
+                    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:0.6rem;">
+                        <div class="glass-section" style="padding:0.75rem; text-align:center;">
+                            <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;">Public Roads</div>
+                            <div style="font-family:'JetBrains Mono',monospace; font-size:1.4rem; font-weight:800; color:#38bdf8;">140 km/h</div>
+                            <div style="font-size:0.68rem; color:var(--text-muted);">Non-highway roads</div>
+                        </div>
+                        <div class="glass-section" style="padding:0.75rem; text-align:center;">
+                            <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;">Highways &amp; Freeways</div>
+                            <div style="font-family:'JetBrains Mono',monospace; font-size:1.4rem; font-weight:800; color:#10b981;">200 km/h</div>
+                            <div style="font-size:0.68rem; color:var(--text-muted);">All San Andreas highways</div>
+                        </div>
+                        <div class="glass-section" style="padding:0.75rem; text-align:center;">
+                            <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;">Special Zones (§5.4)</div>
+                            <div style="font-family:'JetBrains Mono',monospace; font-size:1.4rem; font-weight:800; color:#f59e0b;">90 km/h</div>
+                            <div style="font-size:0.68rem; color:var(--text-muted);">LSPD, Hospital, Capitol, etc.</div>
+                        </div>
+                    </div>
+
+                    <!-- Impound Fee Calculator -->
+                    <div class="glass-section" style="border-color:rgba(56,189,248,0.3);">
+                        <div class="section-title"><span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.15rem; margin-right:4px;">calculate</span> Vehicle Impound Fee Calculator (T.C. 8.1 - 10% State Value)</div>
+                        <div class="grid-layout" style="align-items:end;">
+                            <div class="input-group" style="margin-bottom:0;">
+                                <label>Vehicle State Value ($)</label>
+                                <input type="number" id="impound-state-value" placeholder="e.g. 200000" oninput="window.app.calculateImpoundFee(this.value)">
+                            </div>
+                            <div style="background:rgba(3,7,18,0.6); border:1px solid var(--card-border); padding:0.6rem 1rem; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-size:0.75rem; color:var(--text-muted);">Required Impound Fee:</span>
+                                <span id="impound-fee-result" style="font-family:'JetBrains Mono',monospace; font-size:1.25rem; font-weight:800; color:#34d399;">$0</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-warning discord-jump-btn" data-discord-channel="towing" style="margin-top:0.75rem; width:100%;" onclick="window.app.openDiscordChannel('towing')">
+                            <span class="material-symbols-outlined" style="font-size:1.1rem;">upload_file</span> Open #towing-logs on Discord
+                        </button>
+                    </div>
+
+                    <!-- Traffic Codes Table -->
+                    <div class="penal-table-container">
+                        <div style="padding: 0.6rem 1rem; background: rgba(15,23,42,0.8); border-bottom: 1px solid var(--card-border); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); display: grid; grid-template-columns: 110px 1fr 100px 80px 1fr; text-transform:uppercase; letter-spacing:0.5px;">
+                            <span>Code</span>
+                            <span>Law Description</span>
+                            <span>Fine</span>
+                            <span>Sentence</span>
+                            <span>Remarks / Towing</span>
+                        </div>
+                        <div id="traffic-table-body">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL 6: ARTICLE 7 PARKING REGULATIONS -->
+            <div class="modal-content" id="modal-article7" style="max-width: 900px;">
+                <div class="modal-header">
+                    <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-emerald" style="font-size:1.4rem; margin-right:6px;">local_parking</span> Article 7 Parking Regulations</span>
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
+
+                <div class="modal-body-scroll">
+                    <!-- Legend -->
+                    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:0.5rem;">
+                        <div style="background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.4); padding:0.6rem; border-radius:10px; text-align:center;">
+                            <div style="font-weight:700; color:#34d399; font-size:0.8rem;">GREEN</div>
+                            <div style="font-size:0.68rem; color:var(--text-muted);">Allowed for All Citizens</div>
+                        </div>
+                        <div style="background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.4); padding:0.6rem; border-radius:10px; text-align:center;">
+                            <div style="font-weight:700; color:#fbbf24; font-size:0.8rem;">ORANGE</div>
+                            <div style="font-size:0.68rem; color:var(--text-muted);">State Vehicles Only</div>
+                        </div>
+                        <div style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); padding:0.6rem; border-radius:10px; text-align:center;">
+                            <div style="font-weight:700; color:#f87171; font-size:0.8rem;">RED</div>
+                            <div style="font-size:0.68rem; color:var(--text-muted);">Prohibited for Everyone</div>
+                        </div>
+                        <div style="background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.4); padding:0.6rem; border-radius:10px; text-align:center;">
+                            <div style="font-weight:700; color:#38bdf8; font-size:0.8rem;">BLUE</div>
+                            <div style="font-size:0.68rem; color:var(--text-muted);">Allowed Parking Direction</div>
+                        </div>
+                    </div>
+
+                    <!-- Location List -->
+                    <div id="article7-cards-container" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:0.75rem;">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL 7: PROHIBITED ITEMS CHECKLIST -->
+            <div class="modal-content" id="modal-prohibited" style="max-width: 700px;">
+                <div class="modal-header">
+                    <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-amber" style="font-size:1.4rem; margin-right:6px;">block</span> §2.4 List of Prohibited Items</span>
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
+
+                <div class="modal-body-scroll">
+                    <p style="font-size:0.82rem; color:var(--text-muted); line-height:1.5;">
+                        Possession of any items listed below is subject to immediate confiscation and criminal charges under <strong>P.C. 2.4.1 (1-3 units: $15,000 fine)</strong> or <strong>P.C. 2.4.2 (3+ units: $20,000 fine + 30 months prison, Felony Class D)</strong>.
+                    </p>
+
+                    <div class="glass-section">
+                        <ul style="padding-left:1.2rem; font-size:0.86rem; line-height:1.8; color:#f1f5f9;">
+                            <li><strong>Unregistered Firearms:</strong> All firearms without a serial number (tagged as <em>XXX</em>).</li>
+                            <li><strong>State Weapons:</strong> Government-issued weapons or melees (FIB / SAHP / LSPD / GOV / NG markings).</li>
+                            <li><strong>State Armor:</strong> Ballistic vests with state agency markings.</li>
+                            <li><strong>Illegal Body Armor:</strong> Ballistic vests of any color except standard legal gray (Gang vests, Louis Vuitton, patterned vests).</li>
+                            <li><strong>Weapon Components:</strong> Spare weapon parts and modification kits.</li>
+                            <li><strong>Facial Coverings:</strong> State-issued tactical balaclavas.</li>
+                            <li><strong>Electronic Tools:</strong> Vehicle scanners, Engine blockers, and Search Base Hack units.</li>
+                            <li><strong>Burglar Equipment:</strong> Lockpicks, master key sets, or illegal door bypass tools.</li>
+                            <li><strong>False Credentials:</strong> Counterfeit identification badges or forged police IDs.</li>
+                            <li><strong>Countermeasures:</strong> Anti-radar detectors and vehicle jammers.</li>
+                            <li><strong>Financial Contraband:</strong> Counterfeit currency.</li>
+                            <li><strong>Surveillance:</strong> People scanners and illicit tracking bugs.</li>
+                            <li><strong>Stolen Goods:</strong> Televisions, boxed furniture, appliances without purchase receipts.</li>
+                            <li><strong>Controlled Deliveries:</strong> Medical supplies and alcohol outside authorized commercial transport (P.C. 2.4.3).</li>
+                        </ul>
+                    </div>
+
+                    <button class="btn btn-primary discord-jump-btn" data-discord-channel="confiscation" onclick="window.app.openDiscordChannel('confiscation')" style="width:100%;">
+                        <span class="material-symbols-outlined">upload_file</span> Open #confiscation-logs on Discord
+                    </button>
+                </div>
+            </div>
+
+            <!-- MODAL 8: SETTINGS & CONFIGURATION -->
+            <div class="modal-content" id="modal-settings">
+                <div class="modal-header">
+                    <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-slate" style="font-size:1.4rem; margin-right:6px;">tune</span> Settings &amp; Configuration</span>
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
+
+                <div class="modal-body-scroll">
+                    <div class="grid-layout">
+                        <!-- Profile & Callsign -->
+                        <div class="glass-section">
+                            <div class="section-title"><span class="material-symbols-outlined" style="font-size:1.1rem; margin-right:4px;">badge</span> Officer Profile</div>
+                            <div class="input-group">
+                                <label>Officer Call Sign / Name</label>
+                                <input type="text" id="settingOfficerName" placeholder="e.g. Officer Sergey [701]">
+                            </div>
+                            <div class="input-group">
+                                <label>Badge Number</label>
+                                <input type="text" id="settingBadgeNum" placeholder="e.g. 701">
+                            </div>
+                        </div>
+
+                        <!-- Preferences & Terminal Display (Skip Boot Screen Toggle) -->
+                        <div class="glass-section">
+                            <div class="section-title"><span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.1rem; margin-right:4px;">settings_suggest</span> Preferences &amp; Terminal Display</div>
+                            <div class="setting-toggle-row">
+                                <div class="toggle-info">
+                                    <div class="toggle-label">Skip Initial Boot / Splash Screen</div>
+                                    <div class="toggle-desc">Bypass startup animation and load tactical terminal immediately</div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="settingShowBootScreen">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="setting-toggle-row" style="margin-top: 0.85rem;">
+                                <div class="toggle-info">
+                                    <div class="toggle-label">MDT Tactical Audio / Squelch FX</div>
+                                    <div class="toggle-desc">Synthesized radio clicks, duty chimes, and timer alerts</div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="settingSoundFX" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Discord Routing -->
+                        <div class="glass-section" style="grid-column: 1 / -1;">
+                            <div class="section-title"><span class="material-symbols-outlined icon-gradient-blue" style="font-size:1.1rem; margin-right:4px;">tag</span> Discord Channel IDs (Grand Role Play)</div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;">
+                                <div class="input-group">
+                                    <label>Discord Server ID</label>
+                                    <input type="text" id="settingDiscordServer" value="1035906370102370364">
+                                </div>
+                                <div class="input-group">
+                                    <label>#【🎟】fine-log</label>
+                                    <input type="text" id="settingChanFineLog" value="1256874088140378154">
+                                </div>
+                                <div class="input-group">
+                                    <label>#【👮⛓】arrest-logs</label>
+                                    <input type="text" id="settingChanArrest" value="1126042574168260679">
+                                </div>
+                                <div class="input-group">
+                                    <label>#【⛔】confiscations-logs</label>
+                                    <input type="text" id="settingChanConfiscation" value="1056669110211182612">
+                                </div>
+                                <div class="input-group">
+                                    <label>#【🚥】towing-logs</label>
+                                    <input type="text" id="settingChanTowing" value="1052029071929909368">
+                                </div>
+                                <div class="input-group">
+                                    <label>#bodycam / pov-logs</label>
+                                    <input type="text" id="settingChanBodycam" value="1357931144435466341">
+                                </div>
+                                <div class="input-group">
+                                    <label>#【🚔】radar-logs</label>
+                                    <input type="text" id="settingChanRadar" value="1266676923514486874">
+                                </div>
+                                <div class="input-group">
+                                    <label>#【📝】radio-codes</label>
+                                    <input type="text" id="settingChanRadio" value="1255991443378409688">
+                                </div>
+                            </div>
+                            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.4rem;">
+                                * Tip: If any channel ID is blank or cleared, buttons to jump to that Discord channel will automatically be hidden.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Config Export & Import -->
+                    <div class="glass-section">
+                        <div class="section-title"><span class="material-symbols-outlined icon-gradient-purple" style="font-size:1.1rem; margin-right:4px;">share</span> Share, Backup &amp; Baseline</div>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.8rem;">
+                            Export your custom configurations and duty notes as shareable <code style="color:var(--secondary); background:rgba(56,189,248,0.1); padding:1px 4px; border-radius:4px;">.txt</code> files.
+                        </p>
+                        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                            <input type="text" id="export-filename-input" placeholder="SAHP_Trooper_Config" style="flex:1; min-width:200px;">
+                            <button class="btn btn-primary" onclick="window.app.exportDb()">
+                                <span class="material-symbols-outlined">download</span> Export Config (.txt)
+                            </button>
+                            <input type="file" id="import-db-file" style="display:none;" accept=".txt,.json">
+                            <button class="btn btn-secondary" onclick="document.getElementById('import-db-file').click()">
+                                <span class="material-symbols-outlined">upload_file</span> Import Config (.txt)
+                            </button>
+                        </div>
+                        <div style="display:flex; gap:0.5rem; margin-top:0.8rem;">
+                            <button class="btn btn-secondary btn-sm" onclick="window.app.saveCurrentAsDefault()" style="flex:1;">
+                                <span class="material-symbols-outlined" style="font-size:0.95rem; color:#34d399;">bookmark_added</span> Save As Baseline
+                            </button>
+                            <button class="btn btn-warning btn-sm" onclick="window.app.resetToSavedDefaults()" style="flex:1;">
+                                <span class="material-symbols-outlined" style="font-size:0.95rem;">restore</span> Restore Baseline
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="window.app.resetToFactoryDefaults()">
+                                <span class="material-symbols-outlined" style="font-size:0.95rem;">restart_alt</span> Factory Reset
+                            </button>
+                        </div>
+                        <div id="user-defaults-status-badge" style="font-size:0.75rem; color:#fbbf24; margin-top:0.5rem; text-align:center;">
+                            No Baseline Set
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL 9: QUICK NOTEPAD -->
+            <div class="modal-content" id="modal-notes" style="max-width: 720px;">
+                <div class="modal-header">
+                    <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-amber" style="font-size:1.4rem; margin-right:6px;">edit_note</span> Quick Officer Notepad</span>
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
+
+                <div class="modal-body-scroll">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-secondary btn-sm" onclick="window.app.copyQuickNotes()">
+                                <span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span> Copy All
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="window.app.clearQuickNotes()" style="color: #ef4444;">
+                                <span class="material-symbols-outlined" style="font-size:0.95rem;">delete_sweep</span> Clear
+                            </button>
+                        </div>
+                        <div id="notes-auto-save-status" style="font-size: 0.8rem; color: #34d399; display: flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-outlined" style="font-size:0.95rem;">cloud_done</span> Auto-saved
+                        </div>
+                    </div>
+
+                    <textarea id="quick-notes-textarea" class="quick-notes-editor" placeholder="Write or paste your active suspect notes, badge numbers, witness statements, license plate numbers, or arrest log drafts here... Everything is auto-saved locally in real-time." spellcheck="false"></textarea>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--text-muted);">
+                        <span id="notes-char-count">0 characters | 0 lines</span>
+                        <span style="color: #94a3b8; font-style: italic;">Auto-saved to local browser storage</span>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- End of modalOverlay -->
+
+        <!-- CONSOLIDATED TACTICAL FLOATING DOCK -->
+        <div class="tactical-dock" id="tactical-dock">
+            <button class="dock-btn" onclick="openModal('modal-notes')" title="Quick Field Notepad" aria-label="Quick Notepad">
+                <span class="material-symbols-outlined icon-gradient-amber">edit_note</span>
+                <span class="dock-tooltip">Notepad</span>
+            </button>
+            <button class="dock-btn" onclick="openModal('modal-penal')" title="Penal Code &amp; Citation Calculator" aria-label="Penal Calculator">
+                <span class="material-symbols-outlined icon-gradient-gold">gavel</span>
+                <span class="dock-tooltip">Penal Engine</span>
+            </button>
+            <button class="dock-btn" onclick="openModal('modal-arrest')" title="25-Min Custody Timer" aria-label="Arrest Timer">
+                <span class="material-symbols-outlined icon-gradient-rose">lock_clock</span>
+                <span id="dock-arrest-val" class="dock-badge hidden">25:00</span>
+                <span class="dock-tooltip">Custody Timer</span>
+            </button>
+            <button class="dock-btn" id="dock-audio-btn" onclick="window.app.toggleAudio()" title="MDT Audio FX" aria-label="Toggle Audio">
+                <span class="material-symbols-outlined" id="dock-audio-icon" style="color: #38bdf8;">volume_up</span>
+                <span class="dock-tooltip">Audio FX</span>
+            </button>
+            <button class="dock-btn dock-badge-btn" onclick="openAboutTeam()" title="SAHP Command &amp; Manual" aria-label="About SAHP">
+                <img src="SAHP-LOGO.png" alt="SAHP" class="dock-sahp-logo">
+                <span class="dock-tooltip">About SAHP</span>
+            </button>
+        </div>
+
+    </div> <!-- End of app-container -->
+
+    <!-- FULL PAGE: ABOUT SAHP COMPANION SECTION -->
+    <div id="about-team-page" class="modal-overlay" style="z-index: 1000;" role="dialog" aria-modal="true">
+        <div class="modal-content" style="max-width: 800px; display:flex;">
+            <div class="modal-header">
+                <span style="display:flex; align-items:center; gap:8px;">
+                    <img src="SAHP-LOGO.png" alt="SAHP" style="width:28px; height:28px;">
+                    <span>San Andreas Highway Patrol - MDT Companion</span>
+                </span>
+                <button class="close-btn" onclick="closeAboutTeam()"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="modal-body-scroll" style="text-align:center; padding: 2rem;">
+                <img src="SAHP-LOGO.png" alt="SAHP Badge" style="width: 140px; height: 140px; margin: 0 auto 1.2rem; filter: drop-shadow(0 0 20px rgba(245,158,11,0.5));">
+                <h2 style="font-size:1.5rem; font-weight:800; color:var(--text-main); margin-bottom:0.4rem;">SAHP TROOPER MDT COMPANION</h2>
+                <div style="font-size:0.9rem; color:var(--secondary); font-weight:600; letter-spacing:1px; margin-bottom:1.2rem;">SAFETY AND SERVICE • TO PROTECT AND SERVE</div>
+                <p style="font-size:0.86rem; color:var(--text-muted); line-height:1.6; max-width:600px; margin:0 auto 1.5rem;">
+                    Built from the <strong>Official EN3 Highway Patrol Guide</strong>. Featuring full live Penal Code search (135+ codes), instant fine &amp; prison sentence calculators, in-game PDA citation text formatting, step-by-step 25-minute arrest countdown timer with lawyer pauses, traffic codes, Article 7 parking maps, bodycam sequences, and direct Discord channel integrations.
+                </p>
+                <div style="display:flex; justify-content:center; gap:1rem;">
+                    <button class="btn btn-primary" onclick="closeAboutTeam(); openModal('modal-penal');">Open Penal Code</button>
+                    <button class="btn btn-success" onclick="closeAboutTeam(); openModal('modal-arrest');">Open Arrest Timer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

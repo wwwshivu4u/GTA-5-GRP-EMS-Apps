@@ -1,0 +1,63 @@
+__MIRANDA RIGHTS__
+You have the right to remain silent, anything you say can and will be used against you in the court of law. You have the right to an attorney, if you cannot afford an attorney, one will be appointed to you by the state, if available.
+
+__Martial Law (No Government Present)__
+You have right to remain silent,
+Anything you say can and will be used against you in the court of law,
+Due to the Martial Law, There are no state attorneys available.
+
+Do You Understand your rights I just read to you?
+*Make sure to read the rights at least 3 times. If they don't respond, state:*
+I will take your silence as a yes.
+
+---
+
+__Status Codes__
+Code A: (( Game crash ))
+Code B: (( Paused RP, admin situation ))
+Code 1: Life-threatening emergency, all response. Drop what you are doing and respond immediately (lights and sirens)
+Code 2: Semi-emergency (lights only)
+Code 3: Emergency (lights and sirens)
+Code 4: Situation under control / All clear
+Code 5: Terrorist attack
+Code 6: Out of vehicle
+Code 7: Conducting an investigation
+
+---
+
+__Radio Codes (10-Codes)__
+10-1: Roll call / Announcement — all units return to headquarters
+10-2: Negative
+10-3: Stop Transmitting
+10-4: Acknowledged / Affirmative
+10-5: Repeat Last Transmission
+10-6: Disregard the Last Transmission
+10-7: Break at Headquarters (AFK)
+10-8: In-service / Available
+10-9: Out of Service / Unavailable
+10-10: Shots Fired
+TANGO 10-10: Training Shots Fired
+10-11: Robbery in Progress
+10-12: Estimated Time of Arrival
+10-13: Agent / Government Employee Down (Top Priority)
+10-15: Suspect in Custody
+10-16: Injured Civilian
+10-17: En route
+10-19: Return to the Headquarters
+10-20: Location
+10-21: Status Check (Specify your current status and location)
+10-22: Hostage Situation
+10-23: Arrived at Scene
+10-32: Backup Needed (Specify the number of units and location)
+10-35: Ambulance Needs Assistance
+10-41: Start of Watch
+10-42: End of Watch
+10-51: Vehicle Traffic Stop
+10-52: Felony Traffic Stop
+10-70: Suspect has Warrants
+10-75: Vehicle Wanted / Stolen
+10-80: Vehicle Pursuit
+10-80 Foxtrot: Foot Pursuit
+10-90: Crime in Progress
+10-92: Armed Robbery in Progress
+10-99: Situation concluded

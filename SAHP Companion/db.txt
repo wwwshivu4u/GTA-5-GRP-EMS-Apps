@@ -1,0 +1,52 @@
+{
+  "discordServerId": "1035906370102370364",
+  "discordChannels": {
+    "finelog": "1256874088140378154",
+    "arrestlogs": "1126042574168260679",
+    "confiscation": "1056669110211182612",
+    "towing": "1052029071929909368",
+    "radiocodes": "1255991443378409688",
+    "codea": "1154377770168754218",
+    "radarlogs": "1266676923514486874",
+    "bodycam": "1357931144435466341",
+    "interview": "1269769031460851794",
+    "hiring": "1372874164716699660",
+    "contracts": "1269769097529397299",
+    "bonus": "1169404214049509396"
+  },
+  "shiftRates": {
+    "nightPatrol": 35000,
+    "nightHighway": 40000,
+    "nightDetective": 30000,
+    "dayPatrol": 20000,
+    "dayHighway": 25000,
+    "dayDetective": 15000,
+    "towingBounty": 5000,
+    "arrestBounty": 10000
+  },
+  "selectedLocation": "Patrol (Highway / Paleto)",
+  "dutySteps": {
+    "od1": false,
+    "od2": false,
+    "od3": false,
+    "ref1": false,
+    "ref2": false,
+    "sav1": false,
+    "sav2": false,
+    "off1": false,
+    "off2": false,
+    "off3": false
+  },
+  "customCommands": {
+    "od1": "/me Takes out Bodycam and attaches Bodycam to chest and checks its ballistic, water proof",
+    "od2": "/me Makes sure it is recording and checks for the red light",
+    "od3": "/do It is recording, and its ballistic, water proof",
+    "ref1": "/me Refreshes the bodycam",
+    "ref2": "/do It is recording, and its ballistic, water proof",
+    "sav1": "/me Saves bodycam, uploads it to the SAHP Cloud Server",
+    "sav2": "/do It is recording, and its ballistic, water proof",
+    "off1": "/me Switches off the bodycam and checks for the Green Light",
+    "off2": "/do Bodycam footage has been saved to SD Card",
+    "off3": "/me Uploads the bodycam footage to the SAHP Cloud Server"
+  }
+}

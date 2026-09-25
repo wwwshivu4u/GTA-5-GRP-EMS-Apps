@@ -1,0 +1,67 @@
+// @3 | Trainee // @4 | Probie 
+Headwear - Option 1, Color 1
+Outwear - Option 4, Color 1
+Pants - Option 1, Color 1
+Shoes - Option 4, Color 1
+Accessories - Option 3, Color 1
+Additional Accessories - Option 2 , Color 1
+@5 | Probation Trooper // @6 | Trooper I // @7 | Trooper II // @8 | Trooper III 
+Headwear - Option 1, Color 1
+Outwear - Option 12, Color 1
+Pants - Option 8, Color 1
+Shoes - Option 1, Color 2
+Accessories - Option 12, Color 1
+Additional accessories option 8 , color 1
+@9 | Senior Trooper I // @10 | Senior Trooper II 
+Headwear - Option 1, Color 1
+Outwear - Option 12, Color 1
+Pants - Option 2, Color 1
+Shoes - Option 8, Color 1
+Accessories - Option 9, Color 3
+Additional Accessories - Option 9, Color 1
+@11 | Senior Trooper III  // @12 | Master Trooper I 
+Headwear - Option 1, Color 1
+Outwear - Option 20, Color 1
+Pants - Option 3, Color 1
+Shoes - Option 8, Color 1
+Accessories - Option 9, Color 3
+Additional Accessories - Option 3, Color 1
+@13 | Master Trooper II // @14 | Master Trooper III // @15 | Corporal 
+Headwear - Option 1, Color 1
+Outwear - Option 10, Color 1
+Pants - Option 2, Color 1
+Shoes - Option 8, Color 1
+Accessories - Option 9, Color 3
+Additional Accessories - Option 8, Color 1
+
+@16 | Senior Corporal // @17 | Master Corporal // @18 | Sergeant // @19 | Senior Sergeant 
+Headwear - Option 1, Color 1
+Outwear - Option 3, Color 1
+Pants - Option 2, Color 1
+Shoes - Option 8, Color 1
+Accessories - Option 9, Color 3
+Additional Accessories - Option 8, Color 1
+
+@20 | Supervisor 
+Headwear - Option 1, Color 1
+Outwear - Option 3, Color 1
+Pants - Option 3, Color 1
+Shoes - Option 2, Color 1
+Accessories - Option 8, Color 1
+Additional Accessories - Option 6, Color 1
+
+@21 | Captain 
+Headwear - Option 1, Color 1
+Outwear - Option 8, Color 1
+Pants - Option 7, Color 1
+Shoes - Option 7, Color 1
+Accessories - Option 4, Color 1
+Additional Accessories - Option 6, Color 1
+
+@22 | Lieutenant 
+Headwear - Option 1, Color 1
+Outwear - Option 15, Color 2
+Pants - Option 7, Color 1
+Shoes - Option 7, Color 1
+Accessories - Option 4, Color 1
+Additional Accessories - Option 8, Color 1

@@ -29,6 +29,15 @@
         "**/.*",
         "**/node_modules/**"
       ]
+    },
+    {
+      "target": "sahp-companion",
+      "public": "SAHP Companion",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ]
     }
   ]
 }
